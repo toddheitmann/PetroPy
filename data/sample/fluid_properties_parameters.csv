@@ -1,0 +1,3 @@
+name,mast,temp_grad,press_grad,rws,rwt,rmfs,rmft,p_sep,t_sep,yn2,yco2,yh2s,yh20,gas_grav,oil_api,rs,lith_grad,biot,pr
+default,67,0.015,0.5,0.1,70,0.4,100,100,100,0,0,0,0,0.67,38,0,1.03,0.8,0.25
+WFMP,77,0.01,0.5,0.08,70,0.4,100,100,100,0,0,0,0,0.78,40,0,1.03,0.8,0.25
