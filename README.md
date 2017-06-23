@@ -1,8 +1,14 @@
-![PetroPy Logo](https://github.com/toddheitmann/PetroPy/blob/master/petropy_logo.png)
+<div align="center">
+  <img src="https://github.com/toddheitmann/PetroPy/blob/master/petropy_logo.png"><br>
+</div>
 
 # PetroPy
 
-A petrophysics for python package allowing scientific python computing of conventional and unconventional formation evaluation. Reads las files and creates a [pandas](http://pandas.pydata.org) dataframe of the log data. Includes a basic petrophysical workflow and a simple log viewer based on XML templates.
+A petrophysics with python package allowing scientific python computing of conventional and unconventional formation evaluation. Reads las files and creates a [pandas](http://pandas.pydata.org) dataframe of the log data. Includes a basic petrophysical workflow and a simple log viewer based on XML templates.
+
+<div align="center">
+  <img src="https://github.com/toddheitmann/PetroPy/blob/master/university_6-17_no1.png"><br>
+</div>
 
 ## Requirements
 
@@ -19,10 +25,9 @@ The basic workflow in the module is functional, but requires downloading source 
 
 ### Features
 
-1. Read wrapped las files
-2. Curve edit module for shifting data
-3. Electrofacies module
-4. Add to pypi package registry
+1. Curve edit module for shifting data
+2. Electrofacies module
+3. Add to pypi package registry
 
 ### Examples
 

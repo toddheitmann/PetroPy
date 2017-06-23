@@ -10,6 +10,7 @@ performed after reading the raw data.
 
 import os
 import sys
+import numpy as np
 import pandas as pd
 
 from log import Log, Parameter
@@ -30,6 +31,9 @@ class Las(Log):
     ------
     ValueError
         If NULL not found in header
+
+    ValueError
+        If inconsistent number of columns in wrapped data between depth steps
 
     Examples
     --------
@@ -138,16 +142,63 @@ class Las(Log):
                 break
 
         cleaned_data = []
+        cleaned_rows_len = [] # for use if las data is wrapped
         for row in data:
             values = row.strip().split(' ')
-            cleaned_data.append(list(filter(lambda x: x != '', values)))
+            cleaned_row = list(filter(lambda x: x != '', values))
+            cleaned_data.append(cleaned_row)
+            cleaned_rows_len.append(len(cleaned_row))
+
+        if 'WRAP' in self.version_values:
+            if 'YES' in self.version_values['WRAP'].value:
+                self.version_values['WRAP'].value = 'NO'
+                wrapped = True
+            elif 'YES' in self.version_values['WRAP'].right_value:
+                self.version_values['WRAP'].right_value = 'NO'
+                wrapped = True
+            elif 'YES' in self.version_values['WRAP'].des:
+                self.version_values['WRAP'].des = 'NO'
+                wrapped = True
+            else:
+                wrapped = False
+
+        if wrapped:
+            data_arr = np.asarray(cleaned_data)
+            rows_len_arr = np.asarray(cleaned_rows_len)
+            data_df = pd.DataFrame(cleaned_data)
+
+            unique_lengths = np.unique(np.asarray(rows_len_arr))
+            if len(unique_lengths) == 3:
+                depth_indexes = np.where(rows_len_arr == 1)[0]
+                cleaned_data = np.vstack(np.take(data_arr, depth_indexes))
+                for d in range(depth_indexes[0] + 1, depth_indexes[1]):
+                    added_rows = data_df.iloc[depth_indexes + d].as_matrix()
+                    cleaned_data = np.concatenate((cleaned_data, added_rows), axis = 1)
+
+            elif len(unique_lengths) == 2:
+                # use only even indexes as the odd single row values contain
+                # wrapped data and are not depth values
+                depth_indexes = np.where(rows_len_arr == 1)[0][::2]
+                cleaned_data = np.vstack(np.take(data_arr, depth_indexes))
+                for d in range(depth_indexes[0] + 1, depth_indexes[1]):
+                    added_rows = data_df.iloc[depth_indexes + d].as_matrix()
+                    cleaned_data = np.concatenate((cleaned_data, added_rows), axis = 1)
+
+            else:
+                raise ValueError('Inconsistent values for wrapped data.')
+
+            deleted_columns = []
+            for column, value in enumerate(cleaned_data[0]):
+                if value is None:
+                    deleted_columns.append(column)
+            cleaned_data = np.delete(cleaned_data, deleted_columns, 1)
 
         self.curve_df = pd.DataFrame(cleaned_data, columns = self.curve_parameters)
 
         for column in self.curve_df.columns:
             self.curve_df[column] = self.curve_df[column].astype(float)
 
-
+        ### get uwi from parameters if available ###
         if 'UWI' in self.well_parameters:
             uwi_param = self.well_values['UWI']
         elif 'uwi' in self.well_parameters:

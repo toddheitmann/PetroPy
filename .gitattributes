@@ -1,0 +1,2 @@
+# use python for las files to notate python repository
+*.las linguist-language=Python
