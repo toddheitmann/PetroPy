@@ -16,6 +16,7 @@ A petrophysics with python package allowing scientific python computing of conve
 - [scipy](https://www.scipy.org)
 - [pandas](http://pandas.pydata.org)
 - [matplotlib](http://matplotlib.org)
+- [sci-kit learn](http://scikit-learn.org/stable/) (for electrofacies)
 
 ## Currently Version 0.0
 
@@ -24,32 +25,37 @@ The basic workflow in the module is functional, but requires downloading source 
 ## TO DO version 0.1
 
 ### Features
-
-1. Curve edit module for shifting data
-2. Electrofacies module
-3. Add to pypi package registry
+- [x] Read las files
+- [x] Calculate fluid properties
+- [x] Calculate multimineral, posority, saturation model
+- [x] Calculate and export statistics
+- [x] Curve edit manual manipulation
+- [x] Curve edit module for shifting data
+- [x] Electrofacies module
+- [ ] Replace log object by subclassing [lasio](https://github.com/kinverarity1/lasio) object
+- [ ] Add to pypi package registry
 
 ### Examples
 
-1. Add Sphinx Documentation
-2. Add Wolfcamp example from University Lands
-3. Add Mississippi Limestone Example from KGS
-4. Add Dataframe manipulation for different petrophysics crossplots
+- [ ] Sphinx Documentation
+- [ ] Wolfcamp example from University Lands
+- [ ] Mississippi Limestone Example from KGS
+- [ ] Dataframe manipulation for different petrophysical crossplots
+- [ ] Template creation for log viewer
 
 ## TO DO version 0.2
 
 ### Features
-
-1. Histogram module for normalization
+- [ ] Histogram module for normalization
 
 ## TO DO version 0.3
 
 ### Extended Features with Geologic Software
 
-1. Create Geographix GGXLog object
-  1. Read Well with UWI input
-  2. Save calculations to Database
+[ ] Create Geographix GGXLog object
+  - [ ] Read Well with UWI input
+  - [ ] Save calculations to Database
 
-2. Create Petra PetraLog object
-  1. Read Well with UWI input
-  2. Save calculations to Database
+[ ] Create Petra PetraLog object
+  - [ ]Read Well with UWI input
+  - [ ] Save calculations to Database

@@ -34,11 +34,16 @@ def log_data(source):
         'WFMP': os.path.join(file_dir, '..', 'data', 'sample', '42303347740000.las')
     }
 
+    tops = {
+        'WFMP': os.path.join(file_dir, '..', 'data', 'sample', 'tops.csv')
+    }
+
     if source in paths:
         las_path = paths[source]
     else:
         raise ValueError('%s is not valid source' % source)
 
     log = Las(las_path)
+    log.tops_from_csv(tops[source])
 
     return log
