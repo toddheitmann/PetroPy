@@ -64,7 +64,7 @@ class LogViewer(object):
 
     """
 
-    def __init__(self, log, template_xml_path = None, template_defaults = None, top = None, height = None, edit_mode = True, window_location = (10, 30)):
+    def __init__(self, log, template_xml_path = None, template_defaults = None, top = None, height = None, edit_mode = False, window_location = (10, 30)):
         """
         Creates LogViewer Object
 
@@ -77,15 +77,17 @@ class LogViewer(object):
         log : Log
             A Log object with curve data to display in the LogViewer
         template_xml_path : str (default None)
-            path to xml template.
+            Path to xml template.
         template_defaults : str {'raw', 'multimin_oil', 'multimin_gas', 'multimin_oil_sum', 'multimin_gas_sum'} (default None)
-            name of default template options. Uses prebuilt template to display data
+            Name of default template options. Uses prebuilt template to display data
         top : float (default None)
-            setting to set initial top of graph
+            Setting to set initial top of graph
         height : float (default None)
-            setting to set amout of feet to display
+            Setting to set amout of feet to display
+        edit_mode : boolean (default False)
+            Setting to allow editing of curve data
         window_location : float, float tuple (default 10, 30)
-            tuple of floats to specify top left location of LogViewer when showing in edit_mode == True
+            Tuple of floats to specify top left location of LogViewer when showing in edit_mode == True
 
         Raises
         ------
@@ -135,7 +137,7 @@ class LogViewer(object):
 
         self._radio_button = None # radio button for editing modes
 
-        self._display_name_to_curve_name = {} # display name to curve_df column name dictionary
+        self._display_name_to_curve_name = {} # display name to log column name dictionary
 
         default_templates_paths = {
             'raw': 'default_raw_template.xml',
@@ -169,7 +171,7 @@ class LogViewer(object):
         if 'top' in root.attrib and top is None:
             top = float(root.attrib['top'])
         elif top is None:
-            top = self.log.curve_df.DEPTH.min()
+            top = self.log[0].min()
 
         if 'height' in root.attrib and height is None:
             bottom = top + float(root.attrib['height'])
@@ -263,7 +265,7 @@ class LogViewer(object):
                 if 'font_size' in track.attrib:
                     font_size = float(track.attrib['font_size'])
 
-                max_depth = self.log.curve_df.DEPTH.max()
+                max_depth = self.log[0].max()
                 ticks = range(0, int(max_depth) + tick_spacing, tick_spacing)
                 numbers = range(0, int(max_depth) + number_spacing, number_spacing)
                 lines = range(0, int(max_depth) + line_spacing, line_spacing)
@@ -290,14 +292,14 @@ class LogViewer(object):
 
                 curve_sums = []
                 colors = []
-                summation = np.asarray(self.log.curve_df.DEPTH * 0)
+                summation = np.asarray(self.log[0] * 0)
                 for c, curve in enumerate(track):
                     ### names ###
                     if 'curve_name' not in curve.attrib:
                         raise ValueError('Curve Name required in template at %s' % template_xml_path)
                     curve_name = curve.attrib['curve_name']
 
-                    if curve_name not in self.log.curve_df.columns.values:
+                    if curve_name not in self.log.keys():
                         raise ValueError('Curve %s not found in log.' % curve_name)
 
                     if 'fill_color' not in curve.attrib:
@@ -305,8 +307,8 @@ class LogViewer(object):
 
                     fill_color = curve.attrib['fill_color']
 
-                    increase = summation + np.asarray(self.log.curve_df[curve_name])
-                    ax.fill_betweenx(self.log.curve_df.DEPTH,
+                    increase = summation + np.asarray(self.log[curve_name])
+                    ax.fill_betweenx(self.log[0],
                                      summation,
                                      increase,
                                      color = fill_color)
@@ -331,7 +333,7 @@ class LogViewer(object):
                     dist = abs(left - right) / num_major_lines
                     major_lines = np.arange(left + dist, right, dist)
                     for m in major_lines:
-                        ax.plot((m, m), (0, self.log.curve_df.DEPTH.max()), color = '#c0c0c0', lw = 0.5)
+                        ax.plot((m, m), (0, self.log[0].max()), color = '#c0c0c0', lw = 0.5)
 
                 ax.set_xlim(left, right)
                 if invert_axis:
@@ -347,7 +349,7 @@ class LogViewer(object):
                     else:
                         raise ValueError('Curve Name required in template at %s' % template_xml_path)
 
-                    if curve_name not in self.log.curve_df.columns.values:
+                    if curve_name not in self.log.keys():
                         raise ValueError('Curve %s not found in log.' % curve_name)
 
                     ### style and scale ###
@@ -393,14 +395,14 @@ class LogViewer(object):
 
                     if scale == 'log':
                         ax.set_xlim(left, right)
-                        x = self.log.curve_df[curve_name]
+                        x = self.log[curve_name]
                         m = None
                         b = None
                     else:
                         ax.set_xlim(0,1)
                         m = (1 - 0) / (right - left)
                         b = -m * left
-                        x = m * self.log.curve_df[curve_name] + b
+                        x = m * self.log[curve_name] + b
                         left = 0
                         right = 1
 
@@ -439,13 +441,13 @@ class LogViewer(object):
                             fill_color = curve.attrib['fill_color']
 
                         if curve.attrib['fill'] == 'left':
-                            ax.fill_betweenx(self.log.curve_df.DEPTH,
+                            ax.fill_betweenx(self.log[0],
                                              left,
                                              x,
                                              color = fill_color)
 
                         elif curve.attrib['fill'] == 'right':
-                             ax.fill_betweenx(self.log.curve_df.DEPTH,
+                             ax.fill_betweenx(self.log[0],
                                               x,
                                               right,
                                               color = fill_color)
@@ -461,13 +463,13 @@ class LogViewer(object):
                             v = m * cutoff_value + b
                         else:
                             v = cutoff_value
-                        ax.fill_betweenx(self.log.curve_df.DEPTH,
+                        ax.fill_betweenx(self.log[0],
                                          v,
                                          x,
                                          color = fill_color,
                                          where = v < x)
-                        ax.plot(v * np.ones(len(self.log.curve_df.DEPTH[v < x])),
-                                self.log.curve_df.DEPTH[v < x], c = "#000000", lw = 0.5)
+                        ax.plot(v * np.ones(len(self.log[0][v < x])),
+                                self.log[0][v < x], c = "#000000", lw = 0.5)
 
                     if 'left_cutoff_fill' in curve.attrib:
 
@@ -480,13 +482,13 @@ class LogViewer(object):
                             v = m * cutoff_value + b
                         else:
                             v = cutoff_value
-                        ax.fill_betweenx(self.log.curve_df.DEPTH,
+                        ax.fill_betweenx(self.log[0],
                                          v,
                                          x,
                                          color = fill_color,
                                          where = x < v)
-                        ax.plot(v * np.ones(len(self.log.curve_df.DEPTH[x < v])),
-                                self.log.curve_df.DEPTH[x < v], c = "#000000", lw = 0.5)
+                        ax.plot(v * np.ones(len(self.log[0][x < v])),
+                                self.log[0][x < v], c = "#000000", lw = 0.5)
 
                     if 'left_crossover' in curve.attrib:
 
@@ -495,7 +497,7 @@ class LogViewer(object):
                             fill_color = curve.attrib['left_crossover_fill_color']
 
                         left_curve = curve.attrib['left_crossover']
-                        if left_curve not in self.log.curve_df.columns.values:
+                        if left_curve not in self.log.keys():
                             raise ValueError('Curve %s not found in log.' % left_curve)
 
                         if 'left_crossover_left' not in curve.attrib and \
@@ -509,11 +511,11 @@ class LogViewer(object):
                         if scale != 'log':
                             m = (1 - 0) / (left_crossover_right - left_crossover_left)
                             b = -m * left_crossover_left
-                            v = m * self.log.curve_df[left_curve] + b
+                            v = m * self.log[left_curve] + b
                         else:
-                            v = self.log.curve_df[left_curve]
+                            v = self.log[left_curve]
 
-                        ax.fill_betweenx(self.log.curve_df.DEPTH,
+                        ax.fill_betweenx(self.log[0],
                                          x,
                                          v,
                                          color = fill_color,
@@ -526,7 +528,7 @@ class LogViewer(object):
                             fill_color = curve.attrib['right_crossover_fill_color']
 
                         left_curve = curve.attrib['right_crossover']
-                        if left_curve not in self.log.curve_df.columns.values:
+                        if left_curve not in self.log.keys():
                             raise ValueError('Curve %s not found in log.' % left_curve)
 
                         if 'right_crossover_left' not in curve.attrib and \
@@ -540,18 +542,18 @@ class LogViewer(object):
                         if scale != 'log':
                             m = (1 - 0) / (left_crossover_right - left_crossover_left)
                             b = -m * left_crossover_left
-                            v = m * self.log.curve_df[left_curve] + b
+                            v = m * self.log[left_curve] + b
                         else:
-                            v = self.log.curve_df[left_curve]
+                            v = self.log[left_curve]
 
-                        ax.fill_betweenx(self.log.curve_df.DEPTH,
+                        ax.fill_betweenx(self.log[0],
                                          x,
                                          v,
                                          color = fill_color,
                                          where = v > x)
 
                     curve_line = ax.plot(x,
-                                 self.log.curve_df.DEPTH,
+                                 self.log[0],
                                  c = color,
                                  lw = width,
                                  ls = line_style,
@@ -568,7 +570,7 @@ class LogViewer(object):
                     dist = abs(left - right) / num_major_lines
                     major_lines = np.arange(left + dist, right, dist)
                     for m in major_lines:
-                        ax.plot((m, m), (0, self.log.curve_df.DEPTH.max()), color = '#c0c0c0', lw = 0.5)
+                        ax.plot((m, m), (0, self.log[0].max()), color = '#c0c0c0', lw = 0.5)
 
         if max_track_curves < 5:
             max_track_curves = 5
@@ -665,20 +667,24 @@ class LogViewer(object):
 
         plt.show()
 
-    def write(self, file_path, top_depth = None, bottom_depth = None):
+    def write(self, file_object, version = None, wrap = None, STRT = None, STOP = None, STEP = None, fmt = '%10.5g'):
         """
         Writes log stored in viewer to file.
 
         Parameters
         ----------
-        file_path : str
-            a path to save the las
-        top_depth : float (default None)
-            the start depth of the las file. If None, will begin at the top of
-            recorded data
-        bottom_depth : float (default None)
-            end depth of the las file. If None, will export to the end of
-            recorded data
+        file_object : file
+            a file_like object opening for writing.
+        version : float (default None)
+            las version either 1.2 or 2
+        wrap : bool
+            Boolean to write a wrapped las file. If not provided, will default to WRAP item in Log object
+        STRT : float
+            Optional override to automatic calculation using the first index curve value.
+        STEP :  float
+            Optional override to automatic calculation using the first step size in the index curve.
+        fmt : str
+            Format string for numerical data being written to data section.
 
         Example
         -------
@@ -686,11 +692,12 @@ class LogViewer(object):
         >>> log = ptr.log_data('WFMP') # sample Wolfcamp log
         >>> viewer = ptr.LogViewer(log, edit_mode = True) # allow edits when viewing
         >>> viewer.show() # display and graphically edit log
-        >>> viewer.write('new_file_name.las') # save edits to new las file
+        >>> with open('new_file.las', 'w') as f:
+        ...     viewer.write('new_file_name.las') # save edits to new las file
 
         """
 
-        self.log.write(file_path, top_depth = top_depth, bottom_depth = bottom_depth)
+        self.log.write(file_object, version = None, wrap = None, STRT = None, STOP = None, STEP = None, fmt = '%10.5g')
 
     def _curve_pick(self, event):
         """
@@ -741,19 +748,18 @@ class LogViewer(object):
 
     def _draw_curve(self, event):
         """
-        Event handler for changing data in the figure and in the curve_df dataframe. Connected on line
+        Event handler for changing data in the figure and in the log object. Connected on line
         613 with 'motion_notify_event'.
         """
 
         if self._radio_button.value_selected == 'Manual Edit' and self._edit_lock:
             x, y = event.xdata, event.ydata
 
-            curve_df_name = self._display_name_to_curve_name[self._edit_curve.get_text()]
+            curve_name = self._display_name_to_curve_name[self._edit_curve.get_text()]
 
-            cursor_depth_index = np.argmin(np.abs(self.log.curve_df.DEPTH - y))
-            depth = self.log.curve_df.iloc[cursor_depth_index].DEPTH
-
-            line, m, b = self._edit_curve_lines[curve_df_name]
+            cursor_depth_index = np.argmin(np.abs(self.log[0] - y))
+            depth = self.log[0][cursor_depth_index]
+            line, m, b = self._edit_curve_lines[curve_name]
 
             x_data = line.get_xdata()
             x_data[cursor_depth_index] = x
@@ -762,7 +768,7 @@ class LogViewer(object):
             if m is not None and b is not None:
                 x = (x - b) / m
 
-            self.log.curve_df.loc[cursor_depth_index, curve_df_name] =  x
+            self.log[curve_name][cursor_depth_index] =  x
 
             self.fig.canvas.draw()
 
@@ -770,12 +776,12 @@ class LogViewer(object):
 
             x, y = event.xdata, event.ydata
 
-            curve_df_name = self._display_name_to_curve_name[self._edit_curve.get_text()]
+            curve_name = self._display_name_to_curve_name[self._edit_curve.get_text()]
 
-            cursor_depth_index = np.argmin(np.abs(self.log.curve_df.DEPTH - y))
-            depth = self.log.curve_df.iloc[cursor_depth_index].DEPTH
+            cursor_depth_index = np.argmin(np.abs(self.log[0] - y))
+            depth = self.log[0][cursor_depth_index]
 
-            line, m, b = self._edit_curve_lines[curve_df_name]
+            line, m, b = self._edit_curve_lines[curve_name]
 
             x_data = line.get_xdata()
             x_diff = x_data[cursor_depth_index] - x
@@ -785,6 +791,12 @@ class LogViewer(object):
             if m is not None and b is not None:
                 x_data = (x_data - b) / m
 
-            self.log.curve_df[curve_df_name] = x_data
+            self.log[curve_name] = x_data
 
             self.fig.canvas.draw()
+
+from datasets import log_data
+
+log = log_data('WFMP')
+viewer = LogViewer(log)
+viewer.show()

@@ -5,7 +5,7 @@ Datasets is a way to retrieve included logs with petropy
 """
 
 import os
-from las import Las
+from log import Log
 
 def log_data(source):
     """
@@ -43,7 +43,7 @@ def log_data(source):
     else:
         raise ValueError('%s is not valid source' % source)
 
-    log = Las(las_path)
+    log = Log(las_path)
     log.tops_from_csv(tops[source])
 
     return log

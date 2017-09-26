@@ -10,25 +10,71 @@ from sklearn.preprocessing import StandardScaler
 from sklearn.decomposition import PCA
 from sklearn.cluster import MiniBatchKMeans
 
-from log import Parameter
+def electrofacies(logs, formations, curves, n_clusters, log_scale = [], n_components = 0.85, curve_name = 'FACIES'):
+    """
+    Electrofacies function to group intervals by rock type. Also referred to as heterogenous rock analysis.
 
-def electrofacies(logs, curves, formations, n_clusters, log_scale = [], n_components = 0.85):
+    Parameters
+    ----------
+    logs : list of Log objects
+        List of Log objects
+    formations: list of formation names
+        List of strings containg formation names which should be previously loaded into Log objects
+    curves : list of curve names
+        List of strings containing curve names as inputs in the electrofacies calculations
+    n_clusters : int
+        Number of clusters to group intervals. Number of electrofacies.
+    log_scale : list of curve names
+        List of string containing curve names which are preprocessed on a log scale. For example, deep
+        resistivity separates better on a log scale, and is graph logarithmically when viewing data in
+        a log viewer.
+    n_components : int, float, None or string (default 0.85)
+        Number of principal components to keep. If value is less than one, the number of principal
+        components be the number required to exceed the explained variance.
+    curve_name : str (default 'FACIES')
+        Name of the new electrofacies curve.
+
+    Example
+    -------
+    >>> # loads sample Wolfcamp calculates electrofacies for that well
+    >>> import petropy as ptr
+    >>> log = ptr.log_data('WFMP') # reads sample Wolfcamp Log from las file
+    >>> logs = [log]
+    >>> f = ['WFMPA', 'WFMPB', 'WFMPC']
+    >>> c = ['GR_N', 'RESDEEP_N', 'RHOB_N', 'NPHI_N', 'PE_N']
+    >>> scale = ['RESDEEP_N']
+    >>> logs = electrofacies(logs, f, c, 8, log_scale = scale)
+
+    >>> # loads logs from a list of paths and calculates electrofacies across the wells
+    >>> import petropy as ptr
+    >>> file_paths = ['path/to/log1.las', 'path/to/log2.las', 'path/to/log3.las']
+    >>> logs = [ptr.Log(x) for x in file_paths] # create list of Log objects
+    >>> tops_csv = 'path/to/tops.csv'
+    >>> for log in logs:
+            log.tops_from_csv(tops_csv) # add formation tops to wells
+    >>> f = ['FORM1', 'FORM2'] # list of formation tops. If single formation use f = ['FORM']
+    >>> c = ['GR_N', 'RESDEEP_N', 'RHOB_N', 'NPHI_N', 'PE_N']
+    >>> scale = ['RESDEEP_N']
+    >>> logs = electrofacies(logs, f, c, 8, log_scale = scale) # run electrofacies across logs in list
+
+    """
 
     df = pd.DataFrame()
 
     for log in logs:
 
-        if log.uwi == '':
+        if log.well['UWI'] is None:
             raise ValueError('UWI required for log identification.')
 
-        log.curve_df['UWI'] = log.uwi
+        log_df = log.df()
+        log_df['UWI'] = log.well['UWI'].value
+        log_df['DEPTH_INDEX'] = np.arange(0, len(log[0]))
 
         for formation in formations:
             top = log.tops[formation]
             bottom = log.next_formation_depth(formation)
-            df = df.append(log.curve_df[(log.curve_df.DEPTH >= top) & (log.curve_df.DEPTH < bottom)])
-
-        log.curve_df.drop(['UWI'], 1, inplace = True)
+            depth_index = np.intersect1d(np.where(log[0] >= top)[0], np.where(log[0] < bottom)[0])
+            df = df.append(log_df.iloc[depth_index])
 
     for s in log_scale:
         df[s] = np.log(df[s])
@@ -42,6 +88,7 @@ def electrofacies(logs, curves, formations, n_clusters, log_scale = [], n_compon
     components = pd.DataFrame(data = pc.transform(X), index = df[not_null_rows].index)
     components.columns = ['PC%i' % x for x in range(1, pc.n_components_ + 1)]
     components['UWI'] = df.loc[not_null_rows, 'UWI']
+    components['DEPTH_INDEX'] = df.loc[not_null_rows, 'DEPTH_INDEX']
 
     size = len(components) // 20
     if size > 10000:
@@ -49,28 +96,39 @@ def electrofacies(logs, curves, formations, n_clusters, log_scale = [], n_compon
     elif size < 100:
         size = 100
 
-    facies = MiniBatchKMeans(n_clusters = n_clusters, batch_size = size).fit_predict(components)
-
-    df.loc[not_null_rows, 'FACIES'] = facies
+    df.loc[not_null_rows, curve_name] = MiniBatchKMeans(n_clusters = n_clusters, batch_size = size).fit_predict(components)
 
     for log in logs:
 
-        uwi = log.uwi
+        uwi = log.well['UWI'].value
 
         for v, vector in enumerate(pc.components_):
             v += 1
-            column = 'PC%i' % v
+            pc_curve = 'PC%i' % v
 
             ### add eigenvector data to header ###
 
-            pc_parameter = Parameter(name = column, unit = '', des = 'Principal Component from electrofacies')
-            log.curve_parameters.append(pc_parameter)
-            log.curve_values.append(column)
-            log.curve_df = log.curve_df.join(components[components.UWI == uwi][column])
+            if pc_curve in log.keys():
+                data = log[pc_curve]
+                depth_index = components.loc[components.UWI == uwi, 'DEPTH_INDEX']
+                data[depth_index] = np.copy(components.loc[components.UWI == uwi, pc_curve])
+            else:
+                data = np.empty(len(log[0]))
+                data[:] = np.nan
+                depth_index = components.loc[components.UWI == uwi, 'DEPTH_INDEX']
+                data[depth_index] = np.copy(components.loc[components.UWI == uwi, pc_curve])
+                log.add_curve(pc_curve, np.copy(data),
+                              descr = 'Pricipal Component %i from electrofacies' % v)
 
-        facies_parameter = Parameter(name = 'FACIES', unit = '', des = 'Electrofacies')
-        log.curve_parameters.append(facies_parameter)
-        log.curve_values.append('FACIES')
-        log.curve_df = log.curve_df.join(df[df.UWI == uwi]['FACIES'])
+        if curve_name in log.keys():
+            data = log[curve_name]
+            depth_index = df.loc[df.UWI == uwi, 'DEPTH_INDEX']
+            data[depth_index] = df.loc[df.UWI == uwi, curve_name]
+        else:
+            data = np.empty(len(log[0]))
+            data[:] = np.nan
+            depth_index = components.loc[components.UWI == uwi, 'DEPTH_INDEX']
+            data[depth_index] = np.copy(components.loc[components.UWI == uwi, pc_curve])
+            log.add_curve(curve_name, np.copy(data), descr = 'Electrofacies')
 
     return logs

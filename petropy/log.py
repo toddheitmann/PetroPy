@@ -1,7 +1,6 @@
 ﻿# -*- coding: utf-8 -*-
 """
-Log contains parent classes to work with log data, the Parameter class
-and the Log class.
+Log contains parent classes to work with log data.
 
 The Log class is subclassed based on the source of information. This way,
 regardless of the data source, petrophysical calculations are available on the
@@ -17,237 +16,26 @@ import numpy as np
 import datetime as dt
 from scipy.optimize import nnls
 
+from lasio import LASFile, CurveItem
 
-class Parameter(object):
+class Log(LASFile):
     """
-    A Parameter from the log header data.
+    Log
 
-    The parameter class stores header data from logs in both version 1 and 2
-    formats. There are two main ways to initialize:
-
-        1. providing a header line from an las file
-
-            This reads the line and parses out correct values for las file of
-            version 1 and version 2
-
-        2. providing specific paramter values
-
-            This specifies each parameter value and leaves line as an empty
-            str.
-
-    Attributes
-    ----------
-    line: str
-        Unformated raw str of the header line from an las file
-    name: str
-        name of the well parameter
-    unit: str
-        unit of the well parameter
-    value: str
-        value of the well parameter
-    right_value: str
-        right adjusted value for las version 1
-    des: str
-        parameter description
-    """
-
-    def __init__(self, line = '', name = '', unit = '', value = '', right_value = '', des = ''):
-
-        """
-        initialize Parameter object
-
-        Parameters
-        ----------
-        line: str, optional
-            str of the header line from an las file
-        name: str, optional
-            name of the well parameter
-        unit: str, optional
-            unit of the well parameter
-        value: str, optional
-            value of the well parameter
-        right_value: str, optional
-            right adjusted value for las version 1
-        des: str, optional
-            parameter description
-
-        Raises
-        ------
-        ValueError
-            If name or line is not specified, initialization raises a value
-            error. The name or line variable is required to correctly parse
-            into an object.
-
-        Example
-        -------
-        >>> kb = Parameter(name = 'EKB', unit = 'FT', value = '1000.00', des = 'Elevation of Kelly Bushing')
-
-        """
-
-        if len(line) > 0:
-            line = line.strip()
-            self.name = line.split('.')[0].strip()
-            start = len(line.split('.')[0]) + 1
-
-            if len(line.split(':')) == 2:
-                ### only one : in line ###
-                self.des = line.split(':')[-1].strip()
-            else:
-                ### check for time stamp ###
-                matches = re.compile(r'\d{2}:\d{2}').findall(line)
-                if len(matches) > 0:
-                    ### time stamp in value field ###
-                    first_index = line.index(':')
-                    second_index = line.index(':', first_index + 1)
-                    self.des = line[second_index + 1:].strip()
-                else:
-                    ### : found in description ###
-                    index = line.index(':') + 1
-                    self.des = line[index:].strip()
-
-            if len(self.des) > 3:
-                end = len(line) - (len(self.des) + 3)
-            else:
-                end = len(line) - (len(self.des) + 1)
-
-            line = line[start: end].split(' ')
-            i = -1
-            self.right_value = ''
-            if line[-1] != '':
-                right_values = []
-                data = line[i]
-                while data != '':
-                    right_values.append(data)
-                    i -= 1
-                    data = line[i]
-                for value in reversed(right_values):
-                    self.right_value += value + ' '
-                self.right_value = self.right_value[:-1]
-            self.unit = line[0]
-            line = list(filter(lambda x: x != '', line[1:i]))
-            self.value = ''
-            for l in line:
-                self.value += l + ' '
-            self.value = self.value[:-1].strip()
-        elif len(name) > 0:
-            self.name = name
-            self.unit = unit
-            self.value = value
-            self.right_value = right_value
-            self.des = des
-        else:
-            raise ValueError('A name or line must be specified to create a Parameter object.')
-
-    def to_string(self):
-        """
-        Format parameter string for las file export.
-
-        Returns
-        ------
-        output
-            A string of the Parameter for use in las file format version 2
-
-        Example
-        -------
-        >>> kb = Parameter(name = 'EKB', unit = 'FT', value = '1000.00', des = 'Elevation of Kelly Bushing')
-        >>> print(kb.to_string())
-        EKB         .F           1000.00                           :Elevation of Kelly Bushing
-
-        """
-        output = self.name.ljust(12, ' ') + '.'
-        output += self.unit.ljust(12, ' ')
-        output += self.value.ljust(36, ' ')
-        right_adjustment = max(0 - (len(self.right_value) + 2), -44)
-        if right_adjustment != -2:
-            output = output[:right_adjustment] + self.right_value + ': '
-        else:
-            output = output[:right_adjustment] + self.right_value + ':'
-        output += self.des
-        return output
-
-
-class Log(object):
-    """
-    Well Log
-
-    Parent class for all petrophysical calculations with subclasses for reading
-    and writing to specific databases or data types. Parameter names
-    are stored in a list to maintain order as order is important when reading
-    and writing curve data.
-
-    Attributes
-    ----------
-    uwi : str
-        Unique Well Identifier
-    null : str
-        null value in log
-    version_parameters : list
-        A list of the names of parameters assocaited with the version of the las
-        file.
-    version_values : dict
-        A dictionary of Parameter objects associated with the las version
-        section of the las file. The names of the objects are keys and found in
-        the version_parameters list.
-    well_parameters : list
-        A list of the names of parameters assocaited with the well in the las
-        header.
-    well_values : dict
-        A dictionary of Parameter objects associated with the well parameter
-        section of the las file. The names of the objects are keys and found in
-        the well_parameters list.
-    parameter_parameters : list
-        A list of the names of parameters assocaited with the parameter section
-        in the las header.
-    parameter_values : dict
-        A dictionary of Parameter objects associated with the parameters
-        section of the las file. The names of the objects are keys and found in
-        the parameter_parameters list.
-    curve_parameters : list
-        A list of the names of curves in the las file.
-    curve_values : dict
-        A dictionary of Parameter objects associated with the curve
-        section of the las file. The names of the objects are keys and found in
-        the curve_parameters list.
-    curve_df : DataFrame
-        A PANDAS DataFrame containing the log responses
-    fluid_properties_parameters : dict
-        A dictionary of parameter dictionaries for fluid properties calculations
-    multimineral_parameters : dict
-        A dictionary of parameter dictionaries for multimineral calculations
-    tops : dict
-        A dictionary of tops : depth
-
-
-    See also
-    --------
-    Las
-        The subclass of Log for working with raw or standalone las files.
+    Subclass of LASFile to provide an extension for all petrophysical calculations.
 
     """
 
 
-    def __init__(self):
+    def __init__(self, file_ref = None, drho_matrix = 2.71, **kwargs):
 
-        self.uwi = ''
-        self.null = ''
+        if file_ref is not None:
+            LASFile.__init__(self, file_ref = file_ref, **kwargs)
 
-        self.version_parameters = []
-        self.version_values = {}
+        self.precondition(drho_matrix = drho_matrix)
 
-        self.well_parameters = []
-        self.well_values = {}
-
-        self.parameter_parameters = []
-        self.parameter_values = {}
-
-        self.curve_parameters = []
-        self.curve_values = {}
-
-        self.curve_df = pd.DataFrame()
-
-        self.fluid_properties_parameters = {}
-        self.multimineral_parameters = {}
-
+        self.fluid_properties_parameters_from_csv()
+        self.multimineral_parameters_from_csv()
         self.tops = {}
 
 
@@ -255,18 +43,11 @@ class Log(object):
         """
         Preconditions log curve by aliasing names.
 
-        Precondition is used after initializing data by subclasses and
-        standardizes names for future calculations.
+        Precondition is used after initializing data and standardizes names for future calculations.
 
         Notes
         -----
             1. Curve Alias is provided by the curve_alias.xml file
-
-
-        See Also
-        --------
-        Las : :__init__: ~`las.Las.__init__`
-            Uses precondition by default when reading las file
 
         Parameters
         ----------
@@ -281,12 +62,6 @@ class Log(object):
         file_dir = os.path.dirname(__file__)
         ALIAS_XML_PATH = os.path.join(file_dir, '..', 'data', 'sample', 'curve_alias.xml')
 
-        if not hasattr(self, 'curve_df'):
-            raise ValueError('curve_df not found for log')
-
-        if not hasattr(self, 'curve_parameters'):
-            raise ValueError('Curve Names not found for log')
-
         if not os.path.isfile(ALIAS_XML_PATH):
             raise ValueError('Could not find alias xml at: %s' % ALIAS_XML_PATH)
 
@@ -295,37 +70,17 @@ class Log(object):
 
         for alias in root:
             for curve in alias:
-                if curve.tag in self.curve_parameters:
-                    if alias.tag not in self.curve_parameters:
-                        self.curve_df[alias.tag] = self.curve_df[curve.tag]
-                        line = self.curve_values[curve.tag]
-                        name = alias.tag
-                        unit = line.unit
-                        des = line.des
-                        value = line.value
-                        right_value = line.right_value
-                        self.curve_parameters.append(alias.tag)
-                        self.curve_values[name] = Parameter(name = name,
-                                                            unit = unit,
-                                                            value = value,
-                                                            right_value = right_value,
-                                                            des = des)
+                if curve.tag in self.keys():
+                    if alias.tag not in self.keys():
+                        curve_item = self.curves[curve.tag]
+                        self.add_curve(alias.tag, self[curve.tag], unit = curve_item.unit,
+                                       value = curve_item.value, descr = curve_item.descr)
                     break
 
-        if 'RHOB_N' not in self.curve_parameters and 'DPHI_N' in self.curve_parameters:
-            self.curve_parameters.append('RHOB_N')
-            self.curve_values['RHOB_N'] = Parameter(name = 'RHOB_N',
-                                                    unit = 'g/cc',
-                                                    des = 'Bulk Density from DPHI')
-            self.curve_df['RHOB_N'] = drho_matrix - (drho_matrix - 1) * self.curve_df.DHI_N
-
-        ### rename depth track to DEPTH for consistency ###
-        depth_name = self.curve_parameters[0]
-        self.curve_values[depth_name].name = 'DEPTH'
-        self.curve_df.columns.values[0] = 'DEPTH'
-
-        self.curve_df.replace(self.null, np.nan, inplace = True)
-
+        if 'RHOB_N' not in self.keys() and 'DPHI_N' in self.keys():
+            calculated_rho = drho_matrix - (drho_matrix - 1) * self['DHI_N']
+            self.add_curve('RHOB_N', calculated_rho, unit = 'g/cc', value = '',
+                           descr = 'Calculated bulk density from density porosity assuming rho matrix = %.2f' % drho_matrix)
 
     def tops_from_csv(self, csv_path = None):
         """
@@ -358,7 +113,7 @@ class Log(object):
         Examples
         --------
         >>> import petropy as ptr
-        >>> log = ptr.logdataset('WFMP') # loads Wolfcamp Log
+        >>> log = ptr.log_data('WFMP') # reads sample Wolfcamp Log from las file
         >>> log.tops_from_csv() # loads default tops for included datasets
 
         >>> import petropy as ptr
@@ -373,15 +128,13 @@ class Log(object):
 
         top_df = pd.read_csv(csv_path, dtype = {'uwi': str, 'form': str, 'depth': float})
 
-        for r, row in top_df[top_df.uwi == self.uwi].iterrows():
+        for r, row in top_df[top_df.uwi == self.well['UWI'].value].iterrows():
             self.tops[row.form] = row.depth
 
 
     def next_formation_depth(self, formation):
         """
         Return top of formation below specified formation.
-
-        Function required since python 2 does not use ordered dictionaries.
 
         Parameter
         --------
@@ -397,8 +150,7 @@ class Log(object):
         Example
         -------
         >>> import petropy as ptr
-        >>> log = ptr.log_data('WFMP') # sample Wolfcamp log
-        >>> log.tops_from_csv() # loads default tops for included datasets
+        >>> log = ptr.log_data('WFMP') # reads sample Wolfcamp Log from las file
         >>> wfmpa_top = log.tops['WFMPA']
         >>> print(wfmpa_top)
         6993.5
@@ -413,7 +165,7 @@ class Log(object):
 
         top = self.tops[formation]
 
-        bottom = self.curve_df.DEPTH.max()
+        bottom = np.max(self[0])
         closest_formation = bottom - top
         for form in self.tops:
             form_depth = self.tops[form]
@@ -485,14 +237,12 @@ class Log(object):
         Examples
         --------
         >>> import petropy as ptr
-        >>> from petropy import datasets
-        >>> log = datasets('WFMP') # loads Wolfcamp Log
+        >>> log = ptr.log_data('WFMP') # reads sample Wolfcamp Log from las file
         >>> log.fluid_properties_parameters_from_csv() # loads base parameters
 
         >>> import petropy as ptr
-        >>> from petropy import datasets
-        >>> log = datasets('WFMP') # loads Wolfcamp Log
-        >>> my_csv_paramters = 'path/to/csv/file.csv' # specified csv
+        >>> log = ptr.log_data('WFMP') # reads sample Wolfcamp Log from las file
+        >>> my_csv_paramters = 'path/to/csv/file.csv' # specified csv file
         >>> log.fluid_properties_parameters_from_csv(my_csv_paramters) # loads specified parameters
 
         See Also
@@ -513,7 +263,7 @@ class Log(object):
         self.fluid_properties_parameters = param_df.to_dict(orient = 'index')
 
 
-    def fluid_properties(self, top = None, bottom = None, mast = 67, temp_grad = 0.015, press_grad = 0.5, rws = 0.1, rwt = 70, rmfs = 0.4, rmft = 100, gas_grav = 0.67, oil_api = 38, p_sep = 100, t_sep = 100, yn2 = 0, yco2 = 0, yh2s = 0, yh20 = 0, rs = 0, lith_grad = 1.03, biot = 0.8, pr = 0.25):
+    def fluid_properties(self, top = 0, bottom = 100000, mast = 67, temp_grad = 0.015, press_grad = 0.5, rws = 0.1, rwt = 70, rmfs = 0.4, rmft = 100, gas_grav = 0.67, oil_api = 38, p_sep = 100, t_sep = 100, yn2 = 0, yco2 = 0, yh2s = 0, yh20 = 0, rs = 0, lith_grad = 1.03, biot = 0.8, pr = 0.25):
         """
         Calculates fluid properties along wellbore.
 
@@ -568,10 +318,10 @@ class Log(object):
 
         Parameters
         ----------
-        top : float, optional
+        top : float (default 0)
             The top depth to begin fluid properties calculation. If value is not
             specified, the calculations will start at the top of the log.
-        bottom : float, optional
+        bottom : float (default 100,000)
             The bottom depth to end fluid properties, inclusive. If the value is
             not specified, the calcuations will go to the end of the log.
         mast : float (default 67)
@@ -633,7 +383,7 @@ class Log(object):
         --------
         >>> import petropy as ptr
         >>> from petropy import datasets
-        >>> log = datasets('WFMP') # loads Wolfcamp Log
+        >>> log = ptr.log_data('WFMP') # reads sample Wolfcamp Log from las file
         >>> log.fluid_properties() # calculates fluid properties with default settings
 
 
@@ -646,24 +396,13 @@ class Log(object):
 
         """
 
-        if 'DEPTH' not in list(self.curve_df.columns.values):
-            raise ValueError('No DEPTH curve found in log.')
-
-        if top is not None:
-            df = self.curve_df[self.curve_df.DEPTH >= top].copy()
-        else:
-            df = self.curve_df.copy()
-            top = self.curve_df.DEPTH.min()
-
-        if bottom is not None:
-            df = df[df.DEPTH <= bottom].copy()
-        else:
-            bottom = self.curve_df.DEPTH.max()
-
         ### fluid property calculations ###
 
-        form_temp = mast + temp_grad * df.DEPTH
-        pore_press = press_grad * df.DEPTH
+        depth_index = np.intersect1d(np.where(self[0] >= top)[0], np.where(self[0] < bottom)[0])
+        depths = self[0][depth_index]
+
+        form_temp = mast + temp_grad * depths
+        pore_press = press_grad * depths
 
         ### water properties ###
         rw = (rwt + 6.77) / (form_temp + 6.77) * rws
@@ -695,7 +434,7 @@ class Log(object):
         nphi_mf = 1 + 0.4 * (xsaltmf / 100)
 
         ### net efective stress ###
-        nes = (((lith_grad * df.DEPTH) - (biot * press_grad * df.DEPTH) + 2 * (pr / (1 - pr)) * (lith_grad * df.DEPTH) - (biot * press_grad * df.DEPTH))) / 3
+        nes = (((lith_grad * depths) - (biot * press_grad * depths) + 2 * (pr / (1 - pr)) * (lith_grad * depths) - (biot * press_grad * depths))) / 3
 
         ### gas reservoir ###
         if oil_api == 0:
@@ -781,8 +520,9 @@ class Log(object):
                 bo = 1 + 4.670 * 10 ** -4 * rs + 1.1 * 10 ** -5 * (form_temp - 60) * (oil_api / ygs100) + 1.337 * 10 ** -9 * rs * (form_temp - 60) * (oil_api / ygs100)
 
             ### calculate bo for undersaturated oil ###
-            pp_bp = pore_press > bp + 100
-            bo[pp_bp] = bo[pp_bp] * np.exp(-(0.00001 * (-1433 + 5 * rs + 17.2 * form_temp[pp_bp] - 1180 * ygs100 + 12.61 * oil_api)) * np.log(pore_press[pp_bp] / bp[pp_bp]))
+            pp_gt_bp = np.where(pore_press > bp + 100)[0]
+            if len(pp_gt_bp) > 0:
+                bo[pp_gt_bp] = bo[pp_gt_bp] * np.exp(-(0.00001 * (-1433 + 5 * rs + 17.2 * form_temp[pp_gt_bp] - 1180 * ygs100 + 12.61 * oil_api)) * np.log(pore_press[pp_gt_bp] / bp[pp_gt_bp]))
 
             ### oil properties ###
             rho_hc = (((141.5 / (oil_api + 131.5) * 62.428) + 0.0136 * rs *ygs100) / bo) / 62.428
@@ -793,81 +533,68 @@ class Log(object):
             mu_hc = (10.715 * (rs + 100) ** -0.515) * muod ** (5.44 * (rs + 150) ** -0.338)
 
             # undersaturated oil viscosity, Vasquez and Beggs Eqs. 2.123
-            mu_hc[pp_bp] = mu_hc[pp_bp] * (pore_press[pp_bp] / bp[pp_bp]) ** (2.6 * pore_press[pp_bp] ** 1.187 * 10 ** (-0.000039 * pore_press[pp_bp] - 5))
+            if len(pp_gt_bp) > 0:
+                mu_hc[pp_gt_bp] = mu_hc[pp_gt_bp] * (pore_press[pp_gt_bp] / bp[pp_gt_bp]) ** (2.6 * pore_press[pp_gt_bp] ** 1.187 * 10 ** (-0.000039 * pore_press[pp_gt_bp] - 5))
 
-
-        ### format outputs into curve_df ###
-
-        output_curves = {
-            'PORE_PRESS': pore_press,
-            'RES_TEMP': form_temp,
-            'NES': nes,
-            'RW': rw,
-            'RMF': rmf,
-            'RHO_HC': rho_hc,
-            'RHO_W': rho_w,
-            'RHO_MF': rho_mf,
-            'NPHI_HC': nphi_hc,
-            'NPHI_W': nphi_w,
-            'NPHI_MF': nphi_mf,
-            'MU_HC': mu_hc,
-        }
-
-        output_curve_parameters = {
-            'PORE_PRESS': Parameter(name = 'PORE_PRESS', unit = 'psi', des = 'Calculated Pore Pressure'),
-            'RES_TEMP': Parameter(name = 'RES_TEMP', unit = 'F', des = 'Calculated Reservoir Temperature'),
-            'NES': Parameter(name = 'NES', unit = 'psi', des = 'Calculated Net Effective Stress'),
-            'RW': Parameter(name = 'RW', unit = 'ohmm', des = 'Calculated Resistivity Water'),
-            'RMF': Parameter(name = 'RMF', unit = 'ohmm', des = 'Calculated Resistivity Mud Filtrate'),
-            'RHO_HC': Parameter(name = 'RHO_HC', unit = 'g/cc', des = 'Calculated Density of Hydrocarbon'),
-            'RHO_W': Parameter(name = 'RHO_W', unit = 'g/cc', des = 'Calculated Density of Water'),
-            'RHO_MF': Parameter(name = 'RHO_MF', unit = 'g/cc', des = 'Calculated Density of Mud Filtrate'),
-            'NPHI_HC': Parameter(name = 'NPHI_HC', unit = 'v/v', des = 'Calculated Neutron Log Response of Hydrocarbon'),
-            'NPHI_W': Parameter(name = 'NPHI_W', unit = 'v/v', des = 'Calculated Neutron Log Response of Water'),
-            'NPHI_MF': Parameter(name = 'NPHI_MF', unit = 'v/v', des = 'Calculated Neutron Log Response of Mud Filtrate'),
-            'MU_HC': Parameter(name = 'MU_HC', unit = 'cP', des = 'Calculated Viscosity of Hydrocarbon')
-        }
+        output_curves = [
+            {'mnemoic': 'PORE_PRESS', 'data': pore_press, 'unit': 'psi', 'descr': 'Calculated Pore Pressure'},
+            {'mnemoic': 'RES_TEMP', 'data': form_temp, 'unit': 'F', 'descr': 'Calculated Reservoir Temperature'},
+            {'mnemoic': 'NES', 'data': nes, 'unit': 'psi', 'descr': 'Calculated Net Effective Stress'},
+            {'mnemoic': 'RW', 'data': rw, 'unit': 'ohmm', 'descr': 'Calculated Resistivity Water'},
+            {'mnemoic': 'RMF', 'data': rmf, 'unit': 'ohmm', 'descr': 'Calculated Resistivity Mud Filtrate'},
+            {'mnemoic': 'RHO_HC', 'data': rho_hc, 'unit': 'g/cc', 'descr': 'Calculated Density of Hydrocarbon'},
+            {'mnemoic': 'RHO_W', 'data': rho_w, 'unit': 'g/cc', 'descr': 'Calculated Density of Water'},
+            {'mnemoic': 'RHO_MF', 'data': rho_mf, 'unit': 'g/cc', 'descr': 'Calculated Density of Mud Filtrate'},
+            {'mnemoic': 'NPHI_HC', 'data': nphi_hc, 'unit': 'v/v', 'descr': 'Calculated Neutron Log Response of Hydrocarbon'},
+            {'mnemoic': 'NPHI_W', 'data': nphi_w, 'unit': 'v/v', 'descr': 'Calculated Neutron Log Response of Water'},
+            {'mnemoic': 'NPHI_MF', 'data': nphi_mf, 'unit': 'v/v', 'descr': 'Calculated Neutron Log Response of Mud Filtrate'},
+            {'mnemoic': 'MU_HC', 'data': mu_hc, 'unit': 'cP', 'descr': 'Calculated Viscosity of Hydrocarbon'}
+        ]
 
         for curve in output_curves:
-            self.curve_parameters.append(curve)
-            self.curve_values[curve] = output_curve_parameters[curve]
-            self.curve_df.loc[(self.curve_df.DEPTH >= top) & (self.curve_df.DEPTH < bottom), curve] = output_curves[curve]
+            if curve['mnemoic'] in self.keys():
+                self[curve['mnemoic']][depth_index] = curve['data']
+            else:
+                data = np.empty(len(self[0]))
+                data[:] = np.nan
+                data[depth_index] = curve['data']
+                curve['data'] = data
+                self.add_curve(curve['mnemoic'], data = curve['data'], unit = curve['unit'], descr = curve['descr'])
 
         ### gas curves ###
         if oil_api == 0:
-            gas_curves = {
-                'Z': z,
-                'CG': cg,
-                'BG': bg
-            }
-
-            gas_curve_parameters = {
-                'Z': Parameter(name = 'Z', des = 'Calculated Real Gas Z Factor'),
-                'CG': Parameter(name = 'CG', unit = '1 / psi', des = 'Calculated Gas compressibility'),
-                'BG': Parameter(name = 'BG', des = 'Calculated Gas Formation Volume Factor')
-            }
+            gas_curves = [
+                {'mnemoic': 'Z', 'data': z, 'unit': '', 'descr': 'Calcualted Real Gas Z Factor'},
+                {'mnemoic': 'CG', 'data': cg, 'unit': '1 / psi', 'descr': 'Calculated Gas Compressibility'},
+                {'mnemoic': 'BG', 'data': bg, 'unit': '', 'descr': 'Calculated Gas Formation Volume Factor'}
+            ]
 
             for curve in gas_curves:
-                self.curve_parameters.append(curve)
-                self.curve_values[curve] = gas_curve_parameters[curve]
-                self.curve_df.loc[(self.curve_df.DEPTH >= top) & (self.curve_df.DEPTH < bottom), curve] = gas_curves[curve]
+                if curve['mnemoic'] in self.keys():
+                    self[curve['mnemoic']][depth_index] = curve['data']
+                else:
+                    data = np.empty(len(self[0]))
+                    data[:] = np.nan
+                    data[depth_index] = curve['data']
+                    curve['data'] = data
+                    self.add_curve(curve['mnemoic'], data = curve['data'], unit = curve['unit'], descr = curve['descr'])
 
         ### oil curves ###
         else:
-            oil_curves = {
-                'BO': bo,
-                'BP': bp
-            }
-
-            oil_curve_parameters = {
-                'BO': Parameter(name = 'BO', des = 'Calculated Oil Formation Volume Factor'),
-                'BP': Parameter(name = 'BP', unit = 'psi', des = 'Calculated Bubble Point')
-            }
+            oil_curves = [
+                {'mnemoic': 'BO', 'data': bo, 'unit': '', 'descr': 'Calculated Oil Formation Volume Factor'},
+                {'mnemoic': 'BP', 'data': bp, 'unit': 'psi', 'descr': 'Calcualted Bubble Point'}
+            ]
 
             for curve in oil_curves:
-                self.curve_parameters.append(curve)
-                self.curve_values[curve] = oil_curve_parameters[curve]
-                self.curve_df.loc[(self.curve_df.DEPTH >= top) & (self.curve_df.DEPTH < bottom), curve] = oil_curves[curve]
+                if curve['mnemoic'] in self.keys():
+                    self[curve['mnemoic']][depth_index] = curve['data']
+                else:
+                    data = np.empty(len(self[0]))
+                    data[:] = np.nan
+                    data[depth_index] = curve['data']
+                    curve['data'] = data
+                    self.add_curve(curve['mnemoic'], data = curve['data'], unit = curve['unit'], descr = curve['descr'])
 
 
     def formation_fluid_properties(self, formations = [], parameter = 'default'):
@@ -1044,13 +771,11 @@ class Log(object):
         Examples
         --------
         >>> import petropy as ptr
-        >>> from petropy import datasets
-        >>> log = datasets('WFMP') # loads Wolfcamp Log
+        >>> log = ptr.log_data('WFMP') # reads sample Wolfcamp Log from las file
         >>> log.multimineral_parameters_from_csv() # loads base parameters
 
         >>> import petropy as ptr
-        >>> from petropy import datasets
-        >>> log = datasets('WFMP') # loads Wolfcamp Log
+        >>> log = ptr.log_data('WFMP') # reads sample Wolfcamp Log from las file
         >>> my_csv_paramters = 'path/to/csv/file.csv' # specified csv
         >>> log.multimineral_parameters_from_csv(my_csv_paramters) # loads specified parameters
 
@@ -1430,48 +1155,59 @@ class Log(object):
             Shaly Sands, Society of Petroleum Engineers Journal, June,
             p.107-122, 1968.
 
+
+        Examples
+        --------
+        >>> import petropy as ptr
+        >>> from petropy import datasets
+        >>> log = ptr.log_data('WFMP') # reads sample Wolfcamp Log from las file
+        >>> log.fluid_properties() # calculates fluid properties with default settings
+        >>> log.multimineral_model() # calculates multimeral model with default settings
+
+
+        See Also
+        --------
+        formation_multimineral_model
+            uses multimineral_model accross formations
+
         """
 
         ### check for requirements ###
-
-        df_columns = self.curve_df.columns.values
-
         required_raw_curves = ['GR_N', 'NPHI_N', 'RHOB_N', 'RESDEEP_N']
         for curve in required_raw_curves:
-            if curve not in df_columns:
+            if curve not in self.keys():
                 raise ValueError('Raw curve %s not found and is required for multimineral_model.' % curve)
 
-        required_curves_from_fluid_properties = ['DEPTH', 'RW', 'RHO_HC',
-                  'RHO_W', 'NPHI_HC', 'NPHI_W', 'RES_TEMP', 'NES', 'PORE_PRESS']
+        required_curves_from_fluid_properties = ['RW', 'RHO_HC', 'RHO_W', 'NPHI_HC', 'NPHI_W', 'RES_TEMP', 'NES', 'PORE_PRESS']
         for curve in required_curves_from_fluid_properties:
-            if curve not in df_columns:
+            if curve not in self.keys():
                 raise ValueError('Fluid Properties curve %s not found. Run fluid_properties before multimineral_model.' % curve)
 
         all_required_curves = required_raw_curves + required_curves_from_fluid_properties
 
-        if 'BO' not in df_columns and 'BG' not in df_columns:
+        if 'BO' not in self.keys() and 'BG' not in self.keys():
             raise ValueError('Formation Volume Factor required for multimineral_model. Run fluid_properties first.')
 
-        if 'BO' in df_columns:
+        if 'BO' in self.keys():
             hc_class = 'OIL'
         else:
             hc_class = 'GAS'
 
-        if 'PE_N' in df_columns:
+        if 'PE_N' in self.keys():
             use_pe = True
         else:
-            use_ps = False
+            use_pe = False
 
-        df = self.curve_df.copy()
-        if top is not None:
-            df = df[df.DEPTH >= top]
+        ### get depths ###
+        if top is None:
+            top_index = 0
         else:
-            top = self.curve_df.DEPTH.min()
+            top_index = np.where(self[0] == top)[0][0]
 
-        if bottom is not None:
-            df = df[df.DEPTH <= bottom]
+        if bottom is None:
+            bottom_index = len(self[0]) - 1
         else:
-            bottom = self.curve_df.DEPTH.max()
+            bottom_index = np.where(self[0] == bottom)[0][0]
 
         ### initialize minerals ###
         if include_qtz.upper()[0] == 'Y':
@@ -1495,13 +1231,100 @@ class Log(object):
         else:
             include_x = False
 
+        ### check for existence of calculated curves and add if not found ###
+        nulls = np.empty(len(self[0]))
+        nulls[:] = np.nan
+
+        output_curves = [
+            {'mnemoic': 'PHIE', 'data': np.copy(nulls), 'unit': 'v/v', 'descr': 'Effective Porosity'},
+            {'mnemoic': 'SW', 'data': np.copy(nulls), 'unit': 'v/v', 'descr': 'Water Saturation'},
+            {'mnemoic': 'SHC', 'data': np.copy(nulls), 'unit': 'v/v', 'descr': 'Hydrocarbon Saturation'},
+            {'mnemoic': 'BVH', 'data': np.copy(nulls), 'unit': 'v/v', 'descr': 'Bulk Volume Hydrocarbon'},
+            {'mnemoic': 'BVW', 'data': np.copy(nulls), 'unit': 'v/v', 'descr': 'Bulk Volume Water'},
+            {'mnemoic': 'BVWI', 'data': np.copy(nulls), 'unit': 'v/v', 'descr': 'Bulk Volume Water Irreducible'},
+            {'mnemoic': 'BVWF', 'data': np.copy(nulls), 'unit': 'v/v', 'descr': 'Bulk Volume Water Free'},
+            {'mnemoic': 'BVOM', 'data': np.copy(nulls), 'unit': 'v/v', 'descr': 'Bulk Volume Fraction Organic Matter'},
+            {'mnemoic': 'BVCLAY', 'data': np.copy(nulls), 'unit': 'v/v', 'descr': 'Bulk Volume Fraction Clay'},
+            {'mnemoic': 'BVPYR', 'data': np.copy(nulls), 'unit': 'v/v', 'descr': 'Bulk Volume Fraction Pyrite'},
+            {'mnemoic': 'VOM', 'data': np.copy(nulls), 'unit': 'v/v', 'descr': 'Matrix Volume Fraction Organic Matter'},
+            {'mnemoic': 'VCLAY', 'data': np.copy(nulls), 'unit': 'v/v', 'descr': 'Matrix Volume Fraction Clay'},
+            {'mnemoic': 'VPYR', 'data': np.copy(nulls), 'unit': 'v/v', 'descr': 'Matrix Volume Fraction Pyrite'},
+            {'mnemoic': 'RHOM', 'data': np.copy(nulls), 'unit': 'g/cc', 'descr': 'Matrix Density'},
+            {'mnemoic': 'TOC', 'data': np.copy(nulls), 'unit': 'wt/wt', 'descr': 'Matrix Weight Fraction Organic Matter'},
+            {'mnemoic': 'WTCLAY', 'data': np.copy(nulls), 'unit': 'wt/wt', 'descr': 'Matrix Weight Fraction Clay'},
+            {'mnemoic': 'WTPYR', 'data': np.copy(nulls), 'unit': 'wt/wt', 'descr': 'Matrix Weight Fraction Pyrite'},
+        ]
+        for curve in output_curves:
+            if curve['mnemoic'] not in self.keys():
+                self.add_curve(curve['mnemoic'], curve['data'], unit = curve['unit'], descr = curve['descr'])
+
+        qtz_curves = [
+            {'mnemoic': 'BVQTZ', 'data': np.copy(nulls), 'unit': 'v/v', 'descr': 'Bulk Volume Fraction Quartz'},
+            {'mnemoic': 'VQTZ', 'data': np.copy(nulls), 'unit': 'v/v', 'descr': 'Matrix Volume Fraction Quartz'},
+            {'mnemoic': 'WTQTZ', 'data': np.copy(nulls), 'unit': 'wt/wt', 'descr': 'Matrix Weight Fraction Quartz'}
+        ]
+        if include_qtz:
+            for curve in qtz_curves:
+                if curve['mnemoic'] not in self.keys():
+                    self.add_curve(curve['mnemoic'], curve['data'], unit = curve['unit'], descr = curve['descr'])
+
+        clc_curves = [
+            {'mnemoic': 'BVCLC', 'data': np.copy(nulls), 'unit': 'v/v', 'descr': 'Bulk Volume Fraction Calcite'},
+            {'mnemoic': 'VCLC', 'data': np.copy(nulls), 'unit': 'v/v', 'descr': 'Matrix Volume Fraction Calcite'},
+            {'mnemoic': 'WTCLC', 'data': np.copy(nulls), 'unit': 'wt/wt', 'descr': 'Matrix Weight Fraction Calcite'}
+        ]
+        if include_clc:
+            for curve in clc_curves:
+                if curve['mnemoic'] not in self.keys():
+                    self.add_curve(curve['mnemoic'], curve['data'], unit = curve['unit'], descr = curve['descr'])
+
+        dol_curves = [
+            {'mnemoic': 'BVDOL', 'data': np.copy(nulls), 'unit': 'v/v', 'descr': 'Bulk Volume Fraction Dolomite'},
+            {'mnemoic': 'VDOL', 'data': np.copy(nulls), 'unit': 'v/v', 'descr': 'Matrix Volume Fraction Dolomite'},
+            {'mnemoic': 'WTDOL', 'data': np.copy(nulls), 'unit': 'wt/wt', 'descr': 'Matrix Weight Fraction Dolomite'}
+        ]
+        if include_dol:
+            for curve in dol_curves:
+                if curve['mnemoic'] not in self.keys():
+                    self.add_curve(curve['mnemoic'], curve['data'], unit = curve['unit'], descr = curve['descr'])
+
+        min_x_curves = [
+            {'menmoic': 'V' + name_log_x, 'data': np.copy(nulls), 'unit': 'v/v', 'descr': 'Bulk Volume Fraction ' + name_x},
+            {'mnemoic': 'V' + name_log_x, 'data': np.copy(nulls), 'unit': 'v/v', 'descr': 'Matrix Volume Fraction ' + name_x},
+            {'mnemoic': 'WT' + name_log_x, 'data': np.copy(nulls), 'unit': 'wt/wt', 'descr': 'Matrix Weight Fraction ' + name_x}
+        ]
+        if include_x:
+            for curve in min_x_curves:
+                if curve['mnemoic'] not in self.keys():
+                    self.add_curve(curve['mnemoic'], curve['data'], unit = curve['unit'], descr = curve['descr'])
+
+        oil_curve = {'mnemoic': 'OIP', 'data': np.copy(nulls), 'unit': 'Mmbbl / section', 'descr': 'Oil in Place'}
+        if hc_class == 'OIL':
+            if oil_curve['mnemoic'] not in self.keys():
+                self.add_curve(oil_curve['mnemoic'], oil_curve['data'], unit = oil_curve['unit'], descr = oil_curve['descr'])
+
+        gas_curves = [
+            {'mnemoic': 'GIP', 'data': np.copy(nulls), 'unit': 'BCF / section', 'descr': 'Gas in Place'},
+            {'mnemoic': 'GIP_FREE', 'data': np.copy(nulls), 'unit': 'BCF / section', 'descr': 'Free Gas in Place'},
+            {'mnemoic': 'GIP_ADS', 'data': np.copy(nulls), 'unit': 'BCF / section', 'descr': 'Adsorbed Gas in Place'}
+        ]
+        if hc_class == 'GAS':
+            for curve in gas_curves:
+                if curve['mnemoic'] not in self.keys():
+                    self.add_curve(curve['mnemoic'], curve['data'], unit = curve['unit'], descr = curve['descr'])
+
         ### calculations over depths ###
-        df['sample_rate'] = df.DEPTH.diff()
-        df.loc[0, 'sample_rate'] = df.iloc[1].DEPTH
-        for i, row in df.iterrows():
+        for i in range(top_index, bottom_index):
 
             ### check for null values in data, skip if true ###
-            if True in list(row[all_required_curves].isnull()): continue
+            nans = np.isnan([self[x][i] for x in all_required_curves])
+            infs = np.isinf([self[x][i] for x in all_required_curves])
+            if True in nans or True in infs: continue
+
+            if i > 0:
+                sample_rate = abs(self[0][i] - self[0][i - 1])
+            else:
+                sample_rate = abs(self[0][0] - self[0][1])
 
             ### initial parameters to start iterations ###
             phie = 0.1
@@ -1525,11 +1348,11 @@ class Log(object):
                 counter += 1
 
                 ### log curves without organics ###
-                rhoba = row.RHOB_N + (rhom - rho_om) * vom
-                nphia = row.NPHI_N + (nphi_matrix - nphi_om) * vom
+                rhoba = self['RHOB_N'][i] + (rhom - rho_om) * vom
+                nphia = self['NPHI_N'][i] + (nphi_matrix - nphi_om) * vom
 
                 ### clay solver ###
-                gr_index = np.clip((row.GR_N - gr_matrix) / (gr_clay - gr_matrix), 0, 1)
+                gr_index = np.clip((self['GR_N'][i] - gr_matrix) / (gr_clay - gr_matrix), 0, 1)
 
                 ### linear vclay method ###
                 vclay_linear = gr_index
@@ -1564,14 +1387,14 @@ class Log(object):
                 if vclay > vclay_cutoff:
 
                     ### Passey, A Practical Model for Organic Richness from Porosity and Resistivity Logs, AAPG, 1990 Delta Log R ###
-                    dlr_nphi = np.log10(row.RESDEEP_N / passey_baseline_res) + 4 * (row.NPHI_N - passey_baseline_nphi)
-                    dlr_rhob = np.log10(row.RESDEEP_N / passey_baseline_res) - 2.5 * (row.RHOB_N - passey_baseline_rhob)
+                    dlr_nphi = np.log10(self['RESDEEP_N'][i] / passey_baseline_res) + 4 * (self['NPHI_N'][i] - passey_baseline_nphi)
+                    dlr_rhob = np.log10(self['RESDEEP_N'][i] / passey_baseline_res) - 2.5 * (self['RHOB_N'][i] - passey_baseline_rhob)
 
                     toc_nphi = np.clip((dlr_nphi * 10 ** (2.297 - 0.1688 * passey_lom) / 100), 0, 1)
                     toc_rhob = np.clip((dlr_rhob * 10 ** (2.297 - 0.1688 * passey_lom) / 100), 0, 1)
 
                     ### Schmoker ###
-                    toc_sch = np.clip(schmoker_slope * (schmoker_baseline_rhob - row.RHOB_N), 0, 1)
+                    toc_sch = np.clip(schmoker_slope * (schmoker_baseline_rhob - self['RHOB_N'][i]), 0, 1)
 
                     toc_weights = passey_nphi_weight + passey_rhob_weight + schmoker_weight
 
@@ -1603,14 +1426,14 @@ class Log(object):
 
                 ### removed effect of clay, organics, and pyrite ###
                 volume_unconventional = bvom + bvclay + bvpyr
-                rhob_clean = (row.RHOB_N - (rho_om * bvom + rho_clay * bvclay + rho_pyr * bvpyr)) / (1 - volume_unconventional)
-                nphi_clean = (row.NPHI_N - (nphi_om * bvom + nphi_clay * bvclay + nphi_pyr * bvpyr)) / (1 - volume_unconventional)
+                rhob_clean = (self['RHOB_N'][i] - (rho_om * bvom + rho_clay * bvclay + rho_pyr * bvpyr)) / (1 - volume_unconventional)
+                nphi_clean = (self['NPHI_N'][i] - (nphi_om * bvom + nphi_clay * bvclay + nphi_pyr * bvpyr)) / (1 - volume_unconventional)
 
                 minerals = []
                 if use_pe:
-                    pe_clean = (row.PE_N - (pe_om * bvom + pe_clay * bvclay + pe_pyr * bvpyr)) / (1 - bvom - bvclay - bvpyr)
+                    pe_clean = (self['PE_N'][i] - (pe_om * bvom + pe_clay * bvclay + pe_pyr * bvpyr)) / (1 - bvom - bvclay - bvpyr)
                     l_clean = np.asarray([rhob_clean, nphi_clean, pe_clean, 1])
-                    l = np.asarray([row.RHOB_N, row.NPHI_N, row.PE_N, 1])
+                    l = np.asarray([self['RHOB_N'][i], self['NPHI_N'][i], self['PE_N'][i], 1])
 
                     c_clean = np.asarray([0,0,0]) # initialize mineral matrix C
 
@@ -1640,7 +1463,7 @@ class Log(object):
 
                 else:
                     l_clean = np.asarray([rhob_clean, nphi_clean, 1])
-                    l = np.asarray([row.RHOB_N, row.NPHI_N, 1])
+                    l = np.asarray([self['RHOB_N'][i], self['NPHI_N'][i], 1])
 
                     c_clean = np.asarray((0,0)) # initialize mineral matrix C
 
@@ -1767,31 +1590,31 @@ class Log(object):
                     phis = phie
 
                 ### Archie ###
-                sw_archie = np.clip(((a * row.RW) / (row.RESDEEP_N * (phis ** m))) ** (1 / n), 0, 1)
+                sw_archie = np.clip(((a * self['RW'][i]) / (self['RESDEEP_N'][i] * (phis ** m))) ** (1 / n), 0, 1)
 
                 ### Indonesia ###
-                sw_ind_a = (phie ** m / row.RW) ** 0.5
+                sw_ind_a = (phie ** m / self['RW'][i]) ** 0.5
                 sw_ind_b = (vclay ** (2.0 - vclay) / rt_clay) ** 0.5
-                sw_indonesia = np.clip(((sw_ind_a + sw_ind_b) ** 2.0 * row.RESDEEP_N) ** (-1 / n), 0, 1)
+                sw_indonesia = np.clip(((sw_ind_a + sw_ind_b) ** 2.0 * self['RESDEEP_N'][i]) ** (-1 / n), 0, 1)
 
                 ### Simandoux ###
-                c = (1.0 - vclay) * a * row.RW / (phis ** m)
+                c = (1.0 - vclay) * a * self['RW'][i] / (phis ** m)
                 d = c * vclay / (2.0 * rt_clay)
-                e = c / row.RESDEEP_N
+                e = c / self['RESDEEP_N'][i]
                 sw_simandoux = np.clip(((d**2 + e) ** 0.2 - d) ** (2 / n), 0, 1)
 
                 ### modified Simandoux ###
-                sw_modified_simandoux = np.clip((0.5 * row.RW / phis ** m) * ((4 * phis **m) / (row.RW * row.RESDEEP_N) + (vclay / rt_clay) ** 2) ** (1 / n) - vclay / rt_clay, 0, 1)
+                sw_modified_simandoux = np.clip((0.5 * self['RW'][i] / phis ** m) * ((4 * phis **m) / (self['RW'][i] * self['RESDEEP_N'][i]) + (vclay / rt_clay) ** 2) ** (1 / n) - vclay / rt_clay, 0, 1)
 
                 ### Waxman Smits ###
                 if cec <= 0:
                     cec = 10 ** (1.9832 * vclay - 2.4473)
 
-                rw77 = row.RESDEEP_N * (row.RES_TEMP + 6.8) / 83.8
+                rw77 = self['RESDEEP_N'][i] * (self['RES_TEMP'][i] + 6.8) / 83.8
                 b = 4.6 * (1 - 0.6 * np.exp(-0.77 / rw77))
                 f = a / (phis ** m)
                 qv = cec * (1 - phis) * rhom / phis
-                sw_waxman_smits = np.clip(0.5 * ((-b * qv * rw77) + ((b * qv * rw77) ** 2 + 4 * f * row.RW / row.RESDEEP_N) ** 0.5 ) ** (2 / n), 0, 1)
+                sw_waxman_smits = np.clip(0.5 * ((-b * qv * rw77) + ((b * qv * rw77) ** 2 + 4 * f * self['RW'][i] / self['RESDEEP_N'][i]) ** 0.5 ) ** (2 / n), 0, 1)
 
                 ### weighted calculation with bv output ###
                 weight_saturations = archie_weight + indonesia_weight + simandoux_weight + modified_simandoux_weight + waxman_smits_weight
@@ -1802,211 +1625,97 @@ class Log(object):
                 bvh = phie * (1 - sw)
 
                 if hc_class == 'OIL':
-                    oip = (7758 * 640 * row.sample_rate * bvh * 10 ** -6) / row.BO # Mmbbl per sample rate
+                    oip = (7758 * 640 * sample_rate * bvh * 10 ** -6) / self['BO'][i] # Mmbbl per sample rate
 
                 elif hc_class == 'GAS':
-                    langslope = (-0.08 * row.RES_TEMP + 2 * ro + 22.75) / 2
-                    gas_ads = langslope * vom * 100 * (row.PORE_PRESS / (row.PORE_PRESS + lang_press))
+                    langslope = (-0.08 * self['RES_TEMP'][i] + 2 * ro + 22.75) / 2
+                    gas_ads = langslope * vom * 100 * (self['PORE_PRESS'][i] / (self['PORE_PRESS'][i] + lang_press))
 
-                    gip_free = (43560 * 640 * row.sample_rate * bvh * 10 ** -9) / row.BG   # BCF per sample rate
-                    gip_ads = (1359.7 * 640 * row.sample_rate * row.RHOB_N * gas_ads * 10 ** -9)/ row.BG	# BCF per sample rate
+                    gip_free = (43560 * 640 * sample_rate * bvh * 10 ** -9) / self['BG'][i]   # BCF per sample rate
+                    gip_ads = (1359.7 * 640 * sample_rate * self['RHOB_N'][i] * gas_ads * 10 ** -9)/ self['BG'][i]	# BCF per sample rate
                     gip = gip_free + gip_ads
 
-                rho_fl = row.RHO_W * sw + row.RHO_HC * (1 - sw)
-                nphi_fl = row.NPHI_W * sw + row.NPHI_HC * (1 - sw)
+                rho_fl = self['RHO_W'][i] * sw + self['RHO_HC'][i] * (1 - sw)
+                nphi_fl = self['NPHI_W'][i] * sw + self['NPHI_HC'][i] * (1 - sw)
 
-            ### save calculations to dataframe ###
+            ### save calculations to log ###
 
             ### bulk volume ###
-            self.curve_df.loc[i, 'BVOM'] = bvom
-            self.curve_df.loc[i, 'BVCLAY'] = bvclay
-            self.curve_df.loc[i, 'BVPYR'] = bvpyr
+            self['BVOM'][i] = bvom
+            self['BVCLAY'][i] = bvclay
+            self['BVPYR'][i] = bvpyr
 
             if include_qtz:
-                self.curve_df.loc[i, 'BVQTZ'] = bvqtz
+                self['BVQTZ'][i] = bvqtz
             if include_clc:
-                self.curve_df.loc[i, 'BVCLC'] = bvclc
+                self['BVCLC'][i] = bvclc
             if include_dol:
-                self.curve_df.loc[i, 'BVDOL'] = bvdol
+                self['BVDOL'][i] = bvdol
             if include_x:
-                self.curve_df.loc[i,  'BV' + name_log_x] = bvx
+                self['BV' + name_log_x][i] = bvx
 
-            self.curve_df.loc[i, 'BVH'] = bvh
-            self.curve_df.loc[i, 'BVW'] = bvw
+            self['BVH'][i] = bvh
+            self['BVW'][i] = bvw
 
             ### porosity and saturations ###
-            self.curve_df.loc[i, 'PHIE'] = phie
-            self.curve_df.loc[i, 'SW'] = sw
-            self.curve_df.loc[i, 'SHC'] = 1 - sw
+            self['PHIE'][i] = phie
+            self['SW'][i] = sw
+            self['SHC'][i] = 1 - sw
 
             ### mineral volumes ###
-            self.curve_df.loc[i, 'VOM'] = vom
-            self.curve_df.loc[i, 'VCLAY'] = vclay
-            self.curve_df.loc[i, 'VPYR'] = vpyr
+            self['VOM'][i] = vom
+            self['VCLAY'][i] = vclay
+            self['VPYR'][i] = vpyr
 
             if include_qtz:
-                self.curve_df.loc[i, 'VQTZ'] = vqtz
+                self['VQTZ'][i] = vqtz
             if include_clc:
-                self.curve_df.loc[i, 'VCLC'] = vclc
+                self['VCLC'][i] = vclc
             if include_dol:
-                self.curve_df.loc[i, 'VDOL'] = vdol
+                self['VDOL'][i] = vdol
             if include_x:
-                self.curve_df.loc[i, 'V' + name_log_x] = vx
+                self['V' + name_log_x] = vx
 
             ### weight percent ###
-            self.curve_df.loc[i, 'RHOM'] = rhom
-            self.curve_df.loc[i, 'TOC'] = toc
-            self.curve_df.loc[i, 'WTCLAY'] = wtclay
-            self.curve_df.loc[i, 'WTPYR'] = wtpyr
+            self['RHOM'][i] = rhom
+            self['TOC'][i] = toc
+            self['WTCLAY'][i] = wtclay
+            self['WTPYR'][i] = wtpyr
 
             if include_qtz:
-                self.curve_df.loc[i, 'WTQTZ'] = wtqtz
+                self['WTQTZ'][i] = wtqtz
             if include_clc:
-                self.curve_df.loc[i, 'WTCLC'] = wtclc
+                self['WTCLC'][i] = wtclc
             if include_dol:
-                self.curve_df.loc[i, 'WTDOL'] = wtdol
+                self['WTDOL'][i] = wtdol
             if include_x:
-                self.curve_df.loc[i, 'WT' + name_log_x] = wtx
+                self['WT' + name_log_x] = wtx
 
             ### find irreducible water if buckles_parameter is specified ###
             if buckles_parameter > 0:
                 sw_irr = buckles_parameter / (phie / (1 - vclay))
                 bvwi = phie * sw_irr
                 bvwf = bvw - bvwi
-                self.curve_df.loc[i, 'BVWI'] = bvwi
-                self.curve_df.loc[i, 'BVWF'] = bvwf
+                self['BVWI'][i] = bvwi
+                self['BVWF'][i] = bvwf
 
             if hc_class == 'OIL':
-                self.curve_df.loc[i, 'OIP'] = oip
+                self['OIP'][i] = oip
 
             elif hc_class == 'GAS':
-                self.curve_df.loc[i, 'GIP_FREE'] = gip_free
-                self.curve_df.loc[i, 'GIP_ADS'] = gip_ads
-                self.curve_df.loc[i, 'GIP'] = gip
+                self['GIP_FREE'][i] = gip_free
+                self['GIP_ADS'][i] = gip_ads
+                self['GIP'][i] = gip
 
         ### find irreducible water saturation outside of minerology loop since parameters depend on calculated values ###
         if buckles_parameter < 0:
-            buckles_parameter = np.mean(self.curve_df[(self.curve_df.DEPTH >= top) & (self.curve_df.DEPTH < bottom)].PHIE * self.curve_df[(self.curve_df.DEPTH >= top) & (self.curve_df.DEPTH < bottom)].SW)
+            buckles_parameter = np.mean(self['PHIE'][top_index:bottom_index] * self['SW'][top_index:bottom_index])
 
-            sw_irr = buckles_parameter / (self.curve_df.PHIE / (1 - self.curve_df.VCLAY))
-            self.curve_df.loc[(self.curve_df.DEPTH >= top) & (self.curve_df.DEPTH < bottom), 'BVWI'] = self.curve_df[(self.curve_df.DEPTH >= top) & (self.curve_df.DEPTH < bottom)].PHIE * sw_irr
-            self.curve_df.loc[(self.curve_df.DEPTH >= top) & (self.curve_df.DEPTH < bottom), 'BVWF'] = self.curve_df[(self.curve_df.DEPTH >= top) & (self.curve_df.DEPTH < bottom)].BVW - self.curve_df[(self.curve_df.DEPTH >= top) & (self.curve_df.DEPTH < bottom)].BVWI
-
-        ### append curves to curve_values and curve_parameters ###
-
-        ### bulk volumes ###
-        self.curve_parameters.append('BVOM')
-        self.curve_values['BVOM'] = Parameter(name = 'BVOM', unit = 'v/v', des = 'Bulk Volume Fraction Organic Matter')
-
-        self.curve_parameters.append('BVCLAY')
-        self.curve_values['BVCLAY'] = Parameter(name = 'BVCLAY', unit = 'v/v', des = 'Bulk Volume Fraction Clay')
-
-        self.curve_parameters.append('BVPYR')
-        self.curve_values['BVPYR'] = Parameter(name = 'BVPYR', unit = 'v/v', des = 'Bulk Volume Fraction Pyrite')
-
-        if include_qtz:
-            self.curve_parameters.append('BVQTZ')
-            self.curve_values['BVQTZ'] = Parameter(name = 'BVQTZ', unit = 'v/v', des = 'Bulk Volume Fraction Quartz')
-        if include_clc:
-            self.curve_parameters.append('BVCLC')
-            self.curve_values['BVCLC'] = Parameter(name = 'BVCLC', unit = 'v/v', des = 'Bulk Volume Fraction Calcite')
-        if include_dol:
-            self.curve_parameters.append('BVDOL')
-            self.curve_values['BVDOL'] = Parameter(name = 'BVDOL', unit = 'v/v', des = 'Bulk Volume Fraction Dolomite')
-        if include_x:
-            self.curve_parameters.append('BV' + name_log_x)
-            self.curve_values['BV' + name_log_x] = Parameter(name = 'BV' + name_log_x, unit = 'v/v', des = 'Bulk Volume Fraction ' + name_x)
-
-        self.curve_parameters.append('BVH')
-        self.curve_values['BVH'] = Parameter(name = 'BVH', unit = 'v/v', des = 'Bulk Volume Fraction Hydrocarbon')
-
-        self.curve_parameters.append('BVW')
-        self.curve_values['BVW'] = Parameter(name = 'BVW', unit = 'v/v', des = 'Bulk Volume Fraction Water')
-
-        self.curve_parameters.append('BVWI')
-        self.curve_values['BVWI'] = Parameter(name = 'BVWI', unit = 'v/v', des = 'Bulk Volume Fraction Water irreducible')
-
-        self.curve_parameters.append('BVWF')
-        self.curve_values['BVWF'] = Parameter(name = 'BVWF', unit = 'v/v', des = 'Bulk Volume Fraction Water Free')
-
-        ### porosity and saturations ###
-        self.curve_parameters.append('PHIE')
-        self.curve_values['PHIE'] = Parameter(name = 'PHIE', unit = 'v/v', des = 'Effective Porosity')
-
-        self.curve_parameters.append('SW')
-        self.curve_values['SW'] = Parameter(name = 'SW', unit = 'v/v', des = 'Water Saturation')
-
-        self.curve_parameters.append('SHC')
-        self.curve_values['SHC'] = Parameter(name = 'SHC', unit = 'v/v', des = 'Hydrocarbon Saturation Saturation')
-
-
-        ### matrix mineral volumes ###
-        self.curve_parameters.append('VOM')
-        self.curve_values['VOM'] = Parameter(name = 'VOM', unit = 'v/v', des = 'Matrix Volume Fraction Organic Matter')
-
-        self.curve_parameters.append('VCLAY')
-        self.curve_values['VCLAY'] = Parameter(name = 'VCLAY', unit = 'v/v', des = 'Matrix Volume Fraction Clay')
-
-        self.curve_parameters.append('VPYR')
-        self.curve_values['VPYR'] = Parameter(name = 'VPYR', unit = 'v/v', des = 'Matrix Volume Fraction Pyrite')
-
-        if include_qtz:
-            self.curve_parameters.append('VQTZ')
-            self.curve_values['VQTZ'] = Parameter(name = 'VQTZ', unit = 'v/v', des = 'Matrix Volume Fraction Quartz')
-        if include_clc:
-            self.curve_parameters.append('VCLC')
-            self.curve_values['VCLC'] = Parameter(name = 'VCLC', unit = 'v/v', des = 'Matrix Volume Fraction Calcite')
-        if include_dol:
-            self.curve_parameters.append('VDOL')
-            self.curve_values['VDOL'] = Parameter(name = 'VDOL', unit = 'v/v', des = 'Matrix Volume Fraction Dolomite')
-        if include_x:
-            self.curve_parameters.append('V' + name_log_x)
-            self.curve_values['V' + name_log_x] = Parameter(name = 'V' + name_log_x, unit = 'v/v', des = 'Matrix Volume Fraction ' + name_x)
-
-
-        ### matrix weight fraction ###
-        self.curve_parameters.append('RHOM')
-        self.curve_values['RHOM'] = Parameter(name = 'RHOM', unit = 'g/cc', des = 'Matrix Density')
-
-        self.curve_parameters.append('TOC')
-        self.curve_values['TOC'] = Parameter(name = 'TOC', unit = 'wt/wt', des = 'Matrix Weight Fraction Organic Matter')
-
-        self.curve_parameters.append('WTCLAY')
-        self.curve_values['WTCLAY'] = Parameter(name = 'WTCLAY', unit = 'wt/wt', des = 'Matrix Weight Fraction Clay')
-
-        self.curve_parameters.append('WTPYR')
-        self.curve_values['WTPYR'] = Parameter(name = 'WTPYR', unit = 'wt/wt', des = 'Matrix Weight Fraction Pyrite')
-
-        if include_qtz:
-            self.curve_parameters.append('WTQTZ')
-            self.curve_values['WTQTZ'] = Parameter(name = 'WTQTZ', unit = 'wt/wt', des = 'Matrix Weight Fraction Quartz')
-
-        if include_clc:
-            self.curve_parameters.append('WTCLC')
-            self.curve_values['WTCLC'] = Parameter(name = 'WTCLC', unit = 'wt/wt', des = 'Matrix Weight Fraction Calcite')
-
-        if include_dol:
-            self.curve_parameters.append('WTDOL')
-            self.curve_values['WTDOL'] = Parameter(name = 'WTDOL', unit = 'wt/wt', des = 'Matrix Weight Fraction Dolomite')
-
-        if include_x:
-            self.curve_parameters.append('WT' + name_log_x)
-            self.curve_values['WT' + name_log_x] = Parameter(name = 'WT' + name_log_x, unit = 'wt/wt', des = 'Matrix Weight Fraction ' + name_x)
-
-        ### hydrocarbon in place ###
-        if hc_class == 'OIL':
-            self.curve_parameters.append('OIP')
-            self.curve_values['OIP'] = Parameter(name = 'OIP', unit = 'Mmbbl / section', des = 'Oil in Place')
-
-        elif hc_class == 'GAS':
-            self.curve_parameters.append('GIP')
-            self.curve_values['GIP'] = Parameter(name = 'GIP', unit = 'BCF / section', des = 'Gas in Place')
-
-            self.curve_parameters.append('GIP_FREE')
-            self.curve_values['GIP_FREE'] = Parameter(name = 'GIP_FREE', unit = 'BCF / section', des = 'Free Gas in Place')
-
-            self.curve_parameters.append('GIP_ADS')
-            self.curve_values['GIP_ADS'] = Parameter(name = 'GIP_ADS', unit = 'BCF / section', des = 'Adsorbed Gas in Place')
+            ir_denom = (self['PHIE'][top_index:bottom_index] / (1 - self['VCLAY'][top_index:bottom_index]))
+            ir_denom[np.where(ir_denom < 0.001)[0]] = 0.001
+            sw_irr = buckles_parameter / ir_denom
+            self['BVWI'][top_index:bottom_index] = self['PHIE'][top_index:bottom_index] * sw_irr
+            self['BVWF'][top_index:bottom_index] = self['BVW'][top_index:bottom_index] - self['BVWI'][top_index:bottom_index]
 
 
     def formation_multimineral_model(self, formations = [], parameter = 'default'):
@@ -2020,6 +1729,18 @@ class Log(object):
         parameter : str (default 'default')
             name of parameter to use for fluid properties parameter settings
             loaded in method fluid_properties_parameters_from_csv
+
+
+        Examples
+        --------
+        >>> import petropy as ptr
+        >>> from petropy import datasets
+        >>> log = ptr.log_data('WFMP') # reads sample Wolfcamp Log from las file
+        >>> f = ['WFMPA', 'WFMPB', 'WFMPC']
+        >>> # calculates fluid properties for formations WFMPA, WFMPB, and WFMPC with default settings
+        >>> log.formation_fluid_properties(formations = f)
+        >>> # calculates multimineral model for formations WFMPA, WFMPB, and WFMPC with default settings
+        >>> log.formation_multimineral_model(formations = f)
 
         See Also
         --------
@@ -2041,7 +1762,7 @@ class Log(object):
             self.multimineral_model(top = top, bottom = bottom, **params)
 
 
-    def add_pay_flag(self, formations, flag = 1, less_than_or_equal = [], greater_than_or_equal = [], name = ''):
+    def add_pay_flag(self, formations, flag = 1, less_than_or_equal = [], greater_than_or_equal = [], name = '', descr = 'Pay Flag'):
         """
         Add Pay Flag based on curve cutoffs
 
@@ -2066,64 +1787,66 @@ class Log(object):
         -------
         >>> # loads Wolfcamp and adds pay flag based on resistivity
         >>> import petropy as ptr
-        >>> log = ptr.log_data('WFMP') # sample Wolfcamp log
-        >>> gtoe = [('RESDEEP_N', 20)]
-        >>> forms = ['WFMPA', 'WFMPB', 'WFMPC', 'WFMPD']
-        >>> log.add_pay_flag(forms, greater_than_or_equal = gtoe, name = 'RES')
+        >>> log = ptr.log_data('WFMP') # reads sample Wolfcamp Log from las file
+        >>> gtoe = [('RESDEEP_N', 20)] # specify play flag if RESDEEP_N is greather than or equal to 20
+        >>> f = ['WFMPA', 'WFMPB', 'WFMPC']
+        >>> log.add_pay_flag(f, greater_than_or_equal = gtoe, name = 'RES')
 
         """
 
         if len(name) < 1:
             c = 1
-            for column in self.curve_df.columns.values:
-                if 'PAY_FLAG' in column:
+            for curve in self.keys():
+                if 'PAY_FLAG' in curve:
                     c += 1
             name = 'PAY_FLAG_' + str(c)
         else:
             name = 'PAY_FLAG_' + name
 
+        if name not in self.keys():
+            nulls = np.empty(len(self[0]))
+            nulls[:] = np.nan
+            self.add_curve(name, nulls, descr = descr)
+
         for form in formations:
             top = self.tops[form]
             bottom = self.next_formation_depth(form)
 
-            depths = (self.curve_df.DEPTH >= top) & (self.curve_df.DEPTH < bottom)
-            cutoff = depths.copy()
+            cutoffs = np.where(self[0] >= top)[0]
+
+            cutoffs = np.intersect1d(cutoffs, np.where(self[0] <= bottom)[0])
 
             for curve, value in less_than_or_equal:
-                cutoff = (cutoff) & (self.curve_df[depths][curve] <= value)
+                cutoffs = np.intersect1d(cutoffs, np.where(self[curve] <= value)[0])
 
             for curve, value in greater_than_or_equal:
-                cutoff = (cutoff) & (self.curve_df[depths][curve] >= value)
+                cutoffs = np.intersect1d(cutoffs, np.where(self[curve] >= value)[0])
 
-            self.curve_df.loc[depths, name] = np.nan
-            self.curve_df.loc[cutoff, name] = flag
-            self.curve_df.loc[(depths) & (self.curve_df[name].isnull()), name] = 0
+            self[name][cutoffs] = flag
 
 
-    def summations(self, formations = [], curves = ['PHIE']):
+    def summations(self, formations, curves = ['PHIE']):
         """
         Cumulative summations over formations for given curves.
 
         Parameters
         ---------
-        formations : list (default [])
-            list of formations to calculate summations
+        formations : list
+            list of formations, which must be found in preloaded tops
         curves : list (default ['PHIE'])
             list of curves to calculated cumulative summations. Values in list
-            must be present in the curve_df dataframe.
+            must curves be present in log.
 
         Example
         -------
         Sum Oil in Place for Wolfcamp A
         >>> import petropy as ptr
-        >>> log = ptr.log_data('WFMP') # sample Wolfcamp log
-        >>> log.tops_from_csv() # default tops
-        >>> log.fluid_properties_parameters_from_csv() # load default parameters
-        >>> log.formation_fluid_properties(formations = 'WFMPA') # run with defaults
-        >>> log.multimineral_parameters_from_csv() # load default parameters
-        >>> log.formation_multimineral_model(formation = 'WFMPA') # run with defaults
-        >>> # run summations for oil in place over Wolfcamp A
-        >>> log.summations(formations = ['WFMPA'], curves = ['OIP'])
+        >>> log = ptr.log_data('WFMP') # reads sample Wolfcamp Log from las file
+        >>> f = ['WFMPA', 'WFMPB', 'WFMPC']
+        >>> log.formation_fluid_properties(formations = f)
+        >>> log.formation_multimineral_model(formation = f)
+        >>> # run summations for Oil in Place over WFMPA, WFMPB, and WFMPC
+        >>> log.summations(formations = f, curves = ['OIP'])
 
         See Also
         --------
@@ -2133,27 +1856,30 @@ class Log(object):
         """
 
         hc_columns = ['OIP', 'GIP', 'GIP_ADS', 'GIP_FREE']
+        sample_rate = np.abs(np.append(np.asarray([self[0][0] - self[0][1]]), np.diff(self[0])))
 
-        sample_rate = self.curve_df.DEPTH.diff()
-        sample_rate.loc[0] = self.curve_df.DEPTH.iloc[1]
+        for c in curves:
+            if c + '_SUM' not in self.keys():
+                nulls = np.empty(len(self[0]))
+                nulls[:] = np.nan
+                curve = self.get_curve(c)
+                self.add_curve(c + '_SUM', nulls, unit = curve.unit + ' ft',
+                               descr = curve.descr + ' Summation')
+
         for f in formations:
             top = self.tops[f]
             bottom = self.next_formation_depth(f)
 
-            depths = (self.curve_df.DEPTH >= top) & (self.curve_df.DEPTH < bottom)
+            depth_index = np.intersect1d(np.where(self[0] >= top)[0], np.where(self[0] < bottom)[0])
             for c in curves:
-                name = c + '_SUM'
-                unit = self.curve_values[c].unit
-                des = 'Summation of ' + c
-                series = self.curve_df[depths][c]
 
                 ### include sample rate in summation for non hydrocarbon columns ###
-                if c not in hc_columns:
-                    series = series * sample_rate[depths]
+                if c in hc_columns:
+                    series = self[c][depth_index]
+                else:
+                    series = self[c][depth_index] * sample_rate[depth_index]
 
-                self.curve_df.loc[depths, name] = series.ix[::-1].cumsum()[::-1]
-                self.curve_parameters.append(name)
-                self.curve_values[name] = Parameter(name = name, unit = unit, des = des)
+                self[ c + '_SUM'][depth_index] = series[::-1].cumsum()[::-1]
 
 
     def statistics(self, formations = [], curves = ['PHIE']):
@@ -2178,16 +1904,25 @@ class Log(object):
         Example
         -------
         >>> import petropy as ptr
-        >>> log = ptr.log_data('WFMP') # sample Wolfcamp log
-        >>> log.tops_from_csv() # default tops
-        >>> f = ['WFMPA', 'WFMPB', 'WFMPC', 'WFMPD']
+        >>> log = ptr.log_data('WFMP') # reads sample Wolfcamp Log from las file
+        >>> f = ['WFMPA', 'WFMPB', 'WFMPC']
         >>> c = ['GR_N', 'RHOB_N', NPHI_N']
         >>> stats_df = log.statistics(formations = f, curves = c)
         >>> print(stats_df)
+          FORMATION                   DATETIME  GROSS_H  GR_N_MEAN   GR_N_STD  \
+        0     WFMPA 2017-09-26 16:04:47.543687    300.5  92.597982  31.255365
+        1     WFMPB 2017-09-26 16:04:47.543687    396.5  89.953657  17.478631
+        2     WFMPC 2017-09-26 16:04:47.543687    337.5  75.326230  19.610832
 
-        COPY AND PASTE EXPORT DATA HERE!!!
-        ###
-        :LKSJDF:LSKJDFLKJS
+             GR_N_SUM  RHOB_N_MEAN  RHOB_N_STD  RHOB_N_SUM  NPHI_N_MEAN  NPHI_N_STD  \
+        0  27825.6935     2.503339    0.048434    752.2535     0.208496    0.055684
+        1  35666.6250     2.526271    0.051070   1001.6665     0.219536    0.044894
+        2  25422.6025     2.539730    0.069945    857.1590     0.198791    0.066487
+
+           NPHI_N_SUM             UWI
+        0      62.653  42303347740000
+        1      87.046  42303347740000
+        2      67.092  42303347740000
 
         SEE ALSO
         --------
@@ -2200,14 +1935,12 @@ class Log(object):
         """
 
         hc_columns = ['OIP', 'GIP', 'GIP_ADS', 'GIP_FREE']
-
-        sample_rate = self.curve_df.DEPTH.diff()
-        sample_rate.loc[0] = self.curve_df.DEPTH.iloc[1]
+        sample_rate = np.abs(np.append(np.asarray([self[0][0] - self[0][1]]), np.diff(self[0])))
 
         pay_flags = []
-        for c in self.curve_df.columns.values:
-            if 'PAY_FLAG' in c:
-                pay_flags.append(c)
+        for curve in self.keys():
+            if 'PAY_FLAG' in curve:
+                pay_flags.append(curve)
 
         stats_data = {}
         for f in formations:
@@ -2216,43 +1949,44 @@ class Log(object):
             bottom = self.next_formation_depth(f)
             formation_data = {'DATETIME': dt.datetime.now(), 'GROSS_H': bottom - top}
 
-            depths = (self.curve_df.DEPTH >= top) & (self.curve_df.DEPTH < bottom)
+            depth_index = np.intersect1d(np.where(self[0] >= top)[0], np.where(self[0] < bottom)[0])
 
-            for c in curves:
-                if c not in self.curve_df.columns.values:
-                    raise ValueError('Column %s not in log curves.' % c)
+            for curve in curves:
+                if curve not in self.keys():
+                    raise ValueError('Curve %s not in log curves.' % curve)
 
-                series = self.curve_df[depths][c]
-                formation_data[c + '_MEAN'] = series.mean()
-                formation_data[c + '_STD'] = series.std()
+                series = self[curve][depth_index]
+                formation_data[curve + '_MEAN'] = series.mean()
+                formation_data[curve + '_STD'] = series.std()
 
-                if c not in hc_columns:
-                    ### multiply by step rate for summations ###
-                    series_sum = (series * sample_rate).sum()
-                else:
+                if curve in hc_columns:
                     series_sum = series.sum()
+                else:
+                    ### multiply by step rate for summations ###
+                    series_sum = (series * sample_rate[depth_index]).sum()
 
-                formation_data[c + '_SUM'] = series_sum
+                formation_data[curve + '_SUM'] = series_sum
 
                 for p in pay_flags:
-                    pay_series = series[(depths) & (self.curve_df[p] > 0)].copy()
+                    pay_depth_index = np.intersect1d(depth_index, np.where(self[p] > 0)[0])
+                    pay_series = self[curve][pay_depth_index]
 
-                    formation_data[c + '_' + p + '_MEAN'] = pay_series.mean()
-                    formation_data[c + '_' + p + '_STD'] = pay_series.std()
+                    formation_data[curve + '_' + p + '_MEAN'] = pay_series.mean()
+                    formation_data[curve + '_' + p + '_STD'] = pay_series.std()
 
-                    if c not in hc_columns:
-                        ### multiply by step rate for summations ###
-                        pay_series_sum = (pay_series * sample_rate).sum()
-                    else:
+                    if curve in hc_columns:
                         pay_series_sum = pay_series.sum()
+                    else:
+                        ### multiply by step rate for summations ###
+                        pay_series_sum = (pay_series * sample_rate[pay_depth_index]).sum()
 
-                    formation_data[c + '_' + p + '_SUM'] = pay_series_sum
+                    formation_data[curve + '_' + p + '_SUM'] = pay_series_sum
 
             stats_data[f] = formation_data
 
         df = pd.DataFrame.from_dict(stats_data, orient = 'index')
         df.index.name = 'FORMATION'
-        df['UWI'] = self.uwi
+        df['UWI'] = self.well['UWI'].value
         df.reset_index(inplace = True)
 
         return df
@@ -2277,9 +2011,8 @@ class Log(object):
         Example
         -------
         >>> import petropy as ptr
-        >>> log = ptr.log_data('WFMP') # sample Wolfcamp log
-        >>> log.tops_from_csv() # default tops
-        >>> f = ['WFMPA', 'WFMPB', 'WFMPC', 'WFMPD']
+        >>> log = ptr.log_data('WFMP') # reads sample Wolfcamp Log from las file
+        >>> f = ['WFMPA', 'WFMPB', 'WFMPC']
         >>> c = ['GR_N', 'RHOB_N', NPHI_N']
         >>> p = 'path/to/my/file.csv'
         >>> log.statistics_to_csv(p, formations = f, curves = c)
@@ -2313,113 +2046,7 @@ class Log(object):
 
         new_df.to_csv(file_path)
 
-
-    def write(self, file_path, top_depth = None, bottom_depth = None):
-        """
-        Write an las file of the log
-
-        Parameters
-        ----------
-        file_path : str
-            a path to save the las
-        top_depth : float (default None)
-            the start depth of the las file. If None, will begin at the top of
-            recorded data
-        bottom_depth : float (default None)
-            end depth of the las file. If None, will export to the end of
-            recorded data
-
-        Example
-        -------
-        >>> # Read las file, then write to new location with better formatting
-        >>> import petropy as ptr
-        >>> log = ptr.log_data('WFMP') # sample Wolfcamp log
-        >>> file_name = 'path/to/new/location/name_of_file.las'
-        >>> log.write(file_name)
-
-        >>> # Read las file, and only write Wolfcamp A for a smaller file size
-        >>> import petropy as ptr
-        >>> log = ptr.log_data('WFMP') # sample Wolfcamp log
-        >>> log.tops_from_csv() # default tops
-        >>> start = log.tops['WFMPA']
-        >>> end = log.tops['WFMPB']
-        >>> file_name = 'path/to/new/location/name_of_file.las'
-        >>> log.write(file_name, top_depth = start, bottom_depth = end)
-
-        """
-
-        output = '~VERSION INFORMATION\n'
-        for attribute in self.version_parameters:
-            parameter = self.version_values[attribute]
-            output += parameter.to_string() + '\n'
-
-        output += '#'.ljust(64, '-') + '\n'
-        output += '~WELL INFORMATION\n'
-        output += '#MNEM'.ljust(12, ' ') + 'UNIT'.ljust(9, ' ') + 'DATA'.ljust(34, ' ') + 'DESCRIPTION\n'
-        output += '#'.ljust(11, '-') + ' '.ljust(9, '-') + ' '.ljust(34, '-') + ' '.ljust(11 , '-') + '\n'
-        for attribute in self.well_parameters:
-            parameter = self.well_values[attribute]
-            output += parameter.to_string() + '\n'
-
-        output += '#'.ljust(64, '-') + '\n'
-        output += '~PARAMETER INFORMATION\n'
-        output += '#MNEM'.ljust(12, ' ') + 'UNIT'.ljust(8, ' ') + 'VALUE'.ljust(36, ' ') + 'DESCRIPTION\n'
-        output += '#'.ljust(11, '-') + ' '.ljust(8, '-') + ' '.ljust(36, '-') + ' '.ljust(11 , '-') + '\n'
-        for attribute in self.parameter_parameters:
-            parameter = self.parameter_values[attribute]
-            output += parameter.to_string() + '\n'
-
-        output += '#'.ljust(64, '-') + '\n'
-        output += '~CURVE INFORMATION\n'
-        output += '#MNEM'.ljust(12, ' ') + 'UNIT'.ljust(8, ' ') + 'API CODE'.ljust(36, ' ') + 'DESCRIPTION\n'
-        output += '#'.ljust(11, '-') + ' '.ljust(8, '-') + ' '.ljust(36, '-') + ' '.ljust(11 , '-') + '\n'
-        df_output_columns = []
-        for attribute in self.curve_parameters:
-            if attribute not in df_output_columns:
-                parameter = self.curve_values[attribute]
-                df_output_columns.append(parameter.name)
-                output += parameter.to_string() + '\n'
-
-        output += '#'.ljust(64, '-') + '\n'
-        output += '#\n'
-
-        output += '#   '
-        for name in df_output_columns:
-            output += name.ljust(12, ' ')
-        output += '\n'
-        output += '#\n'
-        output += '~A\n'
-
-        if top_depth is None:
-            top_depth = self.curve_df.DEPTH.min()
-        if bottom_depth is None:
-            bottom_depth = self.curve_df.DEPTH.max()
-
-        self.curve_df.fillna(value = self.null, inplace = True)
-        curve_data = self.curve_df[df_output_columns].to_records(index = False)
-        curve_data = curve_data[(curve_data.DEPTH >= top_depth) & (curve_data.DEPTH <= bottom_depth)]
-
-        columns = len(curve_data[0]) - 1
-        column_lengths = {}
-        for i in range(columns + 1):
-            column_lengths[i] = 0
-
-        for row in curve_data:
-            output += '    '
-            for j, value in enumerate(row):
-                value = '%.4f' % value
-                if j == columns:
-                    output += value
-                else:
-                    value = value.ljust(12, ' ')
-                    output += value
-            output += '\n'
-
-        with open(file_path, 'w') as f:
-            f.write(output)
-
-
-    def to_csv(self, **kwargs):
+    def to_csv(self, *args, **kwargs):
         """
         Write the log DataFrame to a comma-=separated values (csv) file.
 
@@ -2486,11 +2113,12 @@ class Log(object):
         -------
         >>> # Read las file, then write to csv for use in excel
         >>> import petropy as ptr
-        >>> log = ptr.log_data('WFMP') # sample Wolfcamp log
+        >>> log = ptr.log_data('WFMP') # reads sample Wolfcamp Log from las file
         >>> file_name = 'path/to/save/location/name_of_file.csv'
         >>> log.to_csv(path_or_buf = file_name, index = False)
 
         """
 
-        self.curve_df.fillna(value = self.null, inplace = True)
-        self.curve_df.to_csv(**kwargs)
+        df = self.df()
+        df.fillna(value = self.well['NULL'].value, inplace = True)
+        df.to_csv(*args, **kwargs)

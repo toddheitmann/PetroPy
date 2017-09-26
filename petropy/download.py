@@ -92,6 +92,12 @@ def kgs_download(save_dir = None):
     saves them in the folder data/kgs.
 
 
+    Parameters
+    ----------
+    save_dir : str (default None)
+        path to directory to save data. defaults to data folder within petropy
+
+
     Example
     -------
     >>> from petropy import kgs_download
