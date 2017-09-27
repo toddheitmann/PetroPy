@@ -794,9 +794,3 @@ class LogViewer(object):
             self.log[curve_name] = x_data
 
             self.fig.canvas.draw()
-
-from datasets import log_data
-
-log = log_data('WFMP')
-viewer = LogViewer(log)
-viewer.show()

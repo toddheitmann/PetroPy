@@ -17,7 +17,7 @@ A petrophysics with python package allowing scientific python computing of conve
 - [scipy](https://www.scipy.org)
 - [pandas](http://pandas.pydata.org)
 - [matplotlib](http://matplotlib.org)
-- [sci-kit learn](http://scikit-learn.org/stable/) (for electrofacies)
+- [sci-kit learn](http://scikit-learn.org/stable/)
 
 ## Currently Version 0.0
 
@@ -30,8 +30,8 @@ The basic workflow in the module is functional, but requires downloading source 
 - [x] Calculate fluid properties
 - [x] Calculate multimineral, posority, saturation model
 - [x] Calculate and export statistics
-- [x] Curve edit manual manipulation
-- [x] Curve edit module for shifting data
+- [x] Curve edit manual redrawing
+- [x] Curve edit bulk shift data
 - [x] Electrofacies module
 - [x] Replace log object by subclassing [lasio](https://github.com/kinverarity1/lasio) object
 - [ ] Add to pypi package registry
@@ -53,10 +53,10 @@ The basic workflow in the module is functional, but requires downloading source 
 
 ### Extended Features with Geologic Software
 
-[ ] Create Geographix GGXLog object
+- [ ] Create Geographix GGXLog object
   - [ ] Read Well with UWI input
   - [ ] Save calculations to Database
 
-[ ] Create Petra PetraLog object
-  - [ ]Read Well with UWI input
+- [ ] Create Petra PetraLog object
+  - [ ] Read Well with UWI input
   - [ ] Save calculations to Database

@@ -51,7 +51,7 @@ def electrofacies(logs, formations, curves, n_clusters, log_scale = [], n_compon
     >>> logs = [ptr.Log(x) for x in file_paths] # create list of Log objects
     >>> tops_csv = 'path/to/tops.csv'
     >>> for log in logs:
-            log.tops_from_csv(tops_csv) # add formation tops to wells
+    ...     log.tops_from_csv(tops_csv) # add formation tops to wells
     >>> f = ['FORM1', 'FORM2'] # list of formation tops. If single formation use f = ['FORM']
     >>> c = ['GR_N', 'RESDEEP_N', 'RHOB_N', 'NPHI_N', 'PE_N']
     >>> scale = ['RESDEEP_N']
