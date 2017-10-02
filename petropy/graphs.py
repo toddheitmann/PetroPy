@@ -630,12 +630,8 @@ class LogViewer(object):
         >>> log = ptr.log_data('WFMP') # sample Wolfcamp log
         >>> viewer = ptr.LogViewer(log, edit_mode = True) # allow edits when viewing
         >>> viewer.show() # display graphs with editing option
-        >>> viewer.write('wfmp_updated.las') # writes changed data to new las file
-
-        See Also
-        --------
-        write
-            LogViewer method to write the updated log to a new las file.
+        >>> s = 'path/to/new_file.las'
+        >>> viewer.log.write(f) # writes changed data to new las file
 
         """
         if self.edit_mode:
@@ -666,38 +662,6 @@ class LogViewer(object):
             mngr.window.setGeometry(edit_x, edit_y, 225, 225)
 
         plt.show()
-
-    def write(self, file_object, version = None, wrap = None, STRT = None, STOP = None, STEP = None, fmt = '%10.5g'):
-        """
-        Writes log stored in viewer to file.
-
-        Parameters
-        ----------
-        file_object : file
-            a file_like object opening for writing.
-        version : float (default None)
-            las version either 1.2 or 2
-        wrap : bool
-            Boolean to write a wrapped las file. If not provided, will default to WRAP item in Log object
-        STRT : float
-            Optional override to automatic calculation using the first index curve value.
-        STEP :  float
-            Optional override to automatic calculation using the first step size in the index curve.
-        fmt : str
-            Format string for numerical data being written to data section.
-
-        Example
-        -------
-        >>> import petropy as ptr
-        >>> log = ptr.log_data('WFMP') # sample Wolfcamp log
-        >>> viewer = ptr.LogViewer(log, edit_mode = True) # allow edits when viewing
-        >>> viewer.show() # display and graphically edit log
-        >>> with open('new_file.las', 'w') as f:
-        ...     viewer.write('new_file_name.las') # save edits to new las file
-
-        """
-
-        self.log.write(file_object, version = None, wrap = None, STRT = None, STOP = None, STEP = None, fmt = '%10.5g')
 
     def _curve_pick(self, event):
         """

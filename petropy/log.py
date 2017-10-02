@@ -117,7 +117,7 @@ class Log(LASFile):
         >>> log.tops_from_csv() # loads default tops for included datasets
 
         >>> import petropy as ptr
-        >>> log = ptr.Las('path/to/well.las') # loads specified las file
+        >>> log = ptr.Log('path/to/well.las') # loads specified las file
         >>> log.tops_from_csv('path/to/tops.csv') # loads specified tops csv
 
         """
@@ -1734,7 +1734,6 @@ class Log(LASFile):
         Examples
         --------
         >>> import petropy as ptr
-        >>> from petropy import datasets
         >>> log = ptr.log_data('WFMP') # reads sample Wolfcamp Log from las file
         >>> f = ['WFMPA', 'WFMPB', 'WFMPC']
         >>> # calculates fluid properties for formations WFMPA, WFMPB, and WFMPC with default settings
@@ -2122,3 +2121,38 @@ class Log(LASFile):
         df = self.df()
         df.fillna(value = self.well['NULL'].value, inplace = True)
         df.to_csv(*args, **kwargs)
+
+    def write(self, file_path, version = 2.0, wrap = False, STRT = None, STOP = None, STEP = None, fmt = '%10.5g'):
+        """
+        Writes to las file, and overwrites if file exisits. Uses parent class LASFile.write method
+        with specified defaults
+
+        Paramters
+        ---------
+        file_path : str
+            path to new las file.
+        version : {1.2 or 2} (default 2)
+            Version for las file
+        wrap : {True, Flase, None} (default False)
+            Specify to wrap data. If None, uses setting from when file was read.
+        STRT : float (default None)
+            Optional override to automatic calculation using the first index curve value.
+        STOP : float (default None)
+            Optional override to automatic calculation using the last index curve value.
+        STEP : float (default None)
+            Optional override to automatic calculation using the first step size in the index curve.
+        fmt : str (default '%10.5g')
+            Format string for numerical data being written to data section.
+
+        Example
+        -------
+        >>> import petropy as ptr
+        >>> log = ptr.log_data('WFMP') # reads sample Wolfcamp Log from las file
+        >>> p = 'path/to/new_file.las' # create file path to save log
+        >>> log.write(p)
+
+        """
+
+        with open(file_path, 'w') as f:
+            super(Log, self).write(f, version = version, wrap = wrap,
+                        STRT = STRT, STOP = STOP, STEP = None, fmt = fmt)
