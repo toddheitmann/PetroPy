@@ -13,112 +13,122 @@ from matplotlib.widgets import RadioButtons
 import xml.etree.ElementTree as ET
 
 class LogViewer(object):
-    """
-    LogViewer
+    """LogViewer
 
-    Uses matplotlib to create a figure and axes to display log data. XML templates are required to diplay
-    curve data, with a few defaults provided.
+    Uses matplotlib to create a figure and axes to display log data. XML templates are required to diplay curve data, with a few defaults provided.
 
     Attributes
     ----------
-    log: Log
-        The Log class with data updated from any edits performed within LogViewer.
-    fig: Figure
+    log : Log
+        The Log class with data updated from any edits performed within LogViewer
+    fig : Figure
         The matplotlib Figure object
     axes : ndarray
         numpy ndarray of AxesSubplot objects where each axes is a curve track
-    edit_mode : boolean (default False)
-        boolean to display editing tools or not
+    edit_mode : bool (default False)
+        bool to display editing tools or not
 
-    Example
-    -------
-    >>> # create LogViewer with default triple-combo template and display
+
+    Parameters
+    ----------
+    log : Log
+        A `Log` object with curve data to display in the LogViewer
+    template_xml_path : str (default None)
+        Path to xml template.
+    template_defaults : str {'raw', 'multimin_oil', 'multimin_gas', 'multimin_oil_sum', 'multimin_gas_sum'} (default None)
+        Name of default template options. Uses prebuilt template to display data
+    top : float (default None)
+        Setting to set initial top of graph
+    height : float (default None)
+        Setting to set amout of feet to display
+
+    Examples
+    --------
     >>> import petropy as ptr
-    >>> log = ptr.log_data('WFMP') # sample Wolfcamp log
-    >>> viewer = ptr.LogViewer(log, template_defaults = 'raw') # create LogViewer with 'raw' template
+    # create LogViewer with default triple-combo template and display
+    #
+    # Load sample wolfcamp log
+    >>> log = ptr.log_data('WFMP')
+    # create LogViewer with 'raw' template
+    >>> viewer = ptr.LogViewer(log, template_defaults = 'raw')
     >>> viewer.show() # diplay log data
 
-    >>> # create LogViewer for 11 x 17 paper with default triple-combo template and save
     >>> import petropy as ptr
-    >>> log = ptr.log_data('WFMP') # sample Wolfcamp log
-    >>> viewer = ptr.LogViewer(log, template_defaults = 'raw') # create LogViewer with 'raw' template
-    >>> viewer.fig.set_size_inches(17, 11) # use fig attribute to change size to 17 x 11
-    >>> s = 'path/to/save/wfmp_log.png' # file path for image file
-    >>> viewer.fig.savefig(s) # saves matplotlib figure
-
-    >>> # create LogViewer with custom template and save
-    >>> import petropy as ptr
-    >>> log = ptr.log_data('WFMP') # sample Wolfcamp log
-    >>> t = 'path/to/my/custom/template.xml'
-    >>> viewer = ptr.LogViewer(log, template_xml_path = t)
-    >>> s = 'path/to/save/figure.png'
+    # create LogViewer for 11 x 17 paper
+    # with default triple-combo template and save
+    #
+    # Load sample wolfcamp log
+    >>> log = ptr.log_data('WFMP')
+    # create LogViewer with 'raw' template (default)
+    >>> viewer = ptr.LogViewer(log)
+    # use fig attribute to change size to 17 x 11
+    >>> viewer.fig.set_size_inches(17, 11)
+    # file path for image file
+    >>> s = 'path/to/save/wfmp_log.png'
+    # saves matplotlib figure
     >>> viewer.fig.savefig(s)
 
-    >>> # create LogViewer with default triple-combo template, make graphical edits, then save log changes
     >>> import petropy as ptr
-    >>> log = ptr.log_data('WFMP') # sample Wolfcamp log
-    >>> viewer = ptr.LogViewer(log, edit_mode = True, template_defaults = 'raw')
-    >>> viewer.show() # diplay log data and graphically edit
-    >>> s = 'path/to/save/wfmp_edits.las'
-    >>> viewer.log.write(s) # write updated log to new las file. Executed after figures are closed.
+    # create LogViewer with custom template and save
+    #
+    # Load sample wolfcamp log
+    >>> log = ptr.log_data('WFMP')
+    # specify path to template file
+    >>> t = 'path/to/my/custom/template.xml'
+    # create log view with template
+    >>> viewer = ptr.LogViewer(log, template_xml_path = t)
+    # define path to save the log picture
+    >>> s = 'path/to/save/figure.png'
+    # save figure using matplotlib savefig method
+    >>> viewer.fig.savefig(s)
+
+    >>> import petropy as ptr
+    # create LogViewer with default triple-combo template,
+    # make graphical edits, then save log changes
+    #
+    # Load sample wolfcamp log
+    >>> log = ptr.log_data('WFMP')
+    >>> viewer = ptr.LogViewer(log)
+    # diplay log data and graphically edit
+    >>> viewer.show(edit_mode = True)
+    # define path to save the updated log data
+    >>> file_path = 'path/to/save/wfmp_edits.las'
+    # write updated log to new las file.
+    # Executed after figures are closed.
+    >>> viewer.log.write(file_path)
+
+    Raises
+    ------
+    ValueError
+        If template_defaults parameter is not in key of dictionary items
+
+    ValueError
+        If template_xml_path are both specified
+
+    ValueError
+        tick spacing must be specified in depth track
+
+    ValueError
+        number spacing must be specified in depth track
+
+    ValueError
+        left and right values for each curve must be specified in xml template
+
+    ValueError
+        curve must be in log
+
+    ValueError
+        curve display_name must be specified in xml template
+
+    ValueError
+        curve curve_name must be specified in xml template
+
+    ValueError
+        curve fill_color must be specified for cumulative tracks
 
     """
 
-    def __init__(self, log, template_xml_path = None, template_defaults = None, top = None, height = None, edit_mode = False, window_location = (10, 30)):
-        """
-        Creates LogViewer Object
-
-        Uses matplotlib to create a figure and axes to display log data. An XML
-        template is required to specify the tracks and curve colors. Default size
-        is for 8.5" x 11" paper.
-
-        Parameters
-        ----------
-        log : Log
-            A Log object with curve data to display in the LogViewer
-        template_xml_path : str (default None)
-            Path to xml template.
-        template_defaults : str {'raw', 'multimin_oil', 'multimin_gas', 'multimin_oil_sum', 'multimin_gas_sum'} (default None)
-            Name of default template options. Uses prebuilt template to display data
-        top : float (default None)
-            Setting to set initial top of graph
-        height : float (default None)
-            Setting to set amout of feet to display
-        edit_mode : boolean (default False)
-            Setting to allow editing of curve data
-        window_location : float, float tuple (default 10, 30)
-            Tuple of floats to specify top left location of LogViewer when showing in edit_mode == True
-
-        Raises
-        ------
-        ValueError
-            If template_defaults parameter is not in key of dictionary items
-
-        ValueError
-            If template_xml_path are both specified
-
-        ValueError
-            tick spacing must be specified in depth track
-
-        ValueError
-            number spacing must be specified in depth track
-
-        ValueError
-            left and right values for each curve must be specified in xml template
-
-        ValueError
-            curve must be in log
-
-        ValueError
-            curve display_name must be specified in xml template
-
-        ValueError
-            curve curve_name must be specified in xml template
-
-        ValueError
-            curve fill_color must be specified for cumulative tracks
-
-        """
+    def __init__(self, log, template_xml_path = None, template_defaults = None, top = None, height = None):
 
         self.log = log
 
@@ -126,14 +136,12 @@ class LogViewer(object):
         self.template_defaults = template_defaults
         self.top = top
         self.height = height
-        self.edit_mode = edit_mode
-        self.window_location = window_location
 
         ### private parameters for graphically editing curves ###
 
         self._edit_curve = None # stores display name of curve
         self._edit_curve_lines = {} # stores matplotlib line objects by display name
-        self._edit_lock = False # stores boolean to show downclick to edit curve
+        self._edit_lock = False # stores bool to show downclick to edit curve
 
         self._radio_button = None # radio button for editing modes
 
@@ -613,14 +621,23 @@ class LogViewer(object):
         plt.gca().invert_yaxis()
         self.fig.set_size_inches(11, 8.5)
 
-    def show(self):
+    def show(self, edit_mode = False, window_location = (10, 30)):
         """
         Calls matplotlib.pyplot.show() to display log viewer. If edit_mode == True, it includes options
         to graphically edit curve data, and stores these changes within the LogViewer object. After
         editing is finished, access the updated data with the .log property.
 
+        Parameters
+        -----------
+        edit_mode : bool (default False)
+            Setting to allow editing of curve data
+        window_location : float, float tuple (default 10, 30)
+            Tuple of floats to specify top left location of LogViewer
+            First value is pixels from the left of the screen.
+            Second value is pixels from the top of the screen.
+
         Example
-        -------
+        --------
         >>> import petropy as ptr
         >>> log = ptr.log_data('WFMP') # sample Wolfcamp log
         >>> viewer = ptr.LogViewer(log) # default triple-combo template
@@ -628,13 +645,23 @@ class LogViewer(object):
 
         >>> import petropy as ptr
         >>> log = ptr.log_data('WFMP') # sample Wolfcamp log
-        >>> viewer = ptr.LogViewer(log, edit_mode = True) # allow edits when viewing
-        >>> viewer.show() # display graphs with editing option
-        >>> s = 'path/to/new_file.las'
-        >>> viewer.log.write(f) # writes changed data to new las file
+        >>> viewer = ptr.LogViewer(log)
+        # display graphs with editing option
+        >>> viewer.show(edit_mode = True)
+        >>> file_path = 'path/to/new_file.las'
+        # writes changed data to new las file
+        >>> viewer.log.write(file_path)
 
         """
-        if self.edit_mode:
+
+        mngr = self.fig.canvas.manager
+        geom = mngr.window.geometry()
+        x, y, dx, dy = geom.getRect()
+        x = edits_window_location[0]
+        y = edits_window_location[1]
+        mngr.window.setGeometry(x, y, dx, dy)
+
+        if edit_mode:
 
             self.edit_fig, self.edit_axes = plt.subplots(1)
 
@@ -646,13 +673,6 @@ class LogViewer(object):
             self.fig.canvas.mpl_connect('button_press_event', self._edit_lock_toggle)
             self.fig.canvas.mpl_connect('button_release_event', self._edit_lock_toggle)
             self.fig.canvas.mpl_connect('motion_notify_event', self._draw_curve)
-
-            mngr = self.fig.canvas.manager
-            geom = mngr.window.geometry()
-            x, y, dx, dy = geom.getRect()
-            x = self.window_location[0]
-            y = self.window_location[1]
-            mngr.window.setGeometry(x, y, dx, dy)
 
             edit_x = x + dx + 17
             edit_y = y

@@ -1,0 +1,5 @@
+=============
+Electrofacies
+=============
+
+.. autofunction:: petropy.electrofacies

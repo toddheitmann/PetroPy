@@ -17,7 +17,7 @@ A petrophysics with python package allowing scientific python computing of conve
 - [scipy](https://www.scipy.org)
 - [pandas](http://pandas.pydata.org)
 - [matplotlib](http://matplotlib.org)
-- [sci-kit learn](http://scikit-learn.org/stable/)
+- [scikit-learn](http://scikit-learn.org/stable/)
 
 ## Currently Version 0.0
 
@@ -38,7 +38,7 @@ The basic workflow in the module is functional, but requires downloading source 
 
 ### Examples
 
-- [ ] Sphinx Documentation
+- [x] Sphinx Documentation
 - [ ] Wolfcamp example from University Lands
 - [ ] Mississippi Limestone Example from KGS
 - [ ] Dataframe manipulation for different petrophysical crossplots

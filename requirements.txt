@@ -1,0 +1,6 @@
+lasio
+numpy
+scipy
+pandas
+matplotlib
+scikit-learn
