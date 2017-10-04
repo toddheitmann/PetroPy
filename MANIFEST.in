@@ -1,0 +1,8 @@
+# Include the license file
+include LICENSE.txt
+
+# Include the changelog file
+include changelog.md
+
+# Include the data files
+recursive-include data *

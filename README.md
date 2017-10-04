@@ -34,7 +34,7 @@ The basic workflow in the module is functional, but requires downloading source 
 - [x] Curve edit bulk shift data
 - [x] Electrofacies module
 - [x] Replace log object by subclassing [lasio](https://github.com/kinverarity1/lasio) object
-- [ ] Add to pypi package registry
+- [x] Add to pypi package registry
 
 ### Examples
 

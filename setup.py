@@ -15,8 +15,7 @@ setup(
     author = 'Todd Heitmann',
     author_email = 'toddheitmann@protonmail.com',
     url = 'https://github.com/toddheitmann/petropy',
-    download_url = 'https://github.com/toddheitmann/petropy/archive/0.1.tar.gz',
-    keywords = ['petrophysics', 'formation evaluation', 'reservoir characterization']
+    keywords = ['petrophysics', 'formation evaluation', 'reservoir characterization'],
     classifiers=[
         "Intended Audience :: Customer Service",
         "Intended Audience :: Developers",
@@ -33,5 +32,5 @@ setup(
         "Topic :: System :: Filesystems",
         "Topic :: Scientific/Engineering :: Information Analysis",
     ],
-    install_requires = requirements,
+    install_requires = requirements
 )
