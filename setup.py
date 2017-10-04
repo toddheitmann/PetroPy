@@ -7,11 +7,15 @@ from petropy import __version__
 with open(path.join(path.dirname(__file__), "requirements.txt"), "r") as f:
     requirements = f.read().splitlines()
 
+with open(path.join(path.dirname(__file__), "README.rst"), "r") as f:
+    long_description = f.read()
+
 setup(
     name = 'petropy',
     packages=["petropy", ],
     version = __version__,
     description = 'A package to calculate petrophysical properties for formation evaluation.',
+    long_description = long_description,
     author = 'Todd Heitmann',
     author_email = 'toddheitmann@protonmail.com',
     url = 'https://github.com/toddheitmann/petropy',
