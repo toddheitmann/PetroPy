@@ -79,7 +79,7 @@ class Log(LASFile):
         """
 
         file_dir = os.path.dirname(__file__)
-        ALIAS_XML_PATH = os.path.join(file_dir, '..', 'data', 'sample',
+        ALIAS_XML_PATH = os.path.join(file_dir, 'data',
                                       'curve_alias.xml')
 
         if not os.path.isfile(ALIAS_XML_PATH):
@@ -159,8 +159,7 @@ class Log(LASFile):
 
         if csv_path is None:
             local_path = os.path.dirname(__file__)
-            csv_path = os.path.join(local_path, '..', 'data', 'sample',
-                                    'tops.csv')
+            csv_path = os.path.join(local_path, 'data', 'tops.csv')
 
         top_df = pd.read_csv(csv_path, dtype = {'uwi': str,'form': str,
                                                 'depth': float})
@@ -319,7 +318,7 @@ class Log(LASFile):
 
         if csv_path is None:
             local_path = os.path.dirname(__file__)
-            csv_path = os.path.join(local_path, '..', 'data', 'sample',
+            csv_path = os.path.join(local_path, 'data',
                                     'fluid_properties_parameters.csv')
 
         param_df = pd.read_csv(csv_path)
@@ -1043,7 +1042,7 @@ class Log(LASFile):
 
         if csv_path is None:
             local_path = os.path.dirname(__file__)
-            csv_path = os.path.join(local_path, '..', 'data', 'sample',
+            csv_path = os.path.join(local_path, 'data',
                                     'multimineral_parameters.csv')
 
         param_df = pd.read_csv(csv_path)

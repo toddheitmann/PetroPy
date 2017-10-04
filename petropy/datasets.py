@@ -38,11 +38,10 @@ def log_data(source):
     file_dir = os.path.dirname(__file__)
 
     paths = {
-        'WFMP': os.path.join(file_dir, '..', 'data', 'sample',
-                             '42303347740000.las')
+        'WFMP': os.path.join(file_dir, 'data', '42303347740000.las')
     }
 
-    p = os.path.join(file_dir, '..', 'data', 'sample', 'tops.csv')
+    p = os.path.join(file_dir, 'data', 'tops.csv')
 
     if source in paths:
         las_path = paths[source]
@@ -50,6 +49,6 @@ def log_data(source):
         raise ValueError('%s is not valid source' % source)
 
     log = Log(las_path)
-    log.tops_from_csv(v)
+    log.tops_from_csv()
 
     return log

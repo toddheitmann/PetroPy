@@ -36,5 +36,6 @@ setup(
         "Topic :: System :: Filesystems",
         "Topic :: Scientific/Engineering :: Information Analysis",
     ],
-    install_requires = requirements
+    install_requires = requirements,
+    package_data = {'petropy': ['data/*.csv', 'data/*.xml', 'data/*.las']}
 )

@@ -1,11 +1,12 @@
 
-.. image:: _static/petropy_logo.png
+.. image:: static/petropy_logo.png
+
 
 A petrophysics with python package allowing scientific python computing of conventional and unconventional formation evaluation. Reads las files using lasio_. Includes a petrophysical workflow and a log viewer based on XML templates.
 
 .. _lasio: https://github.com/kinverarity1/lasio
 
-.. image:: _static/university_6-17_no1.png
+.. image:: static/university_6-17_no1.png
 
 ************
 Installation

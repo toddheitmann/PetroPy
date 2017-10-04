@@ -58,8 +58,8 @@ def ul_lands_download(save_dir = None):
     ftp_site = 'publicftp.utlands.utsystem.edu'
 
     if save_dir is None:
-        save_dir = os.path.join(os.path.dirname(__file__), '..',
-                                'data', 'ul')
+        save_dir = os.path.join(os.path.dirname(__file__), 'data',
+                                'ul')
 
     ftp = FTP(ftp_site)
     ftp.login()
@@ -127,8 +127,8 @@ def kgs_download(save_dir = None):
     ]
 
     if save_dir is None:
-        save_dir = os.path.join(os.path.dirname(__file__), '..',
-                                'data', 'kgs')
+        save_dir = os.path.join(os.path.dirname(__file__), 'data',
+                                'kgs')
 
     for url in urls:
 

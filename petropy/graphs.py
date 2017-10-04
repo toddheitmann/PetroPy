@@ -1,7 +1,8 @@
 # -*- coding: utf-8 -*-
 """
-Graphs is a simple log viewer using matplotlib to create tracks of log data. Allows graphically editing
-curve data through manual changes and bulk shifting.
+Graphs is a simple log viewer using matplotlib to create tracks of log
+data. Allows graphically editing curve data through manual changes and
+bulk shifting.
 
 """
 
@@ -15,16 +16,20 @@ import xml.etree.ElementTree as ET
 class LogViewer(object):
     """LogViewer
 
-    Uses matplotlib to create a figure and axes to display log data. XML templates are required to diplay curve data, with a few defaults provided.
+    Uses matplotlib to create a figure and axes to display log data.
+    XML templates are required to diplay curve data, with a few
+    defaults provided.
 
     Attributes
     ----------
     log : Log
-        The Log class with data updated from any edits performed within LogViewer
+        The Log class with data updated from any edits performed
+        within LogViewer
     fig : Figure
         The matplotlib Figure object
     axes : ndarray
-        numpy ndarray of AxesSubplot objects where each axes is a curve track
+        numpy ndarray of AxesSubplot objects where each axes is a
+        curve track
     edit_mode : bool (default False)
         bool to display editing tools or not
 
@@ -35,8 +40,10 @@ class LogViewer(object):
         A `Log` object with curve data to display in the LogViewer
     template_xml_path : str (default None)
         Path to xml template.
-    template_defaults : str {'raw', 'multimin_oil', 'multimin_gas', 'multimin_oil_sum', 'multimin_gas_sum'} (default None)
-        Name of default template options. Uses prebuilt template to display data
+    template_defaults : str {'raw', 'multimin_oil', 'multimin_gas',
+    'multimin_oil_sum', 'multimin_gas_sum'} (default None)
+        Name of default template options. Uses prebuilt template to
+        display data
     top : float (default None)
         Setting to set initial top of graph
     height : float (default None)
@@ -100,7 +107,8 @@ class LogViewer(object):
     Raises
     ------
     ValueError
-        If template_defaults parameter is not in key of dictionary items
+        If template_defaults parameter is not in key of dictionary
+        items
 
     ValueError
         If template_xml_path are both specified
@@ -112,7 +120,8 @@ class LogViewer(object):
         number spacing must be specified in depth track
 
     ValueError
-        left and right values for each curve must be specified in xml template
+        left and right values for each curve must be specified in xml
+        template
 
     ValueError
         curve must be in log
@@ -128,7 +137,8 @@ class LogViewer(object):
 
     """
 
-    def __init__(self, log, template_xml_path = None, template_defaults = None, top = None, height = None):
+    def __init__(self, log, template_xml_path = None,
+                 template_defaults = None, top = None, height = None):
 
         self.log = log
 
@@ -156,7 +166,7 @@ class LogViewer(object):
 
         file_dir = os.path.dirname(__file__)
         if template_xml_path is None and template_defaults is None:
-            template_xml_path = os.path.join(file_dir, '..', 'data', 'sample', 'default_raw_template.xml')
+            template_xml_path = os.path.join(file_dir, 'data', 'default_raw_template.xml')
 
         elif template_xml_path is None and template_defaults is not None:
             if template_defaults in default_templates_paths:
@@ -166,7 +176,7 @@ class LogViewer(object):
                 for key in default_templates_paths:
                     print(key)
                 raise ValueError("%s is not valid template_defaults parameter" % template_defaults)
-            template_xml_path = os.path.join(file_dir, '..', 'data', 'sample', file_name)
+            template_xml_path = os.path.join(file_dir, 'data', file_name)
 
         elif template_xml_path is not None and template_defaults is None:
             template_xml_path = template_xml_path
