@@ -1,0 +1,176 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>Electrofacies &#8212; PetroPy 0.1 documentation</title>
+    
+    <link rel="stylesheet" href="../_static/alabaster.css" type="text/css" />
+    <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../',
+        VERSION:     '0.1',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true,
+        SOURCELINK_SUFFIX: '.txt'
+      };
+    </script>
+    <script type="text/javascript" src="../_static/jquery.js"></script>
+    <script type="text/javascript" src="../_static/underscore.js"></script>
+    <script type="text/javascript" src="../_static/doctools.js"></script>
+    <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.0/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="Dataset" href="dataset.html" />
+    <link rel="prev" title="LogViewer" href="../class/LogViewer.html" />
+   
+  <link rel="stylesheet" href="../_static/custom.css" type="text/css" />
+  
+  
+  <meta name="viewport" content="width=device-width, initial-scale=0.9, maximum-scale=0.9" />
+
+  </head>
+  <body role="document">
+  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <div class="section" id="electrofacies">
+<h1>Electrofacies<a class="headerlink" href="#electrofacies" title="Permalink to this headline">¶</a></h1>
+<dl class="function">
+<dt id="petropy.electrofacies">
+<code class="descclassname">petropy.</code><code class="descname">electrofacies</code><span class="sig-paren">(</span><em>logs</em>, <em>formations</em>, <em>curves</em>, <em>n_clusters</em>, <em>log_scale=[]</em>, <em>n_components=0.85</em>, <em>curve_name='FACIES'</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/petropy/electrofacies.html#electrofacies"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#petropy.electrofacies" title="Permalink to this definition">¶</a></dt>
+<dd><p>Electrofacies function to group intervals by rock type. Also
+referred to as heterogenous rock analysis.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
+<li><strong>logs</strong> (list of <code class="xref py py-class docutils literal"><span class="pre">ptr.Log</span></code> objects) &#8211; List of Log objects</li>
+<li><strong>formations</strong> (<em>list of formation names</em>) &#8211; List of strings containg formation names which should be
+previously loaded into Log objects</li>
+<li><strong>curves</strong> (<em>list of curve names</em>) &#8211; List of strings containing curve names as inputs in the
+electrofacies calculations</li>
+<li><strong>n_clusters</strong> (<a class="reference external" href="https://docs.python.org/2/library/functions.html#int" title="(in Python v2.7)"><em>int</em></a>) &#8211; Number of clusters to group intervals. Number of electrofacies.</li>
+<li><strong>log_scale</strong> (<em>list of curve names</em>) &#8211; List of string containing curve names which are preprocessed
+on a log scale. For example, deep resistivity separates better
+on a log scale, and is graph logarithmically when viewing data
+in a log viewer.</li>
+<li><strong>n_components</strong> (<a class="reference external" href="https://docs.python.org/2/library/functions.html#int" title="(in Python v2.7)"><em>int</em></a><em>, </em><a class="reference external" href="https://docs.python.org/2/library/functions.html#float" title="(in Python v2.7)"><em>float</em></a><em>, </em><a class="reference external" href="https://docs.python.org/2/library/constants.html#None" title="(in Python v2.7)"><em>None</em></a><em> or </em><a class="reference external" href="https://docs.python.org/2/library/string.html#module-string" title="(in Python v2.7)"><em>string</em></a><em> (</em><em>default 0.85</em><em>)</em>) &#8211; Number of principal components to keep. If value is less than
+one, the number of principal components be the number required
+to exceed the explained variance.</li>
+<li><strong>curve_name</strong> (<a class="reference external" href="https://docs.python.org/2/library/functions.html#str" title="(in Python v2.7)"><em>str</em></a><em> (</em><em>default 'FACIES'</em><em>)</em>) &#8211; Name of the new electrofacies curve.</li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
+<p class="rubric">Examples</p>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="c1"># loads sample Wolfcamp calculates electrofacies for that well</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="kn">import</span> <span class="nn">petropy</span> <span class="k">as</span> <span class="nn">ptr</span>
+<span class="go"># reads sample Wolfcamp Log from las file</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">log</span> <span class="o">=</span> <span class="n">ptr</span><span class="o">.</span><span class="n">log_data</span><span class="p">(</span><span class="s1">&#39;WFMP&#39;</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">logs</span> <span class="o">=</span> <span class="p">[</span><span class="n">log</span><span class="p">]</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">f</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;WFMPA&#39;</span><span class="p">,</span> <span class="s1">&#39;WFMPB&#39;</span><span class="p">,</span> <span class="s1">&#39;WFMPC&#39;</span><span class="p">]</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">c</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;GR_N&#39;</span><span class="p">,</span> <span class="s1">&#39;RESDEEP_N&#39;</span><span class="p">,</span> <span class="s1">&#39;RHOB_N&#39;</span><span class="p">,</span> <span class="s1">&#39;NPHI_N&#39;</span><span class="p">,</span> <span class="s1">&#39;PE_N&#39;</span><span class="p">]</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">scale</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;RESDEEP_N&#39;</span><span class="p">]</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">logs</span> <span class="o">=</span> <span class="n">electrofacies</span><span class="p">(</span><span class="n">logs</span><span class="p">,</span> <span class="n">f</span><span class="p">,</span> <span class="n">c</span><span class="p">,</span> <span class="mi">8</span><span class="p">,</span> <span class="n">log_scale</span> <span class="o">=</span> <span class="n">scale</span><span class="p">)</span>
+</pre></div>
+</div>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">import</span> <span class="nn">petropy</span> <span class="k">as</span> <span class="nn">ptr</span>
+<span class="go"># loads logs from a list of paths and</span>
+<span class="go"># calculates electrofacies across the wells</span>
+<span class="go">#</span>
+<span class="go"># defin file_paths for las files to analyze</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">file_paths</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;path/to/log1.las&#39;</span><span class="p">,</span> <span class="s1">&#39;path/to/log2.las&#39;</span><span class="p">,</span>
+<span class="gp">... </span><span class="s1">&#39;path/to/log3.las&#39;</span><span class="p">,</span> <span class="s1">&#39;path/to/log4.las&#39;</span><span class="p">]</span>
+<span class="go"># create list of Log objects</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">logs</span> <span class="o">=</span> <span class="p">[</span><span class="n">ptr</span><span class="o">.</span><span class="n">Log</span><span class="p">(</span><span class="n">x</span><span class="p">)</span> <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="n">file_paths</span><span class="p">]</span>
+<span class="go"># define csv with tops for all wells</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">tops_csv</span> <span class="o">=</span> <span class="s1">&#39;path/to/tops.csv&#39;</span>
+<span class="go"># add formation tops to wells</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="k">for</span> <span class="n">log</span> <span class="ow">in</span> <span class="n">logs</span><span class="p">:</span>
+<span class="gp">... </span>    <span class="n">log</span><span class="o">.</span><span class="n">tops_from_csv</span><span class="p">(</span><span class="n">tops_csv</span><span class="p">)</span>
+<span class="go"># define list of formation tops. If single formation, f = [&#39;FORM&#39;]</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">f</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;FORM1&#39;</span><span class="p">,</span> <span class="s1">&#39;FORM2&#39;</span><span class="p">]</span>
+<span class="go"># list of curves to use for classification</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">c</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;GR_N&#39;</span><span class="p">,</span> <span class="s1">&#39;RESDEEP_N&#39;</span><span class="p">,</span> <span class="s1">&#39;RHOB_N&#39;</span><span class="p">,</span> <span class="s1">&#39;NPHI_N&#39;</span><span class="p">,</span> <span class="s1">&#39;PE_N&#39;</span><span class="p">]</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">scale</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;RESDEEP_N&#39;</span><span class="p">]</span>
+<span class="go"># run electrofacies across logs in list</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">logs</span> <span class="o">=</span> <span class="n">electrofacies</span><span class="p">(</span><span class="n">logs</span><span class="p">,</span> <span class="n">f</span><span class="p">,</span> <span class="n">c</span><span class="p">,</span> <span class="mi">8</span><span class="p">,</span> <span class="n">log_scale</span> <span class="o">=</span> <span class="n">scale</span><span class="p">)</span>
+<span class="go"># save las in renamed file</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="n">log</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">logs</span><span class="p">):</span>
+<span class="gp">... </span>    <span class="n">new_file_name</span> <span class="o">=</span> <span class="n">file_paths</span><span class="p">[</span><span class="n">i</span><span class="p">]</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s1">&#39;.&#39;</span><span class="p">)[</span><span class="mi">0</span><span class="p">]</span><span class="o">+</span><span class="s1">&#39;_with_HRA.las&#39;</span>
+<span class="gp">... </span>    <span class="n">log</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">new_file_name</span><span class="p">)</span>
+</pre></div>
+</div>
+</dd></dl>
+
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+<h1 class="logo"><a href="../index.html">PetroPy</a></h1>
+
+
+
+
+
+
+
+
+<h3>Navigation</h3>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="../class/Log.html">Log</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../class/LogViewer.html">LogViewer</a></li>
+<li class="toctree-l1 current"><a class="current reference internal" href="#">Electrofacies</a></li>
+<li class="toctree-l1"><a class="reference internal" href="dataset.html">Dataset</a></li>
+<li class="toctree-l1"><a class="reference internal" href="download.html">Downloads</a></li>
+</ul>
+
+
+<div id="searchbox" style="display: none" role="search">
+  <h3>Quick search</h3>
+    <form class="search" action="../search.html" method="get">
+      <div><input type="text" name="q" /></div>
+      <div><input type="submit" value="Go" /></div>
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="footer">
+      &copy;2017, Todd Heitmann.
+      
+      |
+      Powered by <a href="http://sphinx-doc.org/">Sphinx 1.5.6</a>
+      &amp; <a href="https://github.com/bitprophet/alabaster">Alabaster 0.7.10</a>
+      
+      |
+      <a href="../_sources/function/electrofacies.rst.txt"
+          rel="nofollow">Page source</a>
+    </div>
+
+    
+
+    
+  </body>
+</html>

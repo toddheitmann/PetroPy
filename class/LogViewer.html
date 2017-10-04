@@ -1,0 +1,267 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>LogViewer &#8212; PetroPy 0.1 documentation</title>
+    
+    <link rel="stylesheet" href="../_static/alabaster.css" type="text/css" />
+    <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../',
+        VERSION:     '0.1',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true,
+        SOURCELINK_SUFFIX: '.txt'
+      };
+    </script>
+    <script type="text/javascript" src="../_static/jquery.js"></script>
+    <script type="text/javascript" src="../_static/underscore.js"></script>
+    <script type="text/javascript" src="../_static/doctools.js"></script>
+    <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.0/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="Electrofacies" href="../function/electrofacies.html" />
+    <link rel="prev" title="Log" href="Log.html" />
+   
+  <link rel="stylesheet" href="../_static/custom.css" type="text/css" />
+  
+  
+  <meta name="viewport" content="width=device-width, initial-scale=0.9, maximum-scale=0.9" />
+
+  </head>
+  <body role="document">
+  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <div class="section" id="logviewer">
+<h1>LogViewer<a class="headerlink" href="#logviewer" title="Permalink to this headline">¶</a></h1>
+<dl class="class">
+<dt id="petropy.LogViewer">
+<em class="property">class </em><code class="descclassname">petropy.</code><code class="descname">LogViewer</code><span class="sig-paren">(</span><em>log</em>, <em>template_xml_path=None</em>, <em>template_defaults=None</em>, <em>top=None</em>, <em>height=None</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/petropy/graphs.html#LogViewer"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#petropy.LogViewer" title="Permalink to this definition">¶</a></dt>
+<dd><p>Uses matplotlib to create a figure and axes to display log data. XML templates are required to diplay curve data, with a few defaults provided.</p>
+<dl class="attribute">
+<dt id="LogViewer.log">
+<code class="descname">log</code><a class="headerlink" href="#LogViewer.log" title="Permalink to this definition">¶</a></dt>
+<dd><p><em>Log</em> &#8211; The Log class with data updated from any edits performed within LogViewer</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="LogViewer.fig">
+<code class="descname">fig</code><a class="headerlink" href="#LogViewer.fig" title="Permalink to this definition">¶</a></dt>
+<dd><p><em>Figure</em> &#8211; The matplotlib Figure object</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="LogViewer.axes">
+<code class="descname">axes</code><a class="headerlink" href="#LogViewer.axes" title="Permalink to this definition">¶</a></dt>
+<dd><p><em>ndarray</em> &#8211; numpy ndarray of AxesSubplot objects where each axes is a curve track</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="LogViewer.edit_mode">
+<code class="descname">edit_mode</code><a class="headerlink" href="#LogViewer.edit_mode" title="Permalink to this definition">¶</a></dt>
+<dd><p><em>bool (default False)</em> &#8211; bool to display editing tools or not</p>
+</dd></dl>
+
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
+<li><strong>log</strong> (<a class="reference internal" href="Log.html#petropy.Log" title="petropy.Log"><em>Log</em></a>) &#8211; A <cite>Log</cite> object with curve data to display in the LogViewer</li>
+<li><strong>template_xml_path</strong> (<a class="reference external" href="https://docs.python.org/2/library/functions.html#str" title="(in Python v2.7)"><em>str</em></a><em> (</em><em>default None</em><em>)</em>) &#8211; Path to xml template.</li>
+<li><strong>template_defaults</strong> (<em>str {'raw'</em><em>, </em><em>'multimin_oil'</em><em>, </em><em>'multimin_gas'</em><em>, </em><em>'multimin_oil_sum'</em><em>, </em><em>'multimin_gas_sum'}</em><em> (</em><em>default None</em><em>)</em>) &#8211; Name of default template options. Uses prebuilt template to display data</li>
+<li><strong>top</strong> (<a class="reference external" href="https://docs.python.org/2/library/functions.html#float" title="(in Python v2.7)"><em>float</em></a><em> (</em><em>default None</em><em>)</em>) &#8211; Setting to set initial top of graph</li>
+<li><strong>height</strong> (<a class="reference external" href="https://docs.python.org/2/library/functions.html#float" title="(in Python v2.7)"><em>float</em></a><em> (</em><em>default None</em><em>)</em>) &#8211; Setting to set amout of feet to display</li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
+<p class="rubric">Examples</p>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">import</span> <span class="nn">petropy</span> <span class="k">as</span> <span class="nn">ptr</span>
+<span class="go"># create LogViewer with default triple-combo template and display</span>
+<span class="go">#</span>
+<span class="go"># Load sample wolfcamp log</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">log</span> <span class="o">=</span> <span class="n">ptr</span><span class="o">.</span><span class="n">log_data</span><span class="p">(</span><span class="s1">&#39;WFMP&#39;</span><span class="p">)</span>
+<span class="go"># create LogViewer with &#39;raw&#39; template</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">viewer</span> <span class="o">=</span> <span class="n">ptr</span><span class="o">.</span><span class="n">LogViewer</span><span class="p">(</span><span class="n">log</span><span class="p">,</span> <span class="n">template_defaults</span> <span class="o">=</span> <span class="s1">&#39;raw&#39;</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">viewer</span><span class="o">.</span><span class="n">show</span><span class="p">()</span> <span class="c1"># diplay log data</span>
+</pre></div>
+</div>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">import</span> <span class="nn">petropy</span> <span class="k">as</span> <span class="nn">ptr</span>
+<span class="go"># create LogViewer for 11 x 17 paper</span>
+<span class="go"># with default triple-combo template and save</span>
+<span class="go">#</span>
+<span class="go"># Load sample wolfcamp log</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">log</span> <span class="o">=</span> <span class="n">ptr</span><span class="o">.</span><span class="n">log_data</span><span class="p">(</span><span class="s1">&#39;WFMP&#39;</span><span class="p">)</span>
+<span class="go"># create LogViewer with &#39;raw&#39; template (default)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">viewer</span> <span class="o">=</span> <span class="n">ptr</span><span class="o">.</span><span class="n">LogViewer</span><span class="p">(</span><span class="n">log</span><span class="p">)</span>
+<span class="go"># use fig attribute to change size to 17 x 11</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">viewer</span><span class="o">.</span><span class="n">fig</span><span class="o">.</span><span class="n">set_size_inches</span><span class="p">(</span><span class="mi">17</span><span class="p">,</span> <span class="mi">11</span><span class="p">)</span>
+<span class="go"># file path for image file</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">s</span> <span class="o">=</span> <span class="s1">&#39;path/to/save/wfmp_log.png&#39;</span>
+<span class="go"># saves matplotlib figure</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">viewer</span><span class="o">.</span><span class="n">fig</span><span class="o">.</span><span class="n">savefig</span><span class="p">(</span><span class="n">s</span><span class="p">)</span>
+</pre></div>
+</div>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">import</span> <span class="nn">petropy</span> <span class="k">as</span> <span class="nn">ptr</span>
+<span class="go"># create LogViewer with custom template and save</span>
+<span class="go">#</span>
+<span class="go"># Load sample wolfcamp log</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">log</span> <span class="o">=</span> <span class="n">ptr</span><span class="o">.</span><span class="n">log_data</span><span class="p">(</span><span class="s1">&#39;WFMP&#39;</span><span class="p">)</span>
+<span class="go"># specify path to template file</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">t</span> <span class="o">=</span> <span class="s1">&#39;path/to/my/custom/template.xml&#39;</span>
+<span class="go"># create log view with template</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">viewer</span> <span class="o">=</span> <span class="n">ptr</span><span class="o">.</span><span class="n">LogViewer</span><span class="p">(</span><span class="n">log</span><span class="p">,</span> <span class="n">template_xml_path</span> <span class="o">=</span> <span class="n">t</span><span class="p">)</span>
+<span class="go"># define path to save the log picture</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">s</span> <span class="o">=</span> <span class="s1">&#39;path/to/save/figure.png&#39;</span>
+<span class="go"># save figure using matplotlib savefig method</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">viewer</span><span class="o">.</span><span class="n">fig</span><span class="o">.</span><span class="n">savefig</span><span class="p">(</span><span class="n">s</span><span class="p">)</span>
+</pre></div>
+</div>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">import</span> <span class="nn">petropy</span> <span class="k">as</span> <span class="nn">ptr</span>
+<span class="go"># create LogViewer with default triple-combo template,</span>
+<span class="go"># make graphical edits, then save log changes</span>
+<span class="go">#</span>
+<span class="go"># Load sample wolfcamp log</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">log</span> <span class="o">=</span> <span class="n">ptr</span><span class="o">.</span><span class="n">log_data</span><span class="p">(</span><span class="s1">&#39;WFMP&#39;</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">viewer</span> <span class="o">=</span> <span class="n">ptr</span><span class="o">.</span><span class="n">LogViewer</span><span class="p">(</span><span class="n">log</span><span class="p">)</span>
+<span class="go"># diplay log data and graphically edit</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">viewer</span><span class="o">.</span><span class="n">show</span><span class="p">(</span><span class="n">edit_mode</span> <span class="o">=</span> <span class="kc">True</span><span class="p">)</span>
+<span class="go"># define path to save the updated log data</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">file_path</span> <span class="o">=</span> <span class="s1">&#39;path/to/save/wfmp_edits.las&#39;</span>
+<span class="go"># write updated log to new las file.</span>
+<span class="go"># Executed after figures are closed.</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">viewer</span><span class="o">.</span><span class="n">log</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">file_path</span><span class="p">)</span>
+</pre></div>
+</div>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Raises:</th><td class="field-body"><ul class="first last simple">
+<li><code class="xref py py-exc docutils literal"><span class="pre">ValueError</span></code> &#8211; If template_defaults parameter is not in key of dictionary items</li>
+<li><code class="xref py py-exc docutils literal"><span class="pre">ValueError</span></code> &#8211; If template_xml_path are both specified</li>
+<li><code class="xref py py-exc docutils literal"><span class="pre">ValueError</span></code> &#8211; tick spacing must be specified in depth track</li>
+<li><code class="xref py py-exc docutils literal"><span class="pre">ValueError</span></code> &#8211; number spacing must be specified in depth track</li>
+<li><code class="xref py py-exc docutils literal"><span class="pre">ValueError</span></code> &#8211; left and right values for each curve must be specified in xml template</li>
+<li><code class="xref py py-exc docutils literal"><span class="pre">ValueError</span></code> &#8211; curve must be in log</li>
+<li><code class="xref py py-exc docutils literal"><span class="pre">ValueError</span></code> &#8211; curve display_name must be specified in xml template</li>
+<li><code class="xref py py-exc docutils literal"><span class="pre">ValueError</span></code> &#8211; curve curve_name must be specified in xml template</li>
+<li><code class="xref py py-exc docutils literal"><span class="pre">ValueError</span></code> &#8211; curve fill_color must be specified for cumulative tracks</li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
+<dl class="method">
+<dt id="petropy.LogViewer.show">
+<code class="descname">show</code><span class="sig-paren">(</span><em>edit_mode=False</em>, <em>window_location=(10</em>, <em>30)</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/petropy/graphs.html#LogViewer.show"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#petropy.LogViewer.show" title="Permalink to this definition">¶</a></dt>
+<dd><p>Calls matplotlib.pyplot.show() to display log viewer. If edit_mode == True, it includes options
+to graphically edit curve data, and stores these changes within the LogViewer object. After
+editing is finished, access the updated data with the .log property.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
+<li><strong>edit_mode</strong> (<a class="reference external" href="https://docs.python.org/2/library/functions.html#bool" title="(in Python v2.7)"><em>bool</em></a><em> (</em><em>default False</em><em>)</em>) &#8211; Setting to allow editing of curve data</li>
+<li><strong>window_location</strong> (<a class="reference external" href="https://docs.python.org/2/library/functions.html#float" title="(in Python v2.7)"><em>float</em></a><em>, </em><em>float tuple</em><em> (</em><em>default 10</em><em>, </em><em>30</em><em>)</em>) &#8211; Tuple of floats to specify top left location of LogViewer
+First value is pixels from the left of the screen.
+Second value is pixels from the top of the screen.</li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
+<p class="rubric">Example</p>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">import</span> <span class="nn">petropy</span> <span class="k">as</span> <span class="nn">ptr</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">log</span> <span class="o">=</span> <span class="n">ptr</span><span class="o">.</span><span class="n">log_data</span><span class="p">(</span><span class="s1">&#39;WFMP&#39;</span><span class="p">)</span> <span class="c1"># sample Wolfcamp log</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">viewer</span> <span class="o">=</span> <span class="n">ptr</span><span class="o">.</span><span class="n">LogViewer</span><span class="p">(</span><span class="n">log</span><span class="p">)</span> <span class="c1"># default triple-combo template</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">viewer</span><span class="o">.</span><span class="n">show</span><span class="p">()</span> <span class="c1"># display graphs</span>
+</pre></div>
+</div>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">import</span> <span class="nn">petropy</span> <span class="k">as</span> <span class="nn">ptr</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">log</span> <span class="o">=</span> <span class="n">ptr</span><span class="o">.</span><span class="n">log_data</span><span class="p">(</span><span class="s1">&#39;WFMP&#39;</span><span class="p">)</span> <span class="c1"># sample Wolfcamp log</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">viewer</span> <span class="o">=</span> <span class="n">ptr</span><span class="o">.</span><span class="n">LogViewer</span><span class="p">(</span><span class="n">log</span><span class="p">)</span>
+<span class="go"># display graphs with editing option</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">viewer</span><span class="o">.</span><span class="n">show</span><span class="p">(</span><span class="n">edit_mode</span> <span class="o">=</span> <span class="kc">True</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">file_path</span> <span class="o">=</span> <span class="s1">&#39;path/to/new_file.las&#39;</span>
+<span class="go"># writes changed data to new las file</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">viewer</span><span class="o">.</span><span class="n">log</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">file_path</span><span class="p">)</span>
+</pre></div>
+</div>
+</dd></dl>
+
+</dd></dl>
+
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+<h1 class="logo"><a href="../index.html">PetroPy</a></h1>
+
+
+
+
+
+
+
+
+<h3>Navigation</h3>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="Log.html">Log</a></li>
+<li class="toctree-l1 current"><a class="current reference internal" href="#">LogViewer</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../function/electrofacies.html">Electrofacies</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../function/dataset.html">Dataset</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../function/download.html">Downloads</a></li>
+</ul>
+
+
+<div id="searchbox" style="display: none" role="search">
+  <h3>Quick search</h3>
+    <form class="search" action="../search.html" method="get">
+      <div><input type="text" name="q" /></div>
+      <div><input type="submit" value="Go" /></div>
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="footer">
+      &copy;2017, Todd Heitmann.
+      
+      |
+      Powered by <a href="http://sphinx-doc.org/">Sphinx 1.5.6</a>
+      &amp; <a href="https://github.com/bitprophet/alabaster">Alabaster 0.7.10</a>
+      
+      |
+      <a href="../_sources/class/LogViewer.rst.txt"
+          rel="nofollow">Page source</a>
+    </div>
+
+    
+
+    
+  </body>
+</html>

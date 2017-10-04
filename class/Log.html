@@ -1,0 +1,1388 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>Log &#8212; PetroPy 0.1 documentation</title>
+    
+    <link rel="stylesheet" href="../_static/alabaster.css" type="text/css" />
+    <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../',
+        VERSION:     '0.1',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true,
+        SOURCELINK_SUFFIX: '.txt'
+      };
+    </script>
+    <script type="text/javascript" src="../_static/jquery.js"></script>
+    <script type="text/javascript" src="../_static/underscore.js"></script>
+    <script type="text/javascript" src="../_static/doctools.js"></script>
+    <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.0/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="LogViewer" href="LogViewer.html" />
+    <link rel="prev" title="Installation" href="../index.html" />
+   
+  <link rel="stylesheet" href="../_static/custom.css" type="text/css" />
+  
+  
+  <meta name="viewport" content="width=device-width, initial-scale=0.9, maximum-scale=0.9" />
+
+  </head>
+  <body role="document">
+  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <div class="section" id="log">
+<h1>Log<a class="headerlink" href="#log" title="Permalink to this headline">¶</a></h1>
+<dl class="class">
+<dt id="petropy.Log">
+<em class="property">class </em><code class="descclassname">petropy.</code><code class="descname">Log</code><span class="sig-paren">(</span><em>file_ref=None</em>, <em>drho_matrix=2.71</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/petropy/log.html#Log"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#petropy.Log" title="Permalink to this definition">¶</a></dt>
+<dd><p>Subclass of LASFile to provide an extension for all petrophysical
+calculations.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
+<li><strong>file_ref</strong> (<a class="reference external" href="https://docs.python.org/2/library/functions.html#str" title="(in Python v2.7)"><em>str</em></a>) &#8211; str path to las file</li>
+<li><strong>drho_matrix</strong> (<a class="reference external" href="https://docs.python.org/2/library/functions.html#float" title="(in Python v2.7)"><em>float</em></a><em> (</em><em>default 2.71</em><em>)</em>) &#8211; Matrix density for conversion from density porosity to density.</li>
+<li><strong>kwargs</strong> (<em>kwargs</em>) &#8211; Key Word arguements for use with lasio LASFile class.</li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
+<p class="rubric">Example</p>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">import</span> <span class="nn">petropy</span> <span class="k">as</span> <span class="nn">ptr</span>
+<span class="go"># define path to las file</span>
+<span class="go">p = &#39;path/to/well.las&#39;</span>
+<span class="go"># loads specified las file</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">log</span> <span class="o">=</span> <span class="n">ptr</span><span class="o">.</span><span class="n">Log</span><span class="p">(</span><span class="n">p</span><span class="p">)</span>
+</pre></div>
+</div>
+<dl class="method">
+<dt id="petropy.Log.add_pay_flag">
+<code class="descname">add_pay_flag</code><span class="sig-paren">(</span><em>formations=[]</em>, <em>flag=1</em>, <em>less_than_or_equal=[]</em>, <em>greater_than_or_equal=[]</em>, <em>name=''</em>, <em>descr='Pay Flag'</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/petropy/log.html#Log.add_pay_flag"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#petropy.Log.add_pay_flag" title="Permalink to this definition">¶</a></dt>
+<dd><p>Add Pay Flag based on curve cutoffs</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
+<li><strong>formations</strong> (<em>list</em><em> (</em><em>default</em><em> [</em><em>]</em><em>)</em>) &#8211; list of formations, which must be found in preloaded tops</li>
+<li><strong>flag</strong> (<a class="reference external" href="https://docs.python.org/2/library/functions.html#float" title="(in Python v2.7)"><em>float</em></a>) &#8211; Numeric value of pay flag. If interval meets pay
+requirments, then flag value. Else, 0.</li>
+<li><strong>less_than_or_equal</strong> (<em>list</em><em> (</em><em>tuples</em><em> (</em><em>CURVE</em><em>, </em><em>value</em><em>)</em><em>,</em><em>default</em><em> [</em><em>]</em><em>)</em>) &#8211; pay flag cutoff where interval is flaged if CURVE is less
+than or equal to value. Must be list of tuples</li>
+<li><strong>greater_than_or_equal</strong> (<em>list</em><em> (</em><em>tuples</em><em> (</em><em>CURVE</em><em>,</em><em>value</em><em>)</em><em>, </em><em>default</em><em> [</em><em>]</em><em>)</em>) &#8211; pay flag cutoff where interval is flaged if CURVE is
+greater than or equal to value. Must be list of tuples</li>
+<li><strong>name</strong> (<a class="reference external" href="https://docs.python.org/2/library/functions.html#str" title="(in Python v2.7)"><em>str</em></a><em> (</em><em>default ''</em><em>)</em>) &#8211; End name of pay flag. Defaults to numeric
+<code class="code docutils literal"><span class="pre">PAY_FLAG_1</span></code> and increasing values as more pays flags
+are added.</li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
+<p class="rubric">Example</p>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">import</span> <span class="nn">petropy</span> <span class="k">as</span> <span class="nn">ptr</span>
+<span class="go"># loads Wolfcamp and adds pay flag</span>
+<span class="go"># based on resistivity</span>
+<span class="go">#</span>
+<span class="go"># reads sample Wolfcamp Log from las file</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">log</span> <span class="o">=</span> <span class="n">ptr</span><span class="o">.</span><span class="n">log_data</span><span class="p">(</span><span class="s1">&#39;WFMP&#39;</span><span class="p">)</span>
+<span class="go"># specify play flag if RESDEEP_N is</span>
+<span class="go"># greather than or equal to 20</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">gtoe</span> <span class="o">=</span> <span class="p">[(</span><span class="s1">&#39;RESDEEP_N&#39;</span><span class="p">,</span> <span class="mi">20</span><span class="p">)]</span>
+<span class="go"># define formations to calculate pay flag</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">f</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;WFMPA&#39;</span><span class="p">,</span> <span class="s1">&#39;WFMPB&#39;</span><span class="p">,</span> <span class="s1">&#39;WFMPC&#39;</span><span class="p">]</span>
+<span class="go"># add pay flag over formations</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">log</span><span class="o">.</span><span class="n">add_pay_flag</span><span class="p">(</span><span class="n">f</span><span class="p">,</span> <span class="n">greater_than_or_equal</span><span class="o">=</span><span class="n">gtoe</span><span class="p">,</span><span class="n">name</span> <span class="o">=</span><span class="s1">&#39;RES&#39;</span><span class="p">)</span>
+</pre></div>
+</div>
+</dd></dl>
+
+<dl class="method">
+<dt id="petropy.Log.fluid_properties">
+<code class="descname">fluid_properties</code><span class="sig-paren">(</span><em>top=0</em>, <em>bottom=100000</em>, <em>mast=67</em>, <em>temp_grad=0.015</em>, <em>press_grad=0.5</em>, <em>rws=0.1</em>, <em>rwt=70</em>, <em>rmfs=0.4</em>, <em>rmft=100</em>, <em>gas_grav=0.67</em>, <em>oil_api=38</em>, <em>p_sep=100</em>, <em>t_sep=100</em>, <em>yn2=0</em>, <em>yco2=0</em>, <em>yh2s=0</em>, <em>yh20=0</em>, <em>rs=0</em>, <em>lith_grad=1.03</em>, <em>biot=0.8</em>, <em>pr=0.25</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/petropy/log.html#Log.fluid_properties"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#petropy.Log.fluid_properties" title="Permalink to this definition">¶</a></dt>
+<dd><p>Calculates fluid properties along wellbore.</p>
+<p>The output add the following calculated curves at each depth:</p>
+<dl class="docutils">
+<dt>PORE_PRESS <span class="classifier-delimiter">:</span> <span class="classifier">(psi)</span></dt>
+<dd>Reservoir pore pressure</dd>
+<dt>RES_TEMP <span class="classifier-delimiter">:</span> <span class="classifier">(°F)</span></dt>
+<dd>Reservoir temperature</dd>
+<dt>NES <span class="classifier-delimiter">:</span> <span class="classifier">(psi)</span></dt>
+<dd>Reservoir net effective stress</dd>
+<dt>RW <span class="classifier-delimiter">:</span> <span class="classifier">(ohm.m)</span></dt>
+<dd>Resistivity of water</dd>
+<dt>RMF <span class="classifier-delimiter">:</span> <span class="classifier">(ohm.m)</span></dt>
+<dd>Resistivity of mud filtrate</dd>
+<dt>RHO_HC <span class="classifier-delimiter">:</span> <span class="classifier">(g / cc)</span></dt>
+<dd>Density of hydrocarbon</dd>
+<dt>RHO_W <span class="classifier-delimiter">:</span> <span class="classifier">(g / cc)</span></dt>
+<dd>Density of formation water</dd>
+<dt>RHO_MF <span class="classifier-delimiter">:</span> <span class="classifier">(g / cc)</span></dt>
+<dd>Density of mud filtrate</dd>
+<dt>NPHI_HC</dt>
+<dd>Neutron log response of hydrocarbon</dd>
+<dt>NPHI_W</dt>
+<dd>Neutron log response of water</dd>
+<dt>NPHI_MF</dt>
+<dd>Neutron log response of mud filtrate</dd>
+<dt>MU_HC <span class="classifier-delimiter">:</span> <span class="classifier">(cP)</span></dt>
+<dd>Viscosity of hydrocarbon</dd>
+<dt>Z</dt>
+<dd>Compressiblity factor for non-ideal gas.
+Only output if oil_api = 0</dd>
+<dt>CG <span class="classifier-delimiter">:</span> <span class="classifier">(1 / psi)</span></dt>
+<dd>Gas Compressiblity. Only output if oil_api = 0</dd>
+<dt>BG</dt>
+<dd>Gas formation volume factor. Only output if oil_api = 0</dd>
+<dt>BP <span class="classifier-delimiter">:</span> <span class="classifier">(psi)</span></dt>
+<dd>Bubble point. Only output if oil_api &gt; 0</dd>
+<dt>BO</dt>
+<dd>Oil formation volume factor. Only output if oil_api &gt; 0</dd>
+</dl>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
+<li><strong>top</strong> (<a class="reference external" href="https://docs.python.org/2/library/functions.html#float" title="(in Python v2.7)"><em>float</em></a><em> (</em><em>default 0</em><em>)</em>) &#8211; The top depth to begin fluid properties calculation. If
+value is not specified, the calculations will start at
+the top of the log.</li>
+<li><strong>bottom</strong> (<a class="reference external" href="https://docs.python.org/2/library/functions.html#float" title="(in Python v2.7)"><em>float</em></a><em> (</em><em>default 100</em><em>,</em><em>000</em><em>)</em>) &#8211; The bottom depth to end fluid properties, inclusive. If the
+value is not specified, the calcuations will go to the
+end of the log.</li>
+<li><strong>mast</strong> (<a class="reference external" href="https://docs.python.org/2/library/functions.html#float" title="(in Python v2.7)"><em>float</em></a><em> (</em><em>default 67</em><em>)</em>) &#8211; The mean annual surface temperature at the location of the
+well in degrees Fahrenheit.</li>
+<li><strong>temp_grad</strong> (<a class="reference external" href="https://docs.python.org/2/library/functions.html#float" title="(in Python v2.7)"><em>float</em></a><em> (</em><em>default 0.015</em><em>)</em>) &#8211; The temperature gradient of the reservoir in °F / ft.</li>
+<li><strong>press_grad</strong> (<a class="reference external" href="https://docs.python.org/2/library/functions.html#float" title="(in Python v2.7)"><em>float</em></a><em> (</em><em>default 0.5</em><em>)</em>) &#8211; The pressure gradient of the reservoir in psi / ft.</li>
+<li><strong>rws</strong> (<a class="reference external" href="https://docs.python.org/2/library/functions.html#float" title="(in Python v2.7)"><em>float</em></a><em> (</em><em>default 0.1</em><em>)</em>) &#8211; The resistivity of water at surface conditions in ohm.m.</li>
+<li><strong>rwt</strong> (<a class="reference external" href="https://docs.python.org/2/library/functions.html#float" title="(in Python v2.7)"><em>float</em></a><em> (</em><em>default 70</em><em>)</em>) &#8211; The temperature of the rws measurement in °F.</li>
+<li><strong>rmfs</strong> (<a class="reference external" href="https://docs.python.org/2/library/functions.html#float" title="(in Python v2.7)"><em>float</em></a><em> (</em><em>default 0.4</em><em>)</em>) &#8211; The resistivity of mud fultrate at surface conditions in
+ohm.m</li>
+<li><strong>rmft</strong> (<a class="reference external" href="https://docs.python.org/2/library/functions.html#float" title="(in Python v2.7)"><em>float</em></a><em> (</em><em>default 100</em><em>)</em>) &#8211; The temperature of the rmfs measurement in °F</li>
+<li><strong>gas_grav</strong> (<a class="reference external" href="https://docs.python.org/2/library/functions.html#float" title="(in Python v2.7)"><em>float</em></a><em> (</em><em>default 0.67</em><em>)</em>) &#8211; The specific gravity of the separator gas. Air = 1,
+CH4 = 0.577</li>
+<li><strong>oil_api</strong> (<a class="reference external" href="https://docs.python.org/2/library/functions.html#float" title="(in Python v2.7)"><em>float</em></a><em> (</em><em>default 38</em><em>)</em>) &#8211; The api gravity of oil after the separator
+If fluid system is dry gas, use oil_api = 0.</li>
+<li><strong>p_sep</strong> (<a class="reference external" href="https://docs.python.org/2/library/functions.html#float" title="(in Python v2.7)"><em>float</em></a><em> (</em><em>default 100</em><em>)</em>) &#8211; The pressure of the separator, assuming a 2 stage system
+Only used when oil_api is &gt; 0 (not dry gas).</li>
+<li><strong>t_sep</strong> (<a class="reference external" href="https://docs.python.org/2/library/functions.html#float" title="(in Python v2.7)"><em>float</em></a>) &#8211; The temperature of the separator, assuming a 2 stage system
+Only used with <code class="code docutils literal"><span class="pre">oil_api</span> <span class="pre">&gt;</span> <span class="pre">0</span></code>.</li>
+<li><strong>yn2</strong> (<a class="reference external" href="https://docs.python.org/2/library/functions.html#float" title="(in Python v2.7)"><em>float</em></a><em> (</em><em>default 0</em><em>)</em>) &#8211; Molar fraction of nitrogren in gas.</li>
+<li><strong>yco2</strong> (<a class="reference external" href="https://docs.python.org/2/library/functions.html#float" title="(in Python v2.7)"><em>float</em></a><em> (</em><em>default 0</em><em>)</em>) &#8211; Molar fration of carbon dioxide in gas.</li>
+<li><strong>yh2s</strong> (<a class="reference external" href="https://docs.python.org/2/library/functions.html#float" title="(in Python v2.7)"><em>float</em></a><em> (</em><em>default 0</em><em>)</em>) &#8211; Molar fraction of hydrogen sulfide in gas.</li>
+<li><strong>yh20</strong> (<a class="reference external" href="https://docs.python.org/2/library/functions.html#float" title="(in Python v2.7)"><em>float</em></a><em> (</em><em>default 0</em><em>)</em>) &#8211; Molar fraction of water in gas.</li>
+<li><strong>rs</strong> (<a class="reference external" href="https://docs.python.org/2/library/functions.html#float" title="(in Python v2.7)"><em>float</em></a><em> (</em><em>default 0</em><em>)</em>) &#8211; Solution gas oil ratio at reservoir conditions.
+If unknwon, use 0 and correlation will be used.</li>
+<li><strong>lith_grad</strong> (<a class="reference external" href="https://docs.python.org/2/library/functions.html#float" title="(in Python v2.7)"><em>float</em></a><em> (</em><em>default 1.03</em><em>)</em>) &#8211; Lithostatic overburden pressure gradient in psi / ft.</li>
+<li><strong>biot</strong> (<a class="reference external" href="https://docs.python.org/2/library/functions.html#float" title="(in Python v2.7)"><em>float</em></a><em> (</em><em>default 0.8</em><em>)</em>) &#8211; Biot constant.</li>
+<li><strong>pr</strong> (<a class="reference external" href="https://docs.python.org/2/library/functions.html#float" title="(in Python v2.7)"><em>float</em></a><em> (</em><em>default 0.25</em><em>)</em>) &#8211; Poissons ratio</li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
+<div class="admonition note">
+<p class="first admonition-title">Note</p>
+<p>Current single phase fluid properties assumes either:</p>
+<blockquote class="last">
+<div><p>1. Dry Gas at Reservoir Conditions
+Methane as hydrocarbon type with options to include N2,
+CO2, H2S, or H2O. To assume dry_gas, set
+<code class="code docutils literal"><span class="pre">oil_api</span> <span class="pre">=</span> <span class="pre">0</span></code></p>
+<p>2. Oil at Reservoir Conditions
+Assumes reservoir fluids are either a black or volatile
+oil. Separator conditions of gas are used to calculate
+bubble point and the reservoir fluid properties of the
+reconstituted oil.</p>
+</div></blockquote>
+</div>
+<p class="rubric">References</p>
+<dl class="docutils">
+<dt>Ahmed, Tarek H. Reservoir Engineering Handbook. Oxford: Gulf</dt>
+<dd>Professional, 2006.</dd>
+<dt>Lee, John, and Robert A. Wattenbarger. Gas Reservoir</dt>
+<dd>Engineering. Richardson, TX: Henry L. Doherty Memorial
+Fund of AIME, Society of Petroleum Engineers, 2008.</dd>
+</dl>
+<p class="rubric">Example</p>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">import</span> <span class="nn">petropy</span> <span class="k">as</span> <span class="nn">ptr</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">petropy</span> <span class="k">import</span> <span class="n">datasets</span>
+<span class="go"># reads sample Wolfcamp Log from las file</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">log</span> <span class="o">=</span> <span class="n">ptr</span><span class="o">.</span><span class="n">log_data</span><span class="p">(</span><span class="s1">&#39;WFMP&#39;</span><span class="p">)</span>
+<span class="go"># calculates fluid properties with default settings</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">log</span><span class="o">.</span><span class="n">fluid_properties</span><span class="p">()</span>
+</pre></div>
+</div>
+<div class="admonition seealso">
+<p class="first admonition-title">See also</p>
+<dl class="last docutils">
+<dt><a class="reference internal" href="#petropy.Log.fluid_properties_parameters_from_csv" title="petropy.Log.fluid_properties_parameters_from_csv"><code class="xref py py-meth docutils literal"><span class="pre">petropy.Log.fluid_properties_parameters_from_csv()</span></code></a></dt>
+<dd>loads properties from preconfigured csv file</dd>
+<dt><a class="reference internal" href="#petropy.Log.multimineral_model" title="petropy.Log.multimineral_model"><code class="xref py py-meth docutils literal"><span class="pre">petropy.Log.multimineral_model()</span></code></a></dt>
+<dd>builds on fluid properties to calculate full petrophysical model</dd>
+</dl>
+</div>
+</dd></dl>
+
+<dl class="method">
+<dt id="petropy.Log.fluid_properties_parameters_from_csv">
+<code class="descname">fluid_properties_parameters_from_csv</code><span class="sig-paren">(</span><em>csv_path=None</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/petropy/log.html#Log.fluid_properties_parameters_from_csv"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#petropy.Log.fluid_properties_parameters_from_csv" title="Permalink to this definition">¶</a></dt>
+<dd><p>Reads parameters from a csv for input into fluid properties.</p>
+<p>This method reads the file located at the csv_path and turns the
+values into dictionaries to be used as inputs into the
+fluid_properties method.</p>
+<p>This <a class="reference external" href="../_static/fluid_properties_parameters.csv">reference</a> is a sample csv file with default data for
+fluid properties.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>csv_path</strong> (<a class="reference external" href="https://docs.python.org/2/library/functions.html#str" title="(in Python v2.7)"><em>str</em></a><em> (</em><em>default None</em><em>)</em>) &#8211; </td>
+</tr>
+</tbody>
+</table>
+<div class="admonition note">
+<p class="first admonition-title">Note</p>
+<p>Path to csv file to read. Must contain header row with the
+following properties</p>
+<blockquote class="last">
+<div><dl class="docutils">
+<dt>mast <span class="classifier-delimiter">:</span> <span class="classifier">float (default 67)</span></dt>
+<dd>The mean annual surface temperature at the location of
+the well in degrees Fahrenheit.</dd>
+<dt>temp_grad <span class="classifier-delimiter">:</span> <span class="classifier">float (default 0.015)</span></dt>
+<dd>The temperature gradient of the reservoir in °F / ft.</dd>
+<dt>press_grad <span class="classifier-delimiter">:</span> <span class="classifier">float (default 0.5)</span></dt>
+<dd>The pressure gradient of the reservoir in psi / ft.</dd>
+<dt>rws <span class="classifier-delimiter">:</span> <span class="classifier">float (default 0.1)</span></dt>
+<dd>The resistivity of water at surface conditions in ohm.m</dd>
+<dt>rwt <span class="classifier-delimiter">:</span> <span class="classifier">float (default 70)</span></dt>
+<dd>The temperature of the rws measurement in °F.</dd>
+<dt>rmfs <span class="classifier-delimiter">:</span> <span class="classifier">float (default 0.4)</span></dt>
+<dd>The resistivity of mud fultrate at surface conditions
+in ohm.m</dd>
+<dt>rmft <span class="classifier-delimiter">:</span> <span class="classifier">float (default 100)</span></dt>
+<dd>The temperature of the rmfs measurement in °F.</dd>
+<dt>gas_grav <span class="classifier-delimiter">:</span> <span class="classifier">float (default 0.67)</span></dt>
+<dd>The specific gravity of the separator gas. Air = 1,
+CH4 = 0.577</dd>
+<dt>oil_api <span class="classifier-delimiter">:</span> <span class="classifier">float (default 38)</span></dt>
+<dd>The api gravity of oil after the separator. If fluid
+system is dry gas, use <code class="code docutils literal"><span class="pre">oil_api</span> <span class="pre">=</span> <span class="pre">0</span></code>.</dd>
+<dt>p_sep <span class="classifier-delimiter">:</span> <span class="classifier">float (default 100)</span></dt>
+<dd>The pressure of the separator, assuming a 2 stage
+system. Only used when <code class="code docutils literal"><span class="pre">oil_api</span></code> is &gt; 0
+(not dry gas).</dd>
+<dt>t_sep <span class="classifier-delimiter">:</span> <span class="classifier">float</span></dt>
+<dd>The temperature of the separator , assuming a 2 stage
+system. Only used with <code class="code docutils literal"><span class="pre">oil_api</span> <span class="pre">&gt;</span> <span class="pre">0</span></code>.</dd>
+<dt>yn2 <span class="classifier-delimiter">:</span> <span class="classifier">float (default 0)</span></dt>
+<dd>Molar fraction of nitrogren in gas.</dd>
+<dt>yco2 <span class="classifier-delimiter">:</span> <span class="classifier">float (default 0)</span></dt>
+<dd>Molar fration of carbon dioxide in gas.</dd>
+<dt>yh2s <span class="classifier-delimiter">:</span> <span class="classifier">float (default 0)</span></dt>
+<dd>Molar fraction of hydrogen sulfide in gas.</dd>
+<dt>yh20 <span class="classifier-delimiter">:</span> <span class="classifier">float (default 0)</span></dt>
+<dd>Molar fraction of water in gas.</dd>
+<dt>rs <span class="classifier-delimiter">:</span> <span class="classifier">float (default 0)</span></dt>
+<dd>Solution gas oil ratio at reservoir conditions.
+If unknwon, use 0 and correlation will be calculated.</dd>
+<dt>lith_grad <span class="classifier-delimiter">:</span> <span class="classifier">float (default 1.03)</span></dt>
+<dd>Lithostatic gradient in psi / ft.</dd>
+<dt>biot <span class="classifier-delimiter">:</span> <span class="classifier">float (default 0.8)</span></dt>
+<dd>Biot constant.</dd>
+<dt>pr <span class="classifier-delimiter">:</span> <span class="classifier">float (default 0.25)</span></dt>
+<dd>Poissons ratio</dd>
+</dl>
+</div></blockquote>
+</div>
+<p class="rubric">Examples</p>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">import</span> <span class="nn">petropy</span> <span class="k">as</span> <span class="nn">ptr</span>
+<span class="go"># reads sample Wolfcamp Log from las file</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">log</span> <span class="o">=</span> <span class="n">ptr</span><span class="o">.</span><span class="n">log_data</span><span class="p">(</span><span class="s1">&#39;WFMP&#39;</span><span class="p">)</span>
+<span class="go"># loads sample parameters provided</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">log</span><span class="o">.</span><span class="n">fluid_properties_parameters_from_csv</span><span class="p">()</span>
+</pre></div>
+</div>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">import</span> <span class="nn">petropy</span> <span class="k">as</span> <span class="nn">ptr</span>
+<span class="go"># reads sample Wolfcamp Log from las file</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">log</span> <span class="o">=</span> <span class="n">ptr</span><span class="o">.</span><span class="n">log_data</span><span class="p">(</span><span class="s1">&#39;WFMP&#39;</span><span class="p">)</span>
+<span class="go"># define path to csv file with parameters</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">my_csv_paramters</span> <span class="o">=</span> <span class="s1">&#39;path/to/csv/file.csv&#39;</span>
+<span class="go"># loads specified parameters</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">log</span><span class="o">.</span><span class="n">fluid_properties_parameters_from_csv</span><span class="p">(</span><span class="n">my_csv_paramters</span><span class="p">)</span>
+</pre></div>
+</div>
+<div class="admonition seealso">
+<p class="first admonition-title">See also</p>
+<dl class="last docutils">
+<dt><a class="reference internal" href="#petropy.Log.fluid_properties" title="petropy.Log.fluid_properties"><code class="xref py py-meth docutils literal"><span class="pre">petropy.Log.fluid_properties()</span></code></a></dt>
+<dd>Calculates fluid properties using input settings loaded through this method</dd>
+</dl>
+</div>
+</dd></dl>
+
+<dl class="method">
+<dt id="petropy.Log.formation_fluid_properties">
+<code class="descname">formation_fluid_properties</code><span class="sig-paren">(</span><em>formations</em>, <em>parameter='default'</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/petropy/log.html#Log.formation_fluid_properties"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#petropy.Log.formation_fluid_properties" title="Permalink to this definition">¶</a></dt>
+<dd><p>Calculate fluid properties over formations with preloaded
+paramters</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
+<li><strong>formations</strong> (<em>list</em>) &#8211; list of formations to calculate fluid properties over</li>
+<li><strong>parameter</strong> (<a class="reference external" href="https://docs.python.org/2/library/functions.html#str" title="(in Python v2.7)"><em>str</em></a><em> (</em><em>default 'default'</em><em>)</em>) &#8211; name of parameter to use for fluid properties parameter
+settings loaded in method
+fluid_properties_parameters_from_csv</li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
+<p class="rubric">Example</p>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">import</span> <span class="nn">petropy</span> <span class="k">as</span> <span class="nn">ptr</span>
+<span class="go"># reads sample Wolfcamp Log from las file</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">log</span> <span class="o">=</span> <span class="n">ptr</span><span class="o">.</span><span class="n">log_data</span><span class="p">(</span><span class="s1">&#39;WFMP&#39;</span><span class="p">)</span>
+<span class="go"># loads sample parameters provided</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">log</span><span class="o">.</span><span class="n">fluid_properties_parameters_from_csv</span><span class="p">()</span>
+<span class="go"># define formations to run</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">f</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;WFMPA&#39;</span><span class="p">,</span> <span class="s1">&#39;WFMPB&#39;</span><span class="p">,</span> <span class="s1">&#39;WFMPC&#39;</span><span class="p">]</span>
+<span class="go"># use WFMP parameters for formations from f</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">log</span><span class="o">.</span><span class="n">formation_fluid_properties</span><span class="p">(</span><span class="n">f</span><span class="p">,</span> <span class="n">parameter</span> <span class="o">=</span> <span class="s1">&#39;WFMP&#39;</span><span class="p">)</span>
+</pre></div>
+</div>
+<div class="admonition seealso">
+<p class="first admonition-title">See also</p>
+<dl class="last docutils">
+<dt><a class="reference internal" href="#petropy.Log.fluid_properties" title="petropy.Log.fluid_properties"><code class="xref py py-meth docutils literal"><span class="pre">petropy.Log.fluid_properties()</span></code></a></dt>
+<dd>calculates fluid properties of log</dd>
+<dt><a class="reference internal" href="#petropy.Log.fluid_properties_parameters_from_csv" title="petropy.Log.fluid_properties_parameters_from_csv"><code class="xref py py-meth docutils literal"><span class="pre">petropy.Log.fluid_properties_parameters_from_csv()</span></code></a></dt>
+<dd>loads fluid properties parameters</dd>
+<dt><a class="reference internal" href="#petropy.Log.tops_from_csv" title="petropy.Log.tops_from_csv"><code class="xref py py-meth docutils literal"><span class="pre">petropy.Log.tops_from_csv()</span></code></a></dt>
+<dd>loads tops of log from csv</dd>
+</dl>
+</div>
+</dd></dl>
+
+<dl class="method">
+<dt id="petropy.Log.formation_multimineral_model">
+<code class="descname">formation_multimineral_model</code><span class="sig-paren">(</span><em>formations</em>, <em>parameter='default'</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/petropy/log.html#Log.formation_multimineral_model"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#petropy.Log.formation_multimineral_model" title="Permalink to this definition">¶</a></dt>
+<dd><p>Calculate multimineral model over formations with loaded
+paramters</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
+<li><strong>formations</strong> (<em>list</em>) &#8211; list of formations to calculate fluid properties over</li>
+<li><strong>parameter</strong> (<a class="reference external" href="https://docs.python.org/2/library/functions.html#str" title="(in Python v2.7)"><em>str</em></a><em> (</em><em>default 'default'</em><em>)</em>) &#8211; name of parameter to use for fluid properties parameter
+settings loaded in method
+fluid_properties_parameters_from_csv</li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
+<p class="rubric">Example</p>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">import</span> <span class="nn">petropy</span> <span class="k">as</span> <span class="nn">ptr</span>
+<span class="go"># reads sample Wolfcamp Log from las file</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">log</span> <span class="o">=</span> <span class="n">ptr</span><span class="o">.</span><span class="n">log_data</span><span class="p">(</span><span class="s1">&#39;WFMP&#39;</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">f</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;WFMPA&#39;</span><span class="p">,</span> <span class="s1">&#39;WFMPB&#39;</span><span class="p">,</span> <span class="s1">&#39;WFMPC&#39;</span><span class="p">]</span>
+<span class="go"># calculates fluid properties for formations</span>
+<span class="go"># WFMPA, WFMPB, and WFMPC with default settings</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">log</span><span class="o">.</span><span class="n">formation_fluid_properties</span><span class="p">(</span><span class="n">f</span><span class="p">)</span>
+<span class="go"># calculates multimineral model for formations</span>
+<span class="go"># WFMPA, WFMPB, and WFMPC with default settings</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">log</span><span class="o">.</span><span class="n">formation_multimineral_model</span><span class="p">(</span><span class="n">f</span><span class="p">)</span>
+</pre></div>
+</div>
+<div class="admonition seealso">
+<p class="first admonition-title">See also</p>
+<dl class="last docutils">
+<dt><a class="reference internal" href="#petropy.Log.multimineral_model" title="petropy.Log.multimineral_model"><code class="xref py py-meth docutils literal"><span class="pre">petropy.Log.multimineral_model()</span></code></a></dt>
+<dd>calculates multimineral model from log data</dd>
+<dt><a class="reference internal" href="#petropy.Log.multimineral_parameters_from_csv" title="petropy.Log.multimineral_parameters_from_csv"><code class="xref py py-meth docutils literal"><span class="pre">petropy.Log.multimineral_parameters_from_csv()</span></code></a></dt>
+<dd>loads multimineral model parameters</dd>
+<dt><a class="reference internal" href="#petropy.Log.tops_from_csv" title="petropy.Log.tops_from_csv"><code class="xref py py-meth docutils literal"><span class="pre">petropy.Log.tops_from_csv()</span></code></a></dt>
+<dd>loads tops of log from csv</dd>
+</dl>
+</div>
+</dd></dl>
+
+<dl class="method">
+<dt id="petropy.Log.multimineral_model">
+<code class="descname">multimineral_model</code><span class="sig-paren">(</span><em>top=None</em>, <em>bottom=None</em>, <em>gr_matrix=10</em>, <em>nphi_matrix=0</em>, <em>gr_clay=350</em>, <em>rho_clay=2.64</em>, <em>nphi_clay=0.65</em>, <em>pe_clay=4</em>, <em>rma=180</em>, <em>rt_clay=80</em>, <em>vclay_linear_weight=1</em>, <em>vclay_clavier_weight=0.5</em>, <em>vclay_larionov_weight=0.5</em>, <em>vclay_nphi_weight=1</em>, <em>vclay_nphi_rhob_weight=1</em>, <em>vclay_cutoff=0.1</em>, <em>rho_om=1.15</em>, <em>nphi_om=0.6</em>, <em>pe_om=0.2</em>, <em>ro=1.6</em>, <em>lang_press=670</em>, <em>passey_nphi_weight=1</em>, <em>passey_rhob_weight=1</em>, <em>passey_lom=10</em>, <em>passey_baseline_res=40</em>, <em>passey_baseline_rhob=2.65</em>, <em>passey_baseline_nphi=0</em>, <em>schmoker_weight=1</em>, <em>schmoker_slope=0.7257</em>, <em>schmoker_baseline_rhob=2.6</em>, <em>rho_pyr=5</em>, <em>nphi_pyr=0.13</em>, <em>pe_pyr=13</em>, <em>om_pyrite_slope=0.2</em>, <em>include_qtz='YES'</em>, <em>rho_qtz=2.65</em>, <em>nphi_qtz=-0.04</em>, <em>pe_qtz=1.81</em>, <em>include_clc='YES'</em>, <em>rho_clc=1.71</em>, <em>nphi_clc=0</em>, <em>pe_clc=5.08</em>, <em>include_dol='YES'</em>, <em>rho_dol=2.85</em>, <em>nphi_dol=0.04</em>, <em>pe_dol=3.14</em>, <em>include_x='NO'</em>, <em>name_x='Gypsum'</em>, <em>name_log_x='GYP'</em>, <em>rho_x=2.35</em>, <em>nphi_x=0.507</em>, <em>pe_x=4.04</em>, <em>pe_fl=0</em>, <em>m=2</em>, <em>n=2</em>, <em>a=1</em>, <em>archie_weight=0</em>, <em>indonesia_weight=1</em>, <em>simandoux_weight=0</em>, <em>modified_simandoux_weight=0</em>, <em>waxman_smits_weight=0</em>, <em>cec=-1</em>, <em>buckles_parameter=-1</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/petropy/log.html#Log.multimineral_model"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#petropy.Log.multimineral_model" title="Permalink to this definition">¶</a></dt>
+<dd><p>Calculates a petrophysical lithology and porosity model for
+conventional and unconventional reservoirs. For each depth, the
+method iterates in a 4 step loop until convergence.</p>
+<p><strong>1. Calculate Clay Volume</strong></p>
+<p>Clay volume is calculated using a weighted method. Five
+different equations are available</p>
+<ol class="upperroman simple">
+<li>Linear</li>
+</ol>
+<div class="math">
+\[ \begin{align}\begin{aligned}gr\_index &amp;= \frac{GR_LOG - gr\_matrix}
+                   {gr\_clay - gr_matrix}\\VCLAY &amp;= gr\_index\end{aligned}\end{align} \]</div>
+<ol class="upperroman simple" start="2">
+<li>Clavier</li>
+</ol>
+<div class="math">
+\[VCLAY = 1.7 - \sqrt{3.38 - (gr\_index + 0.7)^2}\]</div>
+<ol class="upperroman simple" start="3">
+<li>Larionov Tertiary Rocks</li>
+</ol>
+<div class="math">
+\[VCLAY = 0.083 * (2^{3.7 * gr\_index} - 1)\]</div>
+<p>IV. Neutron
+Calculate apparent nuetron log without organic matter, nphia.</p>
+<div class="math">
+\[nphia = NPHI\_LOG + (nphi\_matrix - nphi\_om) * vom\]</div>
+<p>Calculate vclay using neutron</p>
+<div class="math">
+\[VCLAY = \frac{nphia - nphi\_matrix}
+              {nphi\_clay - nphi\_matrix}\]</div>
+<ol class="upperalpha simple" start="22">
+<li>Neutron Density</li>
+</ol>
+<p>Calculate apprent density log without organic mater, rhoba.</p>
+<div class="math">
+\[rhoba = RHOB\_LOG + (rhom - rho\_om) * vom\]</div>
+<p>Calculate vclay using neutron density</p>
+<div class="math">
+\[\begin{split}m1 &amp;= \frac{nphi\_fl - nphi\_matrix}{rho\_fl - rhom} \\
+x1 &amp;= nphi + m1 * (rhom - rhoba) \\
+x2 &amp;= nphi\_clay + m1 * (rhom - rhoba) \\
+VCLAY &amp;= \frac{x1 - nphi\_matrix}{x2 - nphi\_matrix} \\\end{split}\]</div>
+<p>First, the clay volume of the resepective euqations are
+calculated. They are then weighted with the vclay_weight.
+For example, if vclay_weight for every method is 1, then the
+final vclay is the average of the four equations. To use a
+single method, set <code class="code docutils literal"><span class="pre">vclay_method_weight</span> <span class="pre">=</span> <span class="pre">1</span></code> and all
+other <code class="code docutils literal"><span class="pre">vclay_weight</span> <span class="pre">=</span> <span class="pre">0</span></code>.</p>
+<p><strong>2. Calculate Total Organic Carbon And Pyrite</strong></p>
+<p>TOC is calculated use a weighted method like vclay with three
+available equations:</p>
+<ol class="upperroman simple">
+<li>Schomker&#8217;s Density Correlation</li>
+</ol>
+<div class="math">
+\[TOC = schmoker\_slope*(schmoker\_baseline\_rhob-RHOB\_LOG)\]</div>
+<ol class="upperroman simple" start="2">
+<li>Passey&#8217;s Nuetron Delta Log R</li>
+</ol>
+<div class="math">
+\[ \begin{align}\begin{aligned}dlr &amp;= 10^{\frac{RESDEEP\_LOG}{passey\_baseline\_res}} +
+    4 * (NPHI\_LOG - passey\_baseline\_nphi)\\TOC&amp;=\frac{dlr\_nphi * 10^{2.297 - 0.1688 * passey\_lom}}
+           {100}\end{aligned}\end{align} \]</div>
+<ol class="upperroman simple" start="3">
+<li>Passey&#8217;s Density Delta Log R</li>
+</ol>
+<div class="math">
+\[ \begin{align}\begin{aligned}dlr &amp;= 10^{\frac{RESDEEP\_LOG}{passey\_baseline\_res}} -
+    2.5 * (RHOB\_LOG - passey\_baseline\_rhob)\\TOC&amp;=\frac{dlr\_nphi * 10^{2.297 - 0.1688 * passey\_lom}}
+           {100}\end{aligned}\end{align} \]</div>
+<p>For conventional reservoirs without organics,
+set <code class="code docutils literal"><span class="pre">vclay_cutoff</span> <span class="pre">=</span> <span class="pre">1</span></code>.</p>
+<p><strong>3. Calculate Minerals And Porosity</strong></p>
+<p>Non-negative least squares is used to find the remaining
+minerals according to the method described in Chapter 4 of
+Doveton&#8217;s Principles of Mathematical Petrophysics.</p>
+<div class="math">
+\[V = C^{-1} L\]</div>
+<p>Pure mineral log responses are required. For example, quartz
+would have the input:</p>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="n">include_qtz</span> <span class="o">=</span> <span class="s1">&#39;YES&#39;</span>
+<span class="n">rho_qtz</span> <span class="o">=</span> <span class="mf">2.65</span>
+<span class="n">nphi_qtz</span> <span class="o">=</span> <span class="o">-</span><span class="mf">0.04</span>
+<span class="n">pe_qtz</span> <span class="o">=</span> <span class="mf">1.81</span>
+</pre></div>
+</div>
+<p>An option to include exotic minerals is by specifiying the
+density, neutron, and pe response of mineral &#8216;X&#8217;. For example,
+to add gypsum, use these parameters:</p>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="n">include_x</span> <span class="o">=</span> <span class="s1">&#39;YES&#39;</span>
+<span class="n">name_x</span> <span class="o">=</span> <span class="s1">&#39;Gypsum&#39;</span>
+<span class="n">name_log_x</span> <span class="o">=</span> <span class="s1">&#39;GYP&#39;</span>
+<span class="n">rho_x</span> <span class="o">=</span> <span class="mf">2.35</span>
+<span class="n">nphi_x</span> <span class="o">=</span> <span class="mf">0.507</span>
+<span class="n">pe_x</span> <span class="o">=</span> <span class="mf">4.04</span>
+</pre></div>
+</div>
+<p>To exclude minerals because they are not present or essentially
+not present in the reservoir, set the include parameter to
+&#8216;NO&#8217;. For example, to exclude dolomite:</p>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="n">include_dol</span> <span class="o">=</span> <span class="s1">&#39;NO&#39;</span>
+</pre></div>
+</div>
+<ol class="arabic simple" start="4">
+<li>Calculate Saturations</li>
+</ol>
+<p>Saturation is calculated using a weighted method like vclay and
+toc. To use a single equation set equation_weight = 1 and all
+other equation_weight = 0. For example, to use only the
+Indonesia equation set parameters to:</p>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="n">archie_weight</span> <span class="o">=</span> <span class="mi">0</span>
+<span class="n">simandoux_weight</span> <span class="o">=</span> <span class="mi">0</span>
+<span class="n">modified_simandoux_weight</span> <span class="o">=</span> <span class="mi">0</span>
+<span class="n">indonesia_weight</span> <span class="o">=</span> <span class="mi">1</span>
+<span class="n">waxman_smits_weight</span> <span class="o">=</span> <span class="mi">0</span>
+</pre></div>
+</div>
+<p>Five saturation equations are available</p>
+<ol class="upperroman simple">
+<li>Archie</li>
+</ol>
+<div class="math">
+\[SW=\left(\frac{a \times RW\_LOG}
+               {RESDEEP\_LOG \times phie^m}
+    \right)^{\frac{1}{n}}\]</div>
+<ol class="upperroman simple" start="2">
+<li>Simandoux</li>
+</ol>
+<div class="math">
+\[ \begin{align}\begin{aligned}c &amp;= \frac{(1 - vclay) \times a \times RESDEEP\_LOG}
+           {phie^m}\\d &amp;= \frac{c \times vclay}{2 \times rt\_clay}\\e &amp;= \frac{c}{RESDEEP\_LOG}\\SW &amp;= ((d^2 + e)^2 - d)^{\frac{2}{n}}\end{aligned}\end{align} \]</div>
+<ol class="upperroman simple" start="3">
+<li>Modified Simandoux</li>
+<li>Indonesia (Poupon-Leveaux)</li>
+</ol>
+<div class="math">
+\[\begin{split}f &amp;= \sqrt{\frac{phie^m}{RESDEEP\_LOG}} \\
+g &amp;= \sqrt{\frac{vclay^{2 - vclay}}{rt\_clay}} \\
+SW &amp;= ((f + g)^2 * RESDEEP\_LOG)^{\frac{-1}{n}}\end{split}\]</div>
+<ol class="upperalpha simple" start="22">
+<li>Waxman And Smits</li>
+</ol>
+<dl class="docutils">
+<dt>CEC</dt>
+<dd><p class="first">if cec &lt;= 0</p>
+<div class="math">
+\[cec = 10^{1.9832 \times vclay - 2.4473}\]</div>
+<dl class="last docutils">
+<dt>else</dt>
+<dd>use input cec</dd>
+</dl>
+</dd>
+</dl>
+<p>SW</p>
+<div class="math">
+\[ \begin{align}\begin{aligned}rw77&amp;=RESDEEP\_LOG * \frac{reservoir\_temperature + 6.8}
+                           {83.8}\\b &amp;= 4.6 * (1 - 0.6 \times e^{\frac{-0.77}{rw77}})\\f &amp;= \frac{a}{phie^m}\\qv &amp;= \frac{cec (1 - phie) rhom}{phie}\\SW &amp;= 0.5 * \left((-b \times qv \times rw77) +
+      \sqrt{(b \times qv \times rw77)^2 +
+      \frac{4 * f * rw}{RESDEEP\_LOG}}
+      \right)^{\frac{2}{n}}\end{aligned}\end{align} \]</div>
+<p><strong>4. Update Fluid Properties</strong></p>
+<div class="math">
+\[ \begin{align}\begin{aligned}rho\_fl &amp;= RHO\_W \times Sw + RHO\_HC \times (1 - Sw)\\nphi\_fl &amp;= NPHI\_W \times Sw + NPHI\_HC \times (1 - Sw)\end{aligned}\end{align} \]</div>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>gr_matrix</strong> (<a class="reference external" href="https://docs.python.org/2/library/functions.html#float" title="(in Python v2.7)"><em>float</em></a><em> (</em><em>default 10</em><em>)</em>) &#8211; Gamma Ray response of clean (non-clay) matrix</li>
+<li><strong>nphi_matrix</strong> (<a class="reference external" href="https://docs.python.org/2/library/functions.html#float" title="(in Python v2.7)"><em>float</em></a><em> (</em><em>default 0</em><em>)</em>) &#8211; Neutron response of clean (non-clay) matrix</li>
+<li><strong>gr_clay</strong> (<a class="reference external" href="https://docs.python.org/2/library/functions.html#float" title="(in Python v2.7)"><em>float</em></a><em> (</em><em>default 450</em><em>)</em>) &#8211; Gamma Ray response of pure clay matrix</li>
+<li><strong>rho_clay</strong> (<a class="reference external" href="https://docs.python.org/2/library/functions.html#float" title="(in Python v2.7)"><em>float</em></a><em> (</em><em>default 2.64</em><em>)</em>) &#8211; Density of pure clay matrix</li>
+<li><strong>nphi_clay</strong> (<a class="reference external" href="https://docs.python.org/2/library/functions.html#float" title="(in Python v2.7)"><em>float</em></a><em> (</em><em>default 0.65</em><em>)</em>) &#8211; Neutron reponse of pure clay matrix</li>
+<li><strong>pe_clay</strong> (<a class="reference external" href="https://docs.python.org/2/library/functions.html#float" title="(in Python v2.7)"><em>float</em></a><em> (</em><em>default 4</em><em>)</em>) &#8211; Photoelectric response of pure clay matrix</li>
+<li><strong>rma</strong> (<a class="reference external" href="https://docs.python.org/2/library/functions.html#float" title="(in Python v2.7)"><em>float</em></a><em> (</em><em>default 180</em><em>)</em>) &#8211; Resistivity of clean tight matrix</li>
+<li><strong>rt_clay</strong> (<a class="reference external" href="https://docs.python.org/2/library/functions.html#float" title="(in Python v2.7)"><em>float</em></a><em> (</em><em>default 80</em><em>)</em>) &#8211; Resistivity for inorganic shale matrix</li>
+<li><strong>vclay_linear_weight</strong> (<a class="reference external" href="https://docs.python.org/2/library/functions.html#float" title="(in Python v2.7)"><em>float</em></a><em> (</em><em>default 1</em><em>)</em>) &#8211; Weight of liner clay volume</li>
+<li><strong>vclay_clavier_weight</strong> (<a class="reference external" href="https://docs.python.org/2/library/functions.html#float" title="(in Python v2.7)"><em>float</em></a><em> (</em><em>defaul 0.5</em><em>)</em>) &#8211; Weight of Clavier clay volume</li>
+<li><strong>vclay_larionov_weight</strong> (<a class="reference external" href="https://docs.python.org/2/library/functions.html#float" title="(in Python v2.7)"><em>float</em></a><em> (</em><em>defaul 0.5</em><em>)</em>) &#8211; Weight of Larionov clay volume</li>
+<li><strong>vclay_nphi_weight</strong> (<a class="reference external" href="https://docs.python.org/2/library/functions.html#float" title="(in Python v2.7)"><em>float</em></a><em> (</em><em>default 1</em><em>)</em>) &#8211; Weight of Neutron clay volume</li>
+<li><strong>vclay_nphi_rhob_weight</strong> (<a class="reference external" href="https://docs.python.org/2/library/functions.html#float" title="(in Python v2.7)"><em>float</em></a><em> (</em><em>default 1</em><em>)</em>) &#8211; Weight of Neutron Density clay volume</li>
+<li><strong>vclay_cutoff</strong> (<a class="reference external" href="https://docs.python.org/2/library/functions.html#float" title="(in Python v2.7)"><em>float</em></a><em> (</em><em>default 0.05</em><em>)</em>) &#8211; Cutoff for oranics calculation.
+If vclay &lt; vclay_cutoff then toc = 0</li>
+<li><strong>rho_om</strong> (<a class="reference external" href="https://docs.python.org/2/library/functions.html#float" title="(in Python v2.7)"><em>float</em></a><em> (</em><em>default 1.15</em><em>)</em>) &#8211; Density of organic matter</li>
+<li><strong>nphi_om</strong> (<a class="reference external" href="https://docs.python.org/2/library/functions.html#float" title="(in Python v2.7)"><em>float</em></a><em> (</em><em>default 0.6</em><em>)</em>) &#8211; Neutron response of pure organic matter</li>
+<li><strong>pe_om</strong> (<a class="reference external" href="https://docs.python.org/2/library/functions.html#float" title="(in Python v2.7)"><em>float</em></a><em> (</em><em>default 0.2</em><em>)</em>) &#8211; Photoelectric response of pure organic matter</li>
+<li><strong>ro</strong> (<a class="reference external" href="https://docs.python.org/2/library/functions.html#float" title="(in Python v2.7)"><em>float</em></a><em> (</em><em>default 1.6</em><em>)</em>) &#8211; Vitronite reflectance of organic matter</li>
+<li><strong>lang_press</strong> (<a class="reference external" href="https://docs.python.org/2/library/functions.html#float" title="(in Python v2.7)"><em>float</em></a><em> (</em><em>default 670</em><em>)</em>) &#8211; Langmiur pressure gas adsorption on organic matter in psi</li>
+<li><strong>passey_nphi_weight</strong> (<a class="reference external" href="https://docs.python.org/2/library/functions.html#float" title="(in Python v2.7)"><em>float</em></a><em> (</em><em>default 1</em><em>)</em>) &#8211; Weight for Passey nphi toc</li>
+<li><strong>passey_rhob_weight</strong> (<a class="reference external" href="https://docs.python.org/2/library/functions.html#float" title="(in Python v2.7)"><em>float</em></a><em> (</em><em>default 1</em><em>)</em>) &#8211; Weight for Passey rhob toc</li>
+<li><strong>passey_lom</strong> (<a class="reference external" href="https://docs.python.org/2/library/functions.html#float" title="(in Python v2.7)"><em>float</em></a><em> (</em><em>default 10</em><em>)</em>) &#8211; Passey level of organic maturity</li>
+<li><strong>passey_baseline_res</strong> (<a class="reference external" href="https://docs.python.org/2/library/functions.html#float" title="(in Python v2.7)"><em>float</em></a><em> (</em><em>default 40</em><em>)</em>) &#8211; Passey inorganic baseline resistivity</li>
+<li><strong>passey_baseline_rhob</strong> (<a class="reference external" href="https://docs.python.org/2/library/functions.html#float" title="(in Python v2.7)"><em>float</em></a><em> (</em><em>default 2.65</em><em>)</em>) &#8211; Passey inorganic baseline density</li>
+<li><strong>passey_baseline_nphi</strong> (<a class="reference external" href="https://docs.python.org/2/library/functions.html#float" title="(in Python v2.7)"><em>float</em></a><em> (</em><em>default 0</em><em>)</em>) &#8211; Passey inorganic baseline neutron</li>
+<li><strong>schmoker_weight</strong> (<a class="reference external" href="https://docs.python.org/2/library/functions.html#float" title="(in Python v2.7)"><em>float</em></a><em> (</em><em>default 1</em><em>)</em>) &#8211; Weight for Schmoker toc</li>
+<li><strong>schmoker_slope</strong> (<a class="reference external" href="https://docs.python.org/2/library/functions.html#float" title="(in Python v2.7)"><em>float</em></a><em> (</em><em>default 0.7257</em><em>)</em>) &#8211; Slope for schmoker density to toc correlation</li>
+<li><strong>schmoker_baseline_rhob</strong> (<a class="reference external" href="https://docs.python.org/2/library/functions.html#float" title="(in Python v2.7)"><em>float</em></a><em> (</em><em>default 2.6</em><em>)</em>) &#8211; Density cutoff for schmoker toc correlation</li>
+<li><strong>rho_pyr</strong> (<a class="reference external" href="https://docs.python.org/2/library/functions.html#float" title="(in Python v2.7)"><em>float</em></a><em> (</em><em>default 5</em><em>)</em>) &#8211; Density of pyrite</li>
+<li><strong>nphi_pyr</strong> (<a class="reference external" href="https://docs.python.org/2/library/functions.html#float" title="(in Python v2.7)"><em>float</em></a><em> (</em><em>default 0.13</em><em>)</em>) &#8211; Neutron response of pure pyrite</li>
+<li><strong>pe_pyr</strong> (<a class="reference external" href="https://docs.python.org/2/library/functions.html#float" title="(in Python v2.7)"><em>float</em></a><em> (</em><em>default 13</em><em>)</em>) &#8211; Photoelectric response of pure pyrite</li>
+<li><strong>om_pyrite_slope</strong> (<a class="reference external" href="https://docs.python.org/2/library/functions.html#float" title="(in Python v2.7)"><em>float</em></a><em> (</em><em>default 0.2</em><em>)</em>) &#8211; Slope correlating pyrite volume to organic matter</li>
+<li><strong>include_qtz</strong> (<em>str {'YES'</em><em>, </em><em>'NO'}</em><em> (</em><em>default 'YES'</em><em>)</em>) &#8211; Toggle to include or exclude qtz.
+&#8216;YES&#8217; to include. &#8216;NO&#8217; to exclude.</li>
+<li><strong>rho_qtz</strong> (<a class="reference external" href="https://docs.python.org/2/library/functions.html#float" title="(in Python v2.7)"><em>float</em></a><em> (</em><em>default 2.65</em><em>)</em>) &#8211; Density of quartz</li>
+<li><strong>nphi_qtz</strong> (<a class="reference external" href="https://docs.python.org/2/library/functions.html#float" title="(in Python v2.7)"><em>float</em></a><em> (</em><em>default -0.04</em><em>)</em>) &#8211; Neutron response for pure quartz</li>
+<li><strong>pe_qtz</strong> (<a class="reference external" href="https://docs.python.org/2/library/functions.html#float" title="(in Python v2.7)"><em>float</em></a><em> (</em><em>default 1.81</em><em>)</em>) &#8211; Photoelectric response for pure quartz</li>
+<li><strong>include_clc</strong> (<em>str {'YES'</em><em>, </em><em>'NO'}</em><em> (</em><em>default 'YES'</em><em>)</em>) &#8211; Toggle to include or exclude clc.
+&#8216;YES&#8217; to include. &#8216;NO&#8217; to exclude.</li>
+<li><strong>rho_clc</strong> (<a class="reference external" href="https://docs.python.org/2/library/functions.html#float" title="(in Python v2.7)"><em>float</em></a><em> (</em><em>default 2.71</em><em>)</em>) &#8211; Density of calcite</li>
+<li><strong>nphi_clc</strong> (<a class="reference external" href="https://docs.python.org/2/library/functions.html#float" title="(in Python v2.7)"><em>float</em></a><em> (</em><em>default 0</em><em>)</em>) &#8211; Neutron response for pure calcite</li>
+<li><strong>pe_clc</strong> (<a class="reference external" href="https://docs.python.org/2/library/functions.html#float" title="(in Python v2.7)"><em>float</em></a><em> (</em><em>default 5.08</em><em>)</em>) &#8211; Photoelectric response for pure calcite</li>
+<li><strong>include_dol</strong> (<em>str {'YES'</em><em>, </em><em>'NO'}</em><em> (</em><em>default 'YES'</em><em>)</em>) &#8211; Toggle to include or exclude dol.
+&#8216;YES&#8217; to include. &#8216;NO&#8217; to exclude.</li>
+<li><strong>rho_dol</strong> (<a class="reference external" href="https://docs.python.org/2/library/functions.html#float" title="(in Python v2.7)"><em>float</em></a><em> (</em><em>default 2.85</em><em>)</em>) &#8211; Density of dolomite</li>
+<li><strong>nphi_dol</strong> (<a class="reference external" href="https://docs.python.org/2/library/functions.html#float" title="(in Python v2.7)"><em>float</em></a><em> (</em><em>default 0.04</em><em>)</em>) &#8211; Neutron response to dolomite</li>
+<li><strong>pe_dol</strong> (<a class="reference external" href="https://docs.python.org/2/library/functions.html#float" title="(in Python v2.7)"><em>float</em></a><em> (</em><em>default 3.14</em><em>)</em>) &#8211; Photoelectric response to dolomite</li>
+<li><strong>include_x</strong> (<em>str {'YES'</em><em>, </em><em>'NO'}</em><em> (</em><em>default 'NO'</em><em>)</em>) &#8211; Toggle to include or exclude exotic mineral, x.
+&#8216;YES&#8217; to include. &#8216;NO&#8217; to exclude.</li>
+<li><strong>name_x</strong> (<a class="reference external" href="https://docs.python.org/2/library/functions.html#str" title="(in Python v2.7)"><em>str</em></a><em> (</em><em>default 'Gypsum'</em><em>)</em>) &#8211; Name of exotic mineral, x.</li>
+<li><strong>name_log_x</strong> (<a class="reference external" href="https://docs.python.org/2/library/functions.html#str" title="(in Python v2.7)"><em>str</em></a><em> (</em><em>default 'GYP'</em><em>)</em>) &#8211; Log name of exotic mineral, x</li>
+<li><strong>rho_x</strong> (<a class="reference external" href="https://docs.python.org/2/library/functions.html#float" title="(in Python v2.7)"><em>float</em></a><em> (</em><em>default 2.35</em><em>)</em>) &#8211; Density of exotic mineral, x</li>
+<li><strong>nphi_x</strong> (<a class="reference external" href="https://docs.python.org/2/library/functions.html#float" title="(in Python v2.7)"><em>float</em></a><em> (</em><em>default 0.507</em><em>)</em>) &#8211; Neutron response of exotic mineral, x</li>
+<li><strong>pe_x</strong> (<a class="reference external" href="https://docs.python.org/2/library/functions.html#float" title="(in Python v2.7)"><em>float</em></a><em> (</em><em>default 4.04</em><em>)</em>) &#8211; Photoelectric respone of exotic mineral, x</li>
+<li><strong>pe_fl</strong> (<a class="reference external" href="https://docs.python.org/2/library/functions.html#float" title="(in Python v2.7)"><em>float</em></a><em> (</em><em>default 0</em><em>)</em>) &#8211; Photoelectric response of reservoir fluid.</li>
+<li><strong>m</strong> (<a class="reference external" href="https://docs.python.org/2/library/functions.html#float" title="(in Python v2.7)"><em>float</em></a><em> (</em><em>default 2</em><em>)</em>) &#8211; Cementation exponent</li>
+<li><strong>n</strong> (<a class="reference external" href="https://docs.python.org/2/library/functions.html#float" title="(in Python v2.7)"><em>float</em></a><em> (</em><em>default 2</em><em>)</em>) &#8211; Saturation exponent</li>
+<li><strong>a</strong> (<a class="reference external" href="https://docs.python.org/2/library/functions.html#float" title="(in Python v2.7)"><em>float</em></a><em> (</em><em>default 1</em><em>)</em>) &#8211; Cementation constant</li>
+<li><strong>cec</strong> (<a class="reference external" href="https://docs.python.org/2/library/functions.html#float" title="(in Python v2.7)"><em>float</em></a><em> (</em><em>default -1</em><em>)</em>) &#8211; Cation Exchange Capaticy for use in Waxman Smits equation.
+If cec = -1, correlation equation is used to calculate cec.</li>
+<li><strong>archie_weight</strong> (<a class="reference external" href="https://docs.python.org/2/library/functions.html#float" title="(in Python v2.7)"><em>float</em></a><em> (</em><em>default 0</em><em>)</em>) &#8211; Weight for archie Sw</li>
+<li><strong>indonesia_weight</strong> (<a class="reference external" href="https://docs.python.org/2/library/functions.html#float" title="(in Python v2.7)"><em>float</em></a><em> (</em><em>default 1</em><em>)</em>) &#8211; Weight for Indonesia Sw</li>
+<li><strong>simandoux_weight</strong> (<a class="reference external" href="https://docs.python.org/2/library/functions.html#float" title="(in Python v2.7)"><em>float</em></a><em> (</em><em>default 0</em><em>)</em>) &#8211; Weight for Simandoux Sw</li>
+<li><strong>modified_simandoux_weight</strong> (<a class="reference external" href="https://docs.python.org/2/library/functions.html#float" title="(in Python v2.7)"><em>float</em></a><em> (</em><em>default 0</em><em>)</em>) &#8211; Weight for Modified Simandoux Sw</li>
+<li><strong>waxman_smits_weight</strong> (<a class="reference external" href="https://docs.python.org/2/library/functions.html#float" title="(in Python v2.7)"><em>float</em></a><em> (</em><em>default 0</em><em>)</em>) &#8211; Weight for Waxman Smits Sw</li>
+<li><strong>buckles_parameter</strong> (<a class="reference external" href="https://docs.python.org/2/library/functions.html#float" title="(in Python v2.7)"><em>float</em></a><em> (</em><em>default -1</em><em>)</em>) &#8211; Buckles parameter for calculating irreducible water
+saturation. If less than 0, it is calculated using a
+correlation.</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Raises:</th><td class="field-body"><ul class="first last simple">
+<li><code class="xref py py-exc docutils literal"><span class="pre">ValueError</span></code> &#8211; If fluid properties curve values are not present in log,
+then ValueError is raised with incorrect curve requirements</li>
+<li><code class="xref py py-exc docutils literal"><span class="pre">ValueError</span></code> &#8211; If raw curves GR_N, NPHI_N, RHOB_N, and RESDEEP_N are not
+present, then ValueError is raised with incorrect curve
+requirements as raw curve is either not present or
+precondtioning has not been properly run.</li>
+<li><code class="xref py py-exc docutils literal"><span class="pre">ValueError</span></code> &#8211; If no formation value factor is found, then ValueError is
+raised to satisfy the calculation requirements.</li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
+<p class="rubric">References</p>
+<p><strong>VCLAY</strong></p>
+<dl class="docutils">
+<dt>Clavier, C., W. Hoyle, and D. Meunier, 1971a, Quantitative</dt>
+<dd>interpretation of thermal neutron decay time logs: Part I.
+Fundamentals and techniques: Journal of Petroleum
+Technology, 23, 743–755</dd>
+<dt>Clavier, C., W. Hoyle, and D. Meunier, 1971b, Quantitative</dt>
+<dd>interpretation of thermal neutron decay time logs: Part II.
+Interpretation example, interpretation accuracy, and
+timelapse technique: Journal of Petroleum Technology,
+23, 756–763.</dd>
+</dl>
+<p>Larionov VV (1969).Borehole Radiometry: Moscow, U.S.S.R. Nedra.</p>
+<p>Nuetron, and Neutron Density taken from presentations.
+Need publish papers for citation.</p>
+<p><strong>TOC</strong></p>
+<dl class="docutils">
+<dt>Passey, Q. R., Creaney, S., Kulla, J. B., Moretti, F. J.,</dt>
+<dd>Stroud, J. D., 1990, Practical Model for Organic Richness
+from Porosity and Resistivity Logs, AAPG Bulletin, 74,
+1777-1794</dd>
+<dt>Schmoker, J.W., 1979, Determination of organic content of</dt>
+<dd>Appalachian Devonian shales from formation-density logs:
+American Association of Petroleum Geologists Bulletin,
+v.63, no.9, p.1504-1509</dd>
+</dl>
+<p><strong>MATRIX</strong></p>
+<dl class="docutils">
+<dt>Doveton, John H. Principles of Mathematical Petrophysics.</dt>
+<dd>Oxford: Oxford University Press, 2014.</dd>
+</dl>
+<p><strong>SATURATIONS</strong></p>
+<dl class="docutils">
+<dt>Archie, G.E. 1942. The Electrical Resistivity Log as an Aid in</dt>
+<dd>Determining Some Reservoir Characteristics. Trans. of AIME
+146 (1): 54-62.</dd>
+<dt>Bardon, C., and Pied, B.,1969, Formation water saturation in</dt>
+<dd>shaly sands: Society of Professional Well Log Analysts 10th
+Annual Logging Symposium Transactions: Paper Z,19 pp.</dd>
+<dt>Poupon, A. and Leveaux, J. 1971. Evaluation of Water</dt>
+<dd>Saturations in Shaly Formations. The Log Analyst 12 (4)</dd>
+<dt>Simandoux, P., 1963, Dielectricmeasurements on porous media</dt>
+<dd>application to the measurement of water saturations: study
+of the behaviour of argillaceous formations: Revue de
+l&#8217;Institut Francais du Petrole 18, Supplementary Issue,
+p. 193-215.</dd>
+<dt>Waxman, M.H., and L.J.M. Smits, Electrical Conductivity in Oil</dt>
+<dd>Bearing Shaly Sands, Society of Petroleum Engineers
+Journal, June, p.107-122, 1968.</dd>
+</dl>
+<div class="admonition note">
+<p class="first admonition-title">Note</p>
+<ol class="last arabic simple">
+<li><dl class="first docutils">
+<dt>Clay bound water</dt>
+<dd>Clay bound water is included as part of the clay volume
+based on the default nphi_clay = 0.65. To calculate
+clay bound water seperately, set nphi_clay to clay
+matrix absent clay bound water, and include appropriate
+buckles_parameter for bound water saturations.</dd>
+</dl>
+</li>
+<li><dl class="first docutils">
+<dt>Organics</dt>
+<dd>No differieniation is made between kerogen and other
+organic matter.</dd>
+</dl>
+</li>
+</ol>
+</div>
+<p class="rubric">Example</p>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">import</span> <span class="nn">petropy</span> <span class="k">as</span> <span class="nn">ptr</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">petropy</span> <span class="k">import</span> <span class="n">datasets</span>
+<span class="go"># reads sample Wolfcamp Log from las file</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">log</span> <span class="o">=</span> <span class="n">ptr</span><span class="o">.</span><span class="n">log_data</span><span class="p">(</span><span class="s1">&#39;WFMP&#39;</span><span class="p">)</span>
+<span class="go"># calculates fluid properties with default settings</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">log</span><span class="o">.</span><span class="n">fluid_properties</span><span class="p">()</span>
+<span class="go"># calculates multimeral model with default settings</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">log</span><span class="o">.</span><span class="n">multimineral_model</span><span class="p">()</span>
+</pre></div>
+</div>
+<div class="admonition seealso">
+<p class="first admonition-title">See also</p>
+<dl class="last docutils">
+<dt><a class="reference internal" href="#petropy.Log.formation_multimineral_model" title="petropy.Log.formation_multimineral_model"><code class="xref py py-meth docutils literal"><span class="pre">petropy.Log.formation_multimineral_model()</span></code></a></dt>
+<dd>uses multimineral_model accross formations</dd>
+</dl>
+</div>
+</dd></dl>
+
+<dl class="method">
+<dt id="petropy.Log.multimineral_parameters_from_csv">
+<code class="descname">multimineral_parameters_from_csv</code><span class="sig-paren">(</span><em>csv_path=None</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/petropy/log.html#Log.multimineral_parameters_from_csv"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#petropy.Log.multimineral_parameters_from_csv" title="Permalink to this definition">¶</a></dt>
+<dd><p>Reads parameters from a csv for input into the multimineral
+model.</p>
+<p>This method reads the file located at the csv_path and turns
+the values into dictionaries to be used as inputs into the
+multimineral method.</p>
+<p>This <a class="reference external" href="../_static/multimineral_parameters.csv">link</a> contains a sample csv file with default
+multimineral properties data.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>csv_path</strong> (<a class="reference external" href="https://docs.python.org/2/library/functions.html#str" title="(in Python v2.7)"><em>str</em></a><em> (</em><em>default None</em><em>)</em>) &#8211; Path to csv file to read.</td>
+</tr>
+</tbody>
+</table>
+<div class="admonition note">
+<p class="first admonition-title">Note</p>
+<p>CSV file must contain header row with the following properties
+for the multimineral_model</p>
+<blockquote class="last">
+<div><dl class="docutils">
+<dt>gr_matrix <span class="classifier-delimiter">:</span> <span class="classifier">float (default 10)</span></dt>
+<dd>Gamma Ray response of clean (non-clay) matrix</dd>
+<dt>nphi_matrix <span class="classifier-delimiter">:</span> <span class="classifier">float (default 0)</span></dt>
+<dd>Neutron response of clean (non-clay) matrix</dd>
+<dt>gr_clay <span class="classifier-delimiter">:</span> <span class="classifier">float (default 450)</span></dt>
+<dd>Gamma Ray response of pure clay matrix</dd>
+<dt>rho_clay <span class="classifier-delimiter">:</span> <span class="classifier">float (default 2.64)</span></dt>
+<dd>Density of pure clay matrix</dd>
+<dt>nphi_clay <span class="classifier-delimiter">:</span> <span class="classifier">float (default 0.65)</span></dt>
+<dd>Neutron reponse of pure clay matrix</dd>
+<dt>pe_clay <span class="classifier-delimiter">:</span> <span class="classifier">float (default 4)</span></dt>
+<dd>Photoelectric response of pure clay matrix</dd>
+<dt>rma <span class="classifier-delimiter">:</span> <span class="classifier">float (default 180)</span></dt>
+<dd>Resistivity of clean tight matrix</dd>
+<dt>rt_clay <span class="classifier-delimiter">:</span> <span class="classifier">float (default 80)</span></dt>
+<dd>Resistivity for inorganic shale matrix</dd>
+<dt>vclay_linear_weight <span class="classifier-delimiter">:</span> <span class="classifier">float (default 1)</span></dt>
+<dd>Weight of liner clay volume</dd>
+<dt>vclay_clavier_weight <span class="classifier-delimiter">:</span> <span class="classifier">float (defaul 0.5)</span></dt>
+<dd>Weight of Clavier clay volume</dd>
+<dt>vclay_larionov_weight <span class="classifier-delimiter">:</span> <span class="classifier">float (defaul 0.5)</span></dt>
+<dd>Weight of Larionov clay volume</dd>
+<dt>vclay_nphi_weight <span class="classifier-delimiter">:</span> <span class="classifier">float (default 1)</span></dt>
+<dd>Weight of Neutron clay volume</dd>
+<dt>vclay_nphi_rhob_weight <span class="classifier-delimiter">:</span> <span class="classifier">float (default 1)</span></dt>
+<dd>Weight of Neutron Density clay volume</dd>
+<dt>vclay_cutoff <span class="classifier-delimiter">:</span> <span class="classifier">float (default 0.05)</span></dt>
+<dd>Cutoff for oranics calculation.
+If vclay &lt; vclay_cutoff then toc = 0</dd>
+<dt>rho_om <span class="classifier-delimiter">:</span> <span class="classifier">float (default 1.15)</span></dt>
+<dd>Density of organic matter</dd>
+<dt>nphi_om <span class="classifier-delimiter">:</span> <span class="classifier">float (default 0.6)</span></dt>
+<dd>Neutron response of pure organic matter</dd>
+<dt>pe_om <span class="classifier-delimiter">:</span> <span class="classifier">float (default 0.2)</span></dt>
+<dd>Photoelectric response of pure organic matter</dd>
+<dt>ro <span class="classifier-delimiter">:</span> <span class="classifier">float (default 1.6)</span></dt>
+<dd>Vitronite reflectance of organic matter</dd>
+<dt>lang_press <span class="classifier-delimiter">:</span> <span class="classifier">float (default 670)</span></dt>
+<dd>Langmiur pressure for gas adsorption on organics in psi</dd>
+<dt>passey_nphi_weight <span class="classifier-delimiter">:</span> <span class="classifier">float (default 1)</span></dt>
+<dd>Weight for Passey nphi toc</dd>
+<dt>passey_rhob_weight <span class="classifier-delimiter">:</span> <span class="classifier">float (default 1)</span></dt>
+<dd>Weight for Passey rhob toc</dd>
+<dt>passey_lom <span class="classifier-delimiter">:</span> <span class="classifier">float (default 10)</span></dt>
+<dd>Passey level of organic maturity</dd>
+<dt>passey_baseline_res <span class="classifier-delimiter">:</span> <span class="classifier">float (default 40)</span></dt>
+<dd>Passey inorganic baseline resistivity</dd>
+<dt>passey_baseline_rhob <span class="classifier-delimiter">:</span> <span class="classifier">float (default 2.65)</span></dt>
+<dd>Passey inorganic baseline density</dd>
+<dt>passey_baseline_nphi <span class="classifier-delimiter">:</span> <span class="classifier">float (default 0)</span></dt>
+<dd>Passey inorganic baseline neutron</dd>
+<dt>schmoker_weight <span class="classifier-delimiter">:</span> <span class="classifier">float (default 1)</span></dt>
+<dd>Weight for Schmoker toc</dd>
+<dt>schmoker_slope <span class="classifier-delimiter">:</span> <span class="classifier">float (default 0.7257)</span></dt>
+<dd>Slope for schmoker density to toc correlation</dd>
+<dt>schmoker_baseline_rhob <span class="classifier-delimiter">:</span> <span class="classifier">float (default 2.6)</span></dt>
+<dd>Density cutoff for schmoker toc correlation</dd>
+<dt>rho_pyr <span class="classifier-delimiter">:</span> <span class="classifier">float (default 5)</span></dt>
+<dd>Density of pyrite</dd>
+<dt>nphi_pyr <span class="classifier-delimiter">:</span> <span class="classifier">float (default 0.13)</span></dt>
+<dd>Neutron response of pure pyrite</dd>
+<dt>pe_pyr <span class="classifier-delimiter">:</span> <span class="classifier">float (default 13)</span></dt>
+<dd>Photoelectric response of pure pyrite</dd>
+<dt>om_pyrite_slope <span class="classifier-delimiter">:</span> <span class="classifier">float (default 0.2)</span></dt>
+<dd>Slope correlating pyrite volume to organic matter</dd>
+<dt>include_qtz <span class="classifier-delimiter">:</span> <span class="classifier">str {&#8216;YES&#8217;, &#8216;NO&#8217;} (default &#8216;YES&#8217;)</span></dt>
+<dd>Toggle to include or exclude qtz.
+&#8216;YES&#8217; to include. &#8216;NO&#8217; to exclude.</dd>
+<dt>rho_qtz <span class="classifier-delimiter">:</span> <span class="classifier">float (default 2.65)</span></dt>
+<dd>Density of quartz</dd>
+<dt>nphi_qtz <span class="classifier-delimiter">:</span> <span class="classifier">float (default -0.04)</span></dt>
+<dd>Neutron response for pure quartz</dd>
+<dt>pe_qtz <span class="classifier-delimiter">:</span> <span class="classifier">float (default 1.81)</span></dt>
+<dd>Photoelectric response for pure quartz</dd>
+<dt>include_clc <span class="classifier-delimiter">:</span> <span class="classifier">str {&#8216;YES&#8217;, &#8216;NO&#8217;} (default &#8216;YES&#8217;)</span></dt>
+<dd>Toggle to include or exclude clc.
+&#8216;YES&#8217; to include. &#8216;NO&#8217; to exclude.</dd>
+<dt>rho_clc <span class="classifier-delimiter">:</span> <span class="classifier">float (default 2.71)</span></dt>
+<dd>Density of calcite</dd>
+<dt>nphi_clc <span class="classifier-delimiter">:</span> <span class="classifier">float (default 0)</span></dt>
+<dd>Neutron response for pure calcite</dd>
+<dt>pe_clc <span class="classifier-delimiter">:</span> <span class="classifier">float (default 5.08)</span></dt>
+<dd>Photoelectric response for pure calcite</dd>
+<dt>include_dol <span class="classifier-delimiter">:</span> <span class="classifier">str {&#8216;YES&#8217;, &#8216;NO&#8217;} (default &#8216;YES&#8217;)</span></dt>
+<dd>Toggle to include or exclude dol.
+&#8216;YES&#8217; to include. &#8216;NO&#8217; to exclude.</dd>
+<dt>rho_dol <span class="classifier-delimiter">:</span> <span class="classifier">float (default 2.85)</span></dt>
+<dd>Density of dolomite</dd>
+<dt>nphi_dol <span class="classifier-delimiter">:</span> <span class="classifier">float (default 0.04)</span></dt>
+<dd>Neutron response to dolomite</dd>
+<dt>pe_dol <span class="classifier-delimiter">:</span> <span class="classifier">float (default 3.14)</span></dt>
+<dd>Photoelectric response to dolomite</dd>
+<dt>include_x <span class="classifier-delimiter">:</span> <span class="classifier">str {&#8216;YES&#8217;, &#8216;NO&#8217;} (default &#8216;NO&#8217;)</span></dt>
+<dd>Toggle to include or exclude exotic mineral, x.
+&#8216;YES&#8217; to include. &#8216;NO&#8217; to exclude.</dd>
+<dt>name_x <span class="classifier-delimiter">:</span> <span class="classifier">str (default &#8216;Gypsum&#8217;)</span></dt>
+<dd>Name of exotic mineral, x.</dd>
+<dt>name_log_x <span class="classifier-delimiter">:</span> <span class="classifier">str (default &#8216;GYP&#8217;)</span></dt>
+<dd>Log name of exotic mineral, x</dd>
+<dt>rho_x <span class="classifier-delimiter">:</span> <span class="classifier">float (default 2.35)</span></dt>
+<dd>Density of exotic mineral, x</dd>
+<dt>nphi_x <span class="classifier-delimiter">:</span> <span class="classifier">float (default 0.507)</span></dt>
+<dd>Neutron response of exotic mineral, x</dd>
+<dt>pe_x <span class="classifier-delimiter">:</span> <span class="classifier">float (default 4.04)</span></dt>
+<dd>Photoelectric respone of exotic mineral, x</dd>
+<dt>pe_fl <span class="classifier-delimiter">:</span> <span class="classifier">float (default 0)</span></dt>
+<dd>Photoelectric response of reservoir fluid.</dd>
+<dt>m <span class="classifier-delimiter">:</span> <span class="classifier">float (default 2)</span></dt>
+<dd>Cementation exponent</dd>
+<dt>n <span class="classifier-delimiter">:</span> <span class="classifier">float (default 2)</span></dt>
+<dd>Saturation exponent</dd>
+<dt>a <span class="classifier-delimiter">:</span> <span class="classifier">float (default 1)</span></dt>
+<dd>Cementation constant</dd>
+<dt>cec <span class="classifier-delimiter">:</span> <span class="classifier">float (default -1)</span></dt>
+<dd>Cation Exchange Capaticy for use in Waxman Smits Sw
+equation. If cec = -1, correlation equation is used to
+calculate cec.</dd>
+<dt>archie_weight <span class="classifier-delimiter">:</span> <span class="classifier">float (default 0)</span></dt>
+<dd>Weight for archie Sw</dd>
+<dt>indonesia_weight <span class="classifier-delimiter">:</span> <span class="classifier">float (default 1)</span></dt>
+<dd>Weight for Indonesia Sw</dd>
+<dt>simandoux_weight <span class="classifier-delimiter">:</span> <span class="classifier">float (default 0)</span></dt>
+<dd>Weight for Simandoux Sw</dd>
+<dt>modified_simandoux_weight <span class="classifier-delimiter">:</span> <span class="classifier">float (default 0)</span></dt>
+<dd>Weight for Modified Simandoux Sw</dd>
+<dt>waxman_smits_weight <span class="classifier-delimiter">:</span> <span class="classifier">float (default 0)</span></dt>
+<dd>Weight for Waxman Smits Sw</dd>
+<dt>buckles_parameter <span class="classifier-delimiter">:</span> <span class="classifier">float (default -1)</span></dt>
+<dd>Buckles parameter for calculating irreducible water
+saturation. If less than 0, it is calculated using a
+correlation.</dd>
+</dl>
+</div></blockquote>
+</div>
+<p class="rubric">Examples</p>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">import</span> <span class="nn">petropy</span> <span class="k">as</span> <span class="nn">ptr</span>
+<span class="go"># reads sample Wolfcamp Log from las file</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">log</span> <span class="o">=</span> <span class="n">ptr</span><span class="o">.</span><span class="n">log_data</span><span class="p">(</span><span class="s1">&#39;WFMP&#39;</span><span class="p">)</span>
+<span class="go"># loads base parameters</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">log</span><span class="o">.</span><span class="n">multimineral_parameters_from_csv</span><span class="p">()</span>
+</pre></div>
+</div>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">import</span> <span class="nn">petropy</span> <span class="k">as</span> <span class="nn">ptr</span>
+<span class="go"># reads sample Wolfcamp Log from las file</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">log</span> <span class="o">=</span> <span class="n">ptr</span><span class="o">.</span><span class="n">log_data</span><span class="p">(</span><span class="s1">&#39;WFMP&#39;</span><span class="p">)</span>
+<span class="go"># define path to csv file</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">my_csv_paramters</span> <span class="o">=</span> <span class="s1">&#39;path/to/csv/file.csv&#39;</span>
+<span class="go"># loads specified parameters</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">log</span><span class="o">.</span><span class="n">multimineral_parameters_from_csv</span><span class="p">(</span><span class="n">my_csv_paramters</span><span class="p">)</span>
+</pre></div>
+</div>
+<div class="admonition seealso">
+<p class="first admonition-title">See also</p>
+<dl class="last docutils">
+<dt><a class="reference internal" href="#petropy.Log.fluid_properties" title="petropy.Log.fluid_properties"><code class="xref py py-meth docutils literal"><span class="pre">petropy.Log.fluid_properties()</span></code></a></dt>
+<dd>Calculates fluid properties using input settings loaded through this method</dd>
+</dl>
+</div>
+</dd></dl>
+
+<dl class="method">
+<dt id="petropy.Log.next_formation_depth">
+<code class="descname">next_formation_depth</code><span class="sig-paren">(</span><em>formation</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/petropy/log.html#Log.next_formation_depth"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#petropy.Log.next_formation_depth" title="Permalink to this definition">¶</a></dt>
+<dd><p>Return top of formation below specified formation.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>formation</strong> (<a class="reference external" href="https://docs.python.org/2/library/functions.html#str" title="(in Python v2.7)"><em>str</em></a>) &#8211; name of formation which should be found in preloaded tops</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><strong>bottom</strong> &#8211; top of formation below input formation, acting as bottom of
+input formation</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><a class="reference external" href="https://docs.python.org/2/library/functions.html#float" title="(in Python v2.7)">float</a></td>
+</tr>
+</tbody>
+</table>
+<p class="rubric">Example</p>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">import</span> <span class="nn">petropy</span> <span class="k">as</span> <span class="nn">ptr</span>
+<span class="go"># reads sample Wolfcamp Log from las file</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">log</span> <span class="o">=</span> <span class="n">ptr</span><span class="o">.</span><span class="n">log_data</span><span class="p">(</span><span class="s1">&#39;WFMP&#39;</span><span class="p">)</span>
+<span class="go"># get top of formation WFMPA</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">wfmpa_top</span> <span class="o">=</span> <span class="n">log</span><span class="o">.</span><span class="n">tops</span><span class="p">[</span><span class="s1">&#39;WFMPA&#39;</span><span class="p">]</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="nb">print</span><span class="p">(</span><span class="n">wfmpa_top</span><span class="p">)</span>
+<span class="go">6993.5</span>
+<span class="go"># got bottom of formation WFMPA</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">wfmpa_bottom</span> <span class="o">=</span> <span class="n">log</span><span class="o">.</span><span class="n">next_formation_depth</span><span class="p">(</span><span class="s1">&#39;WFMPB&#39;</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="nb">print</span><span class="p">(</span><span class="n">wfmpa_bottom</span><span class="p">)</span>
+<span class="go">7294.0</span>
+<span class="go"># Compare depths for bottom of WFMPA</span>
+<span class="go"># to top of WFMPB</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">wfmpb_top</span> <span class="o">=</span> <span class="n">log</span><span class="o">.</span><span class="n">tops</span><span class="p">[</span><span class="s1">&#39;WFMPB&#39;</span><span class="p">]</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="nb">print</span><span class="p">(</span><span class="n">wfmpb_top</span><span class="p">)</span>
+<span class="go">7294.0</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="nb">print</span><span class="p">(</span><span class="n">wfmpa_bottom</span> <span class="o">==</span> <span class="n">wfmpb_top</span><span class="p">)</span>
+<span class="go">True</span>
+</pre></div>
+</div>
+</dd></dl>
+
+<dl class="method">
+<dt id="petropy.Log.precondition">
+<code class="descname">precondition</code><span class="sig-paren">(</span><em>drho_matrix=2.71</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/petropy/log.html#Log.precondition"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#petropy.Log.precondition" title="Permalink to this definition">¶</a></dt>
+<dd><p>Preconditions log curve by aliasing names.</p>
+<p>Precondition is used after initializing data and standardizes
+names for future calculations.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>drho_matrix</strong> (<a class="reference external" href="https://docs.python.org/2/library/functions.html#float" title="(in Python v2.7)"><em>float</em></a><em>, </em><em>optional</em>) &#8211; drho_matrix is for converting density porosity to bulk
+densty, and is only used when bulk density is missing.
+Default value for limestone matrix. If log was run on
+sandstone matrix, use 2.65. If log was run on dolomite
+matrix, use 2.85.</td>
+</tr>
+</tbody>
+</table>
+<div class="admonition note">
+<p class="first admonition-title">Note</p>
+<ol class="last arabic simple">
+<li>Curve Alias is provided by the curve_alias.xml file</li>
+</ol>
+</div>
+</dd></dl>
+
+<dl class="method">
+<dt id="petropy.Log.statistics">
+<code class="descname">statistics</code><span class="sig-paren">(</span><em>formations, curves=['PHIE']</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/petropy/log.html#Log.statistics"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#petropy.Log.statistics" title="Permalink to this definition">¶</a></dt>
+<dd><p>Curve statistcs for given formations and curves</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>formations</strong> (<em>list</em><em> (</em><em>default</em><em> [</em><em>]</em><em>)</em>) &#8211; list of formations to calculate statistics over. Must be
+included in preloaded tops</li>
+<li><strong>curves</strong> (<em>list</em><em> (</em><em>default</em><em> [</em><em>'PHIE'</em><em>]</em><em>)</em>) &#8211; list of curve to calculate statistics for. Must be
+included in Log object.</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first"><strong>df</strong> &#8211; Returns Mean, Sum, and Standard Deviation for each curve
+over every formation</p>
+</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><p class="first last">DataFrame</p>
+</td>
+</tr>
+</tbody>
+</table>
+<p class="rubric">Example</p>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">import</span> <span class="nn">petropy</span> <span class="k">as</span> <span class="nn">ptr</span>
+<span class="go"># reads sample Wolfcamp Log from las file</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">log</span> <span class="o">=</span> <span class="n">ptr</span><span class="o">.</span><span class="n">log_data</span><span class="p">(</span><span class="s1">&#39;WFMP&#39;</span><span class="p">)</span>
+<span class="go"># define formations to calculate statistics</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">f</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;WFMPA&#39;</span><span class="p">,</span> <span class="s1">&#39;WFMPB&#39;</span><span class="p">,</span> <span class="s1">&#39;WFMPC&#39;</span><span class="p">]</span>
+<span class="go"># define curves to calculate statistics</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">c</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;GR_N&#39;</span><span class="p">,</span> <span class="s1">&#39;RHOB_N&#39;</span><span class="p">,</span> <span class="n">NPHI_N</span><span class="s1">&#39;]</span>
+<span class="go"># calculate statistics</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">stats_df</span> <span class="o">=</span> <span class="n">log</span><span class="o">.</span><span class="n">statistics</span><span class="p">(</span><span class="n">formations</span> <span class="o">=</span> <span class="n">f</span><span class="p">,</span> <span class="n">curves</span> <span class="o">=</span> <span class="n">c</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="nb">print</span><span class="p">(</span><span class="n">stats_df</span><span class="p">)</span>
+<span class="go">..FORMATION                   DATETIME GROSS_H  GR_N_MEAN</span>
+<span class="go">0     WFMPA 2017-09-26 16:04:47.543687   300.5  92.597982</span>
+<span class="go">1     WFMPB 2017-09-26 16:04:47.543687   396.5  89.953657</span>
+<span class="go">2     WFMPC 2017-09-26 16:04:47.543687   337.5  75.326230</span>
+<span class="go">........GR_N_SUM   RHOB_N_MEAN   RHOB_N_STD   RHOB_N_SUM</span>
+<span class="go">1    27825.6935      2.503339     0.048434     752.2535</span>
+<span class="go">2    35666.6250      2.526271     0.051070    1001.6665</span>
+<span class="go">3    25422.6025      2.539730     0.069945     857.1590</span>
+<span class="go">...NPHI_N_MEAN  NPHI_N_STD  NPHI_N_SUM              UWI</span>
+<span class="go">1     0.208496    0.055684      62.653   42303347740000</span>
+<span class="go">2     0.219536    0.044894      87.046   42303347740000</span>
+<span class="go">3     0.198791    0.066487      67.092   42303347740000</span>
+</pre></div>
+</div>
+<div class="admonition seealso">
+<p class="first admonition-title">See also</p>
+<dl class="last docutils">
+<dt><a class="reference internal" href="#petropy.Log.statistics_to_csv" title="petropy.Log.statistics_to_csv"><code class="xref py py-meth docutils literal"><span class="pre">petropy.Log.statistics_to_csv()</span></code></a></dt>
+<dd>saves statistics to csv file with option to append or overwrite formation values</dd>
+<dt><a class="reference internal" href="#petropy.Log.summations" title="petropy.Log.summations"><code class="xref py py-meth docutils literal"><span class="pre">petropy.Log.summations()</span></code></a></dt>
+<dd>calculate summation curves over a given formation</dd>
+</dl>
+</div>
+</dd></dl>
+
+<dl class="method">
+<dt id="petropy.Log.statistics_to_csv">
+<code class="descname">statistics_to_csv</code><span class="sig-paren">(</span><em>file_path, replace=False, formations=[], curves=['PHIE']</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/petropy/log.html#Log.statistics_to_csv"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#petropy.Log.statistics_to_csv" title="Permalink to this definition">¶</a></dt>
+<dd><p>Saves curve statistcs for given formations and curves to a csv</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
+<li><strong>file_path</strong> (<a class="reference external" href="https://docs.python.org/2/library/functions.html#str" title="(in Python v2.7)"><em>str</em></a>) &#8211; path to csv file</li>
+<li><strong>replace</strong> (<em>boolean</em><em> (</em><em>default False</em><em>)</em>) &#8211; option to replace uwi, formation statistics if already in
+csv file</li>
+<li><strong>formations</strong> (<em>list</em><em> (</em><em>default</em><em> [</em><em>]</em><em>)</em>) &#8211; list of formations to calculate statistics over. Must be
+included in preloaded tops</li>
+<li><strong>curves</strong> (<em>list</em><em> (</em><em>default</em><em> [</em><em>'PHIE'</em><em>]</em><em>)</em>) &#8211; list of curve to calculate statistics.</li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
+<p class="rubric">Example</p>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">import</span> <span class="nn">petropy</span> <span class="k">as</span> <span class="nn">ptr</span>
+<span class="go"># reads sample Wolfcamp Log from las file</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">log</span> <span class="o">=</span> <span class="n">ptr</span><span class="o">.</span><span class="n">log_data</span><span class="p">(</span><span class="s1">&#39;WFMP&#39;</span><span class="p">)</span>
+<span class="go"># define formations to calculate</span>
+<span class="go"># define formations to calculate statistics</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">f</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;WFMPA&#39;</span><span class="p">,</span> <span class="s1">&#39;WFMPB&#39;</span><span class="p">,</span> <span class="s1">&#39;WFMPC&#39;</span><span class="p">]</span>
+<span class="go"># define curves to calculate statistics</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">c</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;GR_N&#39;</span><span class="p">,</span> <span class="s1">&#39;RHOB_N&#39;</span><span class="p">,</span> <span class="n">NPHI_N</span><span class="s1">&#39;]</span>
+<span class="go"># define path to csv</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">p</span> <span class="o">=</span> <span class="s1">&#39;path/to/my/file.csv&#39;</span>
+<span class="go"># calculate and save statistcs to csv</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">log</span><span class="o">.</span><span class="n">statistics_to_csv</span><span class="p">(</span><span class="n">p</span><span class="p">,</span> <span class="n">formations</span> <span class="o">=</span> <span class="n">f</span><span class="p">,</span> <span class="n">curves</span> <span class="o">=</span> <span class="n">c</span><span class="p">)</span>
+</pre></div>
+</div>
+<div class="admonition seealso">
+<p class="first admonition-title">See also</p>
+<dl class="last docutils">
+<dt><a class="reference internal" href="#petropy.Log.statistics" title="petropy.Log.statistics"><code class="xref py py-meth docutils literal"><span class="pre">petropy.Log.statistics()</span></code></a></dt>
+<dd>calculates statistics and returns a dataframe</dd>
+<dt><a class="reference internal" href="#petropy.Log.summations" title="petropy.Log.summations"><code class="xref py py-meth docutils literal"><span class="pre">petropy.Log.summations()</span></code></a></dt>
+<dd>calculate summation curves over a given formation</dd>
+</dl>
+</div>
+</dd></dl>
+
+<dl class="method">
+<dt id="petropy.Log.summations">
+<code class="descname">summations</code><span class="sig-paren">(</span><em>formations, curves=['PHIE']</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/petropy/log.html#Log.summations"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#petropy.Log.summations" title="Permalink to this definition">¶</a></dt>
+<dd><p>Cumulative summations over formations for given curves.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
+<li><strong>formations</strong> (<em>list</em>) &#8211; list of formations, which must be found in preloaded tops</li>
+<li><strong>curves</strong> (<em>list</em><em> (</em><em>default</em><em> [</em><em>'PHIE'</em><em>]</em><em>)</em>) &#8211; list of curves to calculated cumulative summations.
+Values in list must curves be present in log.</li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
+<p class="rubric">Example</p>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">import</span> <span class="nn">petropy</span> <span class="k">as</span> <span class="nn">ptr</span>
+<span class="go"># Sum Oil in Place for Wolfcamp A</span>
+<span class="go">#</span>
+<span class="go"># reads sample Wolfcamp Log from las file</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">log</span> <span class="o">=</span> <span class="n">ptr</span><span class="o">.</span><span class="n">log_data</span><span class="p">(</span><span class="s1">&#39;WFMP&#39;</span><span class="p">)</span>
+<span class="go"># define formations</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">f</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;WFMPA&#39;</span><span class="p">,</span> <span class="s1">&#39;WFMPB&#39;</span><span class="p">,</span> <span class="s1">&#39;WFMPC&#39;</span><span class="p">]</span>
+<span class="go"># calculate fluid properties for formations</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">log</span><span class="o">.</span><span class="n">formation_fluid_properties</span><span class="p">(</span><span class="n">formations</span> <span class="o">=</span> <span class="n">f</span><span class="p">)</span>
+<span class="go"># calculate minerals and saturations for formations</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">log</span><span class="o">.</span><span class="n">formation_multimineral_model</span><span class="p">(</span><span class="n">formation</span> <span class="o">=</span> <span class="n">f</span><span class="p">)</span>
+<span class="go"># run summations for Oil in Place over formations</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">log</span><span class="o">.</span><span class="n">summations</span><span class="p">(</span><span class="n">formations</span> <span class="o">=</span> <span class="n">f</span><span class="p">,</span> <span class="n">curves</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;OIP&#39;</span><span class="p">])</span>
+</pre></div>
+</div>
+<div class="admonition seealso">
+<p class="first admonition-title">See also</p>
+<dl class="last docutils">
+<dt><a class="reference internal" href="#petropy.Log.statistics" title="petropy.Log.statistics"><code class="xref py py-meth docutils literal"><span class="pre">petropy.Log.statistics()</span></code></a></dt>
+<dd>Calculates statistics over given formations and curves</dd>
+</dl>
+</div>
+</dd></dl>
+
+<dl class="method">
+<dt id="petropy.Log.to_csv">
+<code class="descname">to_csv</code><span class="sig-paren">(</span><em>*args</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/petropy/log.html#Log.to_csv"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#petropy.Log.to_csv" title="Permalink to this definition">¶</a></dt>
+<dd><p>Write the log DataFrame to a comma-separated values (csv) file.</p>
+<p>Calls pandas.DataFrame.to_csv which includes these parameters.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
+<li><strong>path_or_buf</strong> (<a class="reference external" href="https://docs.python.org/2/library/functions.html#str" title="(in Python v2.7)"><em>str</em></a><em> or </em><em>file handle</em><em> (</em><em>default None</em><em>)</em>) &#8211; File path or object, if None is provided the result is
+returned as a string.</li>
+<li><strong>sep</strong> (<a class="reference external" href="https://docs.python.org/2/library/functions.html#str" title="(in Python v2.7)"><em>str</em></a><em> (</em><em>default ‘</em><em>,</em><em>’</em><em>)</em>) &#8211; Field delimiter for the output file.</li>
+<li><strong>na_rep</strong> (<a class="reference external" href="https://docs.python.org/2/library/functions.html#str" title="(in Python v2.7)"><em>str</em></a><em> (</em><em>default ‘’</em><em>)</em>) &#8211; Missing data representation</li>
+<li><strong>float_format</strong> (<a class="reference external" href="https://docs.python.org/2/library/functions.html#str" title="(in Python v2.7)"><em>str</em></a><em> (</em><em>default None</em><em>)</em>) &#8211; Format string for floating point numbers</li>
+<li><strong>columns</strong> (<em>sequence</em><em>, </em><em>optional</em>) &#8211; Columns to write</li>
+<li><strong>header</strong> (<em>boolean</em><em> or </em><em>list of string</em><em> (</em><em>default True</em><em>)</em>) &#8211; Write out column names. If a list of string is given it is
+assumed to be aliases for the column names</li>
+<li><strong>index</strong> (<em>boolean</em><em> (</em><em>default True</em><em>)</em>) &#8211; Write row names (index)</li>
+<li><strong>index_label</strong> (<a class="reference external" href="https://docs.python.org/2/library/functions.html#str" title="(in Python v2.7)"><em>str</em></a><em> or </em><em>sequence</em><em>, or </em><a class="reference external" href="https://docs.python.org/2/library/constants.html#False" title="(in Python v2.7)"><em>False</em></a><em> (</em><em>default None</em><em>)</em>) &#8211; Column label for index column(s) if desired. If None is
+given, and header and index are True, then the index names
+are used. A sequence should be given if the DataFrame uses
+MultiIndex. If False do not print fields for index names.
+Use index_label = False for easier importing in R</li>
+<li><strong>mode</strong> (<a class="reference external" href="https://docs.python.org/2/library/functions.html#str" title="(in Python v2.7)"><em>str</em></a>) &#8211; Python write mode, default &#8216;w&#8217;</li>
+<li><strong>encoding</strong> (<a class="reference external" href="https://docs.python.org/2/library/functions.html#str" title="(in Python v2.7)"><em>str</em></a><em>, </em><em>optional</em>) &#8211; A string representing the encoding to use in the output
+file, defaults to &#8216;ascii&#8217; on Python 2 and &#8216;utf-8&#8217; on
+Python 3.</li>
+<li><strong>compression</strong> (<a class="reference external" href="https://docs.python.org/2/library/functions.html#str" title="(in Python v2.7)"><em>str</em></a><em>, </em><em>optional</em>) &#8211; a string representing the compression to use in the output
+file, allowed values are &#8216;gzip&#8217;, &#8216;bz2&#8217;, &#8216;xz&#8217;, only used
+when the first argument is a filename</li>
+<li><strong>line_terminator</strong> (<a class="reference external" href="https://docs.python.org/2/library/functions.html#str" title="(in Python v2.7)"><em>str</em></a>) &#8211; The newline character or character sequence to use in the
+output file</li>
+<li><strong>quoting</strong> (<em>constant from csv module</em><em>, </em><em>optional</em>) &#8211; defaults to csv.QUOTE_MINIMAL. If you have set a
+float_format then floats are converted to strings and thus
+csv.QUOTE_NONNUMERIC will treat them as non-numeric</li>
+<li><strong>quotechar</strong> (<em>str with length 1</em><em> (</em><em>default ‘”’</em><em>)</em>) &#8211; character used to quote fields</li>
+<li><strong>doublequote</strong> (<em>boolean</em><em> (</em><em>default True</em><em>)</em>) &#8211; Control quoting of quotechar inside a field</li>
+<li><strong>escapechar</strong> (<em>str with length 1</em><em> (</em><em>default None</em><em>)</em>) &#8211; character used to escape sep and quotechar when appropriate</li>
+<li><strong>chunksize</strong> (<a class="reference external" href="https://docs.python.org/2/library/functions.html#int" title="(in Python v2.7)"><em>int</em></a><em> (</em><em>default None</em><em>)</em>) &#8211; rows to write at a time</li>
+<li><strong>tupleize_cols</strong> (<em>boolean</em><em> (</em><em>default False</em><em>)</em>) &#8211; write multi_index columns as a list of tuples (if True) or
+new (expanded format) if False)</li>
+<li><strong>date_format</strong> (<a class="reference external" href="https://docs.python.org/2/library/functions.html#str" title="(in Python v2.7)"><em>str</em></a><em> (</em><em>default None</em><em>)</em>) &#8211; Format string for datetime objects</li>
+<li><strong>decimal</strong> (<a class="reference external" href="https://docs.python.org/2/library/functions.html#str" title="(in Python v2.7)"><em>str</em></a><em> (</em><em>default ‘.’</em><em>)</em>) &#8211; Character recognized as decimal separator. E.g. use ‘,’ for
+European data</li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
+<p class="rubric">Example</p>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">import</span> <span class="nn">petropy</span> <span class="k">as</span> <span class="nn">ptr</span>
+<span class="go"># Read las file, then write to csv for use in excel</span>
+<span class="go">#</span>
+<span class="go"># reads sample Wolfcamp Log from las file</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">log</span> <span class="o">=</span> <span class="n">ptr</span><span class="o">.</span><span class="n">log_data</span><span class="p">(</span><span class="s1">&#39;WFMP&#39;</span><span class="p">)</span>
+<span class="go"># define path to save csv</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">file_name</span> <span class="o">=</span> <span class="s1">&#39;path/to/save/name_of_file.csv&#39;</span>
+<span class="go"># save log to csv</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">log</span><span class="o">.</span><span class="n">to_csv</span><span class="p">(</span><span class="n">path_or_buf</span> <span class="o">=</span> <span class="n">file_name</span><span class="p">,</span> <span class="n">index</span> <span class="o">=</span> <span class="kc">False</span><span class="p">)</span>
+</pre></div>
+</div>
+</dd></dl>
+
+<dl class="method">
+<dt id="petropy.Log.tops_from_csv">
+<code class="descname">tops_from_csv</code><span class="sig-paren">(</span><em>csv_path=None</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/petropy/log.html#Log.tops_from_csv"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#petropy.Log.tops_from_csv" title="Permalink to this definition">¶</a></dt>
+<dd><p>Reads tops from a csv file and saves as dictionary.</p>
+<p>Here is a sample csv file with default <a class="reference external" href="../_static/tops.csv">tops</a> data.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>csv_path</strong> (<a class="reference external" href="https://docs.python.org/2/library/functions.html#str" title="(in Python v2.7)"><em>str</em></a><em> (</em><em>default None</em><em>)</em>) &#8211; <p>Path to csv file to read. Must contain header row the the
+following properties:</p>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="n">uwi</span> <span class="p">:</span> <span class="nb">str</span>
+    <span class="n">Unique</span> <span class="n">Well</span> <span class="n">Identifier</span>
+<span class="n">form</span> <span class="p">:</span> <span class="nb">str</span>
+    <span class="n">Name</span> <span class="n">of</span> <span class="n">formation</span> <span class="n">top</span>
+<span class="n">depth</span> <span class="p">:</span> <span class="nb">float</span>
+    <span class="n">depth</span> <span class="n">of</span> <span class="n">corresponding</span> <span class="n">formation</span> <span class="n">top</span>
+</pre></div>
+</div>
+</td>
+</tr>
+</tbody>
+</table>
+<div class="admonition note">
+<p class="first admonition-title">Note</p>
+<p>Format for csv:</p>
+<div class="last highlight-default"><div class="highlight"><pre><span></span><span class="n">uwi</span><span class="p">,</span><span class="n">form</span><span class="p">,</span><span class="n">depth</span>
+<span class="mi">11111111111</span><span class="p">,</span><span class="n">WFMPA</span><span class="p">,</span><span class="mf">7000.50</span>
+<span class="mi">11111111111</span><span class="p">,</span><span class="n">WFMPB</span><span class="p">,</span><span class="mf">7250.50</span>
+<span class="mi">11111111111</span><span class="p">,</span><span class="n">WFMPC</span><span class="p">,</span><span class="mf">7500.00</span>
+<span class="mi">11111111111</span><span class="p">,</span><span class="n">WFMPD</span><span class="p">,</span><span class="mf">7700.25</span>
+<span class="mi">11111111111</span><span class="p">,</span><span class="n">DEAN</span><span class="p">,</span><span class="mf">8000.00</span>
+</pre></div>
+</div>
+</div>
+<p class="rubric">Example</p>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">import</span> <span class="nn">petropy</span> <span class="k">as</span> <span class="nn">ptr</span>
+<span class="go"># define path to las file</span>
+<span class="go">p = &#39;path/to/well.las&#39;</span>
+<span class="go"># loads specified las file</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">log</span> <span class="o">=</span> <span class="n">ptr</span><span class="o">.</span><span class="n">Log</span><span class="p">(</span><span class="n">p</span><span class="p">)</span>
+<span class="go"># define path to csv tops file</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">t</span> <span class="o">=</span> <span class="s1">&#39;path/to/tops.csv&#39;</span>
+<span class="go"># loads specified tops csv</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">log</span><span class="o">.</span><span class="n">tops_from_csv</span><span class="p">(</span><span class="n">t</span><span class="p">)</span>
+</pre></div>
+</div>
+</dd></dl>
+
+<dl class="method">
+<dt id="petropy.Log.write">
+<code class="descname">write</code><span class="sig-paren">(</span><em>file_path</em>, <em>version=2.0</em>, <em>wrap=False</em>, <em>STRT=None</em>, <em>STOP=None</em>, <em>STEP=None</em>, <em>fmt='%10.5g'</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/petropy/log.html#Log.write"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#petropy.Log.write" title="Permalink to this definition">¶</a></dt>
+<dd><p>Writes to las file, and overwrites if file exisits. Uses parent
+class LASFile.write method with specified defaults.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
+<li><strong>file_path</strong> (<a class="reference external" href="https://docs.python.org/2/library/functions.html#str" title="(in Python v2.7)"><em>str</em></a>) &#8211; path to new las file.</li>
+<li><strong>version</strong> (<em>{1.2</em><em> or </em><em>2}</em><em> (</em><em>default 2</em><em>)</em>) &#8211; Version for las file</li>
+<li><strong>wrap</strong> (<em>{True</em><em>, </em><em>Flase</em><em>, </em><em>None}</em><em> (</em><em>default False</em><em>)</em>) &#8211; Specify to wrap data. If None, uses setting from when
+file was read.</li>
+<li><strong>STRT</strong> (<a class="reference external" href="https://docs.python.org/2/library/functions.html#float" title="(in Python v2.7)"><em>float</em></a><em> (</em><em>default None</em><em>)</em>) &#8211; Optional override to automatic calculation using the first
+index curve value.</li>
+<li><strong>STOP</strong> (<a class="reference external" href="https://docs.python.org/2/library/functions.html#float" title="(in Python v2.7)"><em>float</em></a><em> (</em><em>default None</em><em>)</em>) &#8211; Optional override to automatic calculation using the last
+index curve value.</li>
+<li><strong>STEP</strong> (<a class="reference external" href="https://docs.python.org/2/library/functions.html#float" title="(in Python v2.7)"><em>float</em></a><em> (</em><em>default None</em><em>)</em>) &#8211; Optional override to automatic calculation using the first
+step size in the index curve.</li>
+<li><strong>fmt</strong> (<a class="reference external" href="https://docs.python.org/2/library/functions.html#str" title="(in Python v2.7)"><em>str</em></a><em> (</em><em>default '%10.5g'</em><em>)</em>) &#8211; Format string for numerical data being written to data
+section.</li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
+<p class="rubric">Example</p>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">import</span> <span class="nn">petropy</span> <span class="k">as</span> <span class="nn">ptr</span>
+<span class="go"># reads sample Wolfcamp Log from las file</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">log</span> <span class="o">=</span> <span class="n">ptr</span><span class="o">.</span><span class="n">log_data</span><span class="p">(</span><span class="s1">&#39;WFMP&#39;</span><span class="p">)</span>
+<span class="go"># define file path to save log</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">p</span> <span class="o">=</span> <span class="s1">&#39;path/to/new_file.las&#39;</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">log</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">p</span><span class="p">)</span>
+</pre></div>
+</div>
+</dd></dl>
+
+</dd></dl>
+
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+<h1 class="logo"><a href="../index.html">PetroPy</a></h1>
+
+
+
+
+
+
+
+
+<h3>Navigation</h3>
+<ul class="current">
+<li class="toctree-l1 current"><a class="current reference internal" href="#">Log</a></li>
+<li class="toctree-l1"><a class="reference internal" href="LogViewer.html">LogViewer</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../function/electrofacies.html">Electrofacies</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../function/dataset.html">Dataset</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../function/download.html">Downloads</a></li>
+</ul>
+
+
+<div id="searchbox" style="display: none" role="search">
+  <h3>Quick search</h3>
+    <form class="search" action="../search.html" method="get">
+      <div><input type="text" name="q" /></div>
+      <div><input type="submit" value="Go" /></div>
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="footer">
+      &copy;2017, Todd Heitmann.
+      
+      |
+      Powered by <a href="http://sphinx-doc.org/">Sphinx 1.5.6</a>
+      &amp; <a href="https://github.com/bitprophet/alabaster">Alabaster 0.7.10</a>
+      
+      |
+      <a href="../_sources/class/Log.rst.txt"
+          rel="nofollow">Page source</a>
+    </div>
+
+    
+
+    
+  </body>
+</html>

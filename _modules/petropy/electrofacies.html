@@ -1,0 +1,274 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>petropy.electrofacies &#8212; PetroPy 0.1 documentation</title>
+    
+    <link rel="stylesheet" href="../../_static/alabaster.css" type="text/css" />
+    <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../../',
+        VERSION:     '0.1',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true,
+        SOURCELINK_SUFFIX: '.txt'
+      };
+    </script>
+    <script type="text/javascript" src="../../_static/jquery.js"></script>
+    <script type="text/javascript" src="../../_static/underscore.js"></script>
+    <script type="text/javascript" src="../../_static/doctools.js"></script>
+    <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.0/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    <link rel="index" title="Index" href="../../genindex.html" />
+    <link rel="search" title="Search" href="../../search.html" />
+   
+  <link rel="stylesheet" href="../../_static/custom.css" type="text/css" />
+  
+  
+  <meta name="viewport" content="width=device-width, initial-scale=0.9, maximum-scale=0.9" />
+
+  </head>
+  <body role="document">
+  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <h1>Source code for petropy.electrofacies</h1><div class="highlight"><pre>
+<span></span><span class="c1"># -*- coding: utf-8 -*-</span>
+<span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">Electrofacies is a model to calculate numerical facies from log data.</span>
+<span class="sd">It uses sckit-learn for standardization and clustering.</span>
+
+<span class="sd">&quot;&quot;&quot;</span>
+<span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+<span class="kn">import</span> <span class="nn">pandas</span> <span class="k">as</span> <span class="nn">pd</span>
+<span class="kn">from</span> <span class="nn">sklearn.preprocessing</span> <span class="k">import</span> <span class="n">StandardScaler</span>
+<span class="kn">from</span> <span class="nn">sklearn.decomposition</span> <span class="k">import</span> <span class="n">PCA</span>
+<span class="kn">from</span> <span class="nn">sklearn.cluster</span> <span class="k">import</span> <span class="n">MiniBatchKMeans</span>
+
+<div class="viewcode-block" id="electrofacies"><a class="viewcode-back" href="../../function/electrofacies.html#petropy.electrofacies">[docs]</a><span class="k">def</span> <span class="nf">electrofacies</span><span class="p">(</span><span class="n">logs</span><span class="p">,</span> <span class="n">formations</span><span class="p">,</span> <span class="n">curves</span><span class="p">,</span> <span class="n">n_clusters</span><span class="p">,</span> <span class="n">log_scale</span> <span class="o">=</span> <span class="p">[],</span>
+                  <span class="n">n_components</span> <span class="o">=</span> <span class="mf">0.85</span><span class="p">,</span> <span class="n">curve_name</span> <span class="o">=</span> <span class="s1">&#39;FACIES&#39;</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Electrofacies function to group intervals by rock type. Also</span>
+<span class="sd">    referred to as heterogenous rock analysis.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    logs : list of :class:`ptr.Log` objects</span>
+<span class="sd">        List of Log objects</span>
+<span class="sd">    formations: list of formation names</span>
+<span class="sd">        List of strings containg formation names which should be</span>
+<span class="sd">        previously loaded into Log objects</span>
+<span class="sd">    curves : list of curve names</span>
+<span class="sd">        List of strings containing curve names as inputs in the</span>
+<span class="sd">        electrofacies calculations</span>
+<span class="sd">    n_clusters : int</span>
+<span class="sd">        Number of clusters to group intervals. Number of electrofacies.</span>
+<span class="sd">    log_scale : list of curve names</span>
+<span class="sd">        List of string containing curve names which are preprocessed</span>
+<span class="sd">        on a log scale. For example, deep resistivity separates better</span>
+<span class="sd">        on a log scale, and is graph logarithmically when viewing data</span>
+<span class="sd">        in a log viewer.</span>
+<span class="sd">    n_components : int, float, None or string (default 0.85)</span>
+<span class="sd">        Number of principal components to keep. If value is less than</span>
+<span class="sd">        one, the number of principal components be the number required</span>
+<span class="sd">        to exceed the explained variance.</span>
+<span class="sd">    curve_name : str (default &#39;FACIES&#39;)</span>
+<span class="sd">        Name of the new electrofacies curve.</span>
+
+<span class="sd">    Examples</span>
+<span class="sd">    --------</span>
+<span class="sd">    &gt;&gt;&gt; # loads sample Wolfcamp calculates electrofacies for that well</span>
+<span class="sd">    &gt;&gt;&gt; import petropy as ptr</span>
+<span class="sd">    # reads sample Wolfcamp Log from las file</span>
+<span class="sd">    &gt;&gt;&gt; log = ptr.log_data(&#39;WFMP&#39;)</span>
+<span class="sd">    &gt;&gt;&gt; logs = [log]</span>
+<span class="sd">    &gt;&gt;&gt; f = [&#39;WFMPA&#39;, &#39;WFMPB&#39;, &#39;WFMPC&#39;]</span>
+<span class="sd">    &gt;&gt;&gt; c = [&#39;GR_N&#39;, &#39;RESDEEP_N&#39;, &#39;RHOB_N&#39;, &#39;NPHI_N&#39;, &#39;PE_N&#39;]</span>
+<span class="sd">    &gt;&gt;&gt; scale = [&#39;RESDEEP_N&#39;]</span>
+<span class="sd">    &gt;&gt;&gt; logs = electrofacies(logs, f, c, 8, log_scale = scale)</span>
+
+<span class="sd">    &gt;&gt;&gt; import petropy as ptr</span>
+<span class="sd">    # loads logs from a list of paths and</span>
+<span class="sd">    # calculates electrofacies across the wells</span>
+<span class="sd">    #</span>
+<span class="sd">    # defin file_paths for las files to analyze</span>
+<span class="sd">    &gt;&gt;&gt; file_paths = [&#39;path/to/log1.las&#39;, &#39;path/to/log2.las&#39;,</span>
+<span class="sd">    ... &#39;path/to/log3.las&#39;, &#39;path/to/log4.las&#39;]</span>
+<span class="sd">    # create list of Log objects</span>
+<span class="sd">    &gt;&gt;&gt; logs = [ptr.Log(x) for x in file_paths]</span>
+<span class="sd">    # define csv with tops for all wells</span>
+<span class="sd">    &gt;&gt;&gt; tops_csv = &#39;path/to/tops.csv&#39;</span>
+<span class="sd">    # add formation tops to wells</span>
+<span class="sd">    &gt;&gt;&gt; for log in logs:</span>
+<span class="sd">    ...     log.tops_from_csv(tops_csv)</span>
+<span class="sd">    # define list of formation tops. If single formation, f = [&#39;FORM&#39;]</span>
+<span class="sd">    &gt;&gt;&gt; f = [&#39;FORM1&#39;, &#39;FORM2&#39;]</span>
+<span class="sd">    # list of curves to use for classification</span>
+<span class="sd">    &gt;&gt;&gt; c = [&#39;GR_N&#39;, &#39;RESDEEP_N&#39;, &#39;RHOB_N&#39;, &#39;NPHI_N&#39;, &#39;PE_N&#39;]</span>
+<span class="sd">    &gt;&gt;&gt; scale = [&#39;RESDEEP_N&#39;]</span>
+<span class="sd">    # run electrofacies across logs in list</span>
+<span class="sd">    &gt;&gt;&gt; logs = electrofacies(logs, f, c, 8, log_scale = scale)</span>
+<span class="sd">    # save las in renamed file</span>
+<span class="sd">    &gt;&gt;&gt; for i, log in enumerate(logs):</span>
+<span class="sd">    ...     new_file_name = file_paths[i].split(&#39;.&#39;)[0]+&#39;_with_HRA.las&#39;</span>
+<span class="sd">    ...     log.write(new_file_name)</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="n">df</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">()</span>
+
+    <span class="k">for</span> <span class="n">log</span> <span class="ow">in</span> <span class="n">logs</span><span class="p">:</span>
+
+        <span class="k">if</span> <span class="n">log</span><span class="o">.</span><span class="n">well</span><span class="p">[</span><span class="s1">&#39;UWI&#39;</span><span class="p">]</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s1">&#39;UWI required for log identification.&#39;</span><span class="p">)</span>
+
+        <span class="n">log_df</span> <span class="o">=</span> <span class="n">log</span><span class="o">.</span><span class="n">df</span><span class="p">()</span>
+        <span class="n">log_df</span><span class="p">[</span><span class="s1">&#39;UWI&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">log</span><span class="o">.</span><span class="n">well</span><span class="p">[</span><span class="s1">&#39;UWI&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">value</span>
+        <span class="n">log_df</span><span class="p">[</span><span class="s1">&#39;DEPTH_INDEX&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="nb">len</span><span class="p">(</span><span class="n">log</span><span class="p">[</span><span class="mi">0</span><span class="p">]))</span>
+
+        <span class="k">for</span> <span class="n">formation</span> <span class="ow">in</span> <span class="n">formations</span><span class="p">:</span>
+            <span class="n">top</span> <span class="o">=</span> <span class="n">log</span><span class="o">.</span><span class="n">tops</span><span class="p">[</span><span class="n">formation</span><span class="p">]</span>
+            <span class="n">bottom</span> <span class="o">=</span> <span class="n">log</span><span class="o">.</span><span class="n">next_formation_depth</span><span class="p">(</span><span class="n">formation</span><span class="p">)</span>
+            <span class="n">depth_index</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">intersect1d</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">where</span><span class="p">(</span><span class="n">log</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">&gt;=</span> <span class="n">top</span><span class="p">)[</span><span class="mi">0</span><span class="p">],</span>
+                                         <span class="n">np</span><span class="o">.</span><span class="n">where</span><span class="p">(</span><span class="n">log</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">&lt;</span> <span class="n">bottom</span><span class="p">)[</span><span class="mi">0</span><span class="p">])</span>
+            <span class="n">df</span> <span class="o">=</span> <span class="n">df</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">log_df</span><span class="o">.</span><span class="n">iloc</span><span class="p">[</span><span class="n">depth_index</span><span class="p">])</span>
+
+    <span class="k">for</span> <span class="n">s</span> <span class="ow">in</span> <span class="n">log_scale</span><span class="p">:</span>
+        <span class="n">df</span><span class="p">[</span><span class="n">s</span><span class="p">]</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">log</span><span class="p">(</span><span class="n">df</span><span class="p">[</span><span class="n">s</span><span class="p">])</span>
+
+    <span class="n">not_null_rows</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">notnull</span><span class="p">(</span><span class="n">df</span><span class="p">[</span><span class="n">curves</span><span class="p">])</span><span class="o">.</span><span class="n">any</span><span class="p">(</span><span class="n">axis</span> <span class="o">=</span> <span class="mi">1</span><span class="p">)</span>
+
+    <span class="n">X</span> <span class="o">=</span> <span class="n">StandardScaler</span><span class="p">()</span><span class="o">.</span><span class="n">fit_transform</span><span class="p">(</span><span class="n">df</span><span class="o">.</span><span class="n">loc</span><span class="p">[</span><span class="n">not_null_rows</span><span class="p">,</span> <span class="n">curves</span><span class="p">])</span>
+
+    <span class="n">pc</span> <span class="o">=</span> <span class="n">PCA</span><span class="p">(</span><span class="n">n_components</span> <span class="o">=</span> <span class="n">n_components</span><span class="p">)</span><span class="o">.</span><span class="n">fit</span><span class="p">(</span><span class="n">X</span><span class="p">)</span>
+
+    <span class="n">components</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">(</span><span class="n">data</span> <span class="o">=</span> <span class="n">pc</span><span class="o">.</span><span class="n">transform</span><span class="p">(</span><span class="n">X</span><span class="p">),</span>
+                              <span class="n">index</span> <span class="o">=</span> <span class="n">df</span><span class="p">[</span><span class="n">not_null_rows</span><span class="p">]</span><span class="o">.</span><span class="n">index</span><span class="p">)</span>
+
+    <span class="n">components</span><span class="o">.</span><span class="n">columns</span> <span class="o">=</span> \
+                   <span class="p">[</span><span class="s1">&#39;PC</span><span class="si">%i</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="n">x</span> <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="n">pc</span><span class="o">.</span><span class="n">n_components_</span> <span class="o">+</span> <span class="mi">1</span><span class="p">)]</span>
+
+    <span class="n">components</span><span class="p">[</span><span class="s1">&#39;UWI&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">df</span><span class="o">.</span><span class="n">loc</span><span class="p">[</span><span class="n">not_null_rows</span><span class="p">,</span> <span class="s1">&#39;UWI&#39;</span><span class="p">]</span>
+    <span class="n">components</span><span class="p">[</span><span class="s1">&#39;DEPTH_INDEX&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">df</span><span class="o">.</span><span class="n">loc</span><span class="p">[</span><span class="n">not_null_rows</span><span class="p">,</span> <span class="s1">&#39;DEPTH_INDEX&#39;</span><span class="p">]</span>
+
+    <span class="n">size</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">components</span><span class="p">)</span> <span class="o">//</span> <span class="mi">20</span>
+    <span class="k">if</span> <span class="n">size</span> <span class="o">&gt;</span> <span class="mi">10000</span><span class="p">:</span>
+        <span class="n">size</span> <span class="o">=</span> <span class="mi">10000</span>
+    <span class="k">elif</span> <span class="n">size</span> <span class="o">&lt;</span> <span class="mi">100</span><span class="p">:</span>
+        <span class="n">size</span> <span class="o">=</span> <span class="mi">100</span>
+
+    <span class="n">df</span><span class="o">.</span><span class="n">loc</span><span class="p">[</span><span class="n">not_null_rows</span><span class="p">,</span> <span class="n">curve_name</span><span class="p">]</span> <span class="o">=</span> \
+                            <span class="n">MiniBatchKMeans</span><span class="p">(</span><span class="n">n_clusters</span> <span class="o">=</span> <span class="n">n_clusters</span><span class="p">,</span>
+                            <span class="n">batch_size</span> <span class="o">=</span> <span class="n">size</span><span class="p">)</span><span class="o">.</span><span class="n">fit_predict</span><span class="p">(</span><span class="n">components</span><span class="p">)</span>
+
+    <span class="k">for</span> <span class="n">log</span> <span class="ow">in</span> <span class="n">logs</span><span class="p">:</span>
+
+        <span class="n">uwi</span> <span class="o">=</span> <span class="n">log</span><span class="o">.</span><span class="n">well</span><span class="p">[</span><span class="s1">&#39;UWI&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">value</span>
+
+        <span class="k">for</span> <span class="n">v</span><span class="p">,</span> <span class="n">vector</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">pc</span><span class="o">.</span><span class="n">components_</span><span class="p">):</span>
+            <span class="n">v</span> <span class="o">+=</span> <span class="mi">1</span>
+            <span class="n">pc_curve</span> <span class="o">=</span> <span class="s1">&#39;PC</span><span class="si">%i</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="n">v</span>
+
+            <span class="c1">### add eigenvector data to header ###</span>
+
+            <span class="k">if</span> <span class="n">pc_curve</span> <span class="ow">in</span> <span class="n">log</span><span class="o">.</span><span class="n">keys</span><span class="p">():</span>
+                <span class="n">data</span> <span class="o">=</span> <span class="n">log</span><span class="p">[</span><span class="n">pc_curve</span><span class="p">]</span>
+                <span class="n">depth_index</span> <span class="o">=</span> <span class="n">components</span><span class="o">.</span><span class="n">loc</span><span class="p">[</span><span class="n">components</span><span class="o">.</span><span class="n">UWI</span> <span class="o">==</span> <span class="n">uwi</span><span class="p">,</span>
+                                             <span class="s1">&#39;DEPTH_INDEX&#39;</span><span class="p">]</span>
+                <span class="n">data</span><span class="p">[</span><span class="n">depth_index</span><span class="p">]</span> <span class="o">=</span> \
+                          <span class="n">np</span><span class="o">.</span><span class="n">copy</span><span class="p">(</span><span class="n">components</span><span class="o">.</span><span class="n">loc</span><span class="p">[</span><span class="n">components</span><span class="o">.</span><span class="n">UWI</span> <span class="o">==</span> <span class="n">uwi</span><span class="p">,</span>
+                                                <span class="n">pc_curve</span><span class="p">])</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">data</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">empty</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">log</span><span class="p">[</span><span class="mi">0</span><span class="p">]))</span>
+                <span class="n">data</span><span class="p">[:]</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">nan</span>
+                <span class="n">depth_index</span> <span class="o">=</span> <span class="n">components</span><span class="o">.</span><span class="n">loc</span><span class="p">[</span><span class="n">components</span><span class="o">.</span><span class="n">UWI</span> <span class="o">==</span> <span class="n">uwi</span><span class="p">,</span>
+                                             <span class="s1">&#39;DEPTH_INDEX&#39;</span><span class="p">]</span>
+                <span class="n">data</span><span class="p">[</span><span class="n">depth_index</span><span class="p">]</span> <span class="o">=</span> \
+                          <span class="n">np</span><span class="o">.</span><span class="n">copy</span><span class="p">(</span><span class="n">components</span><span class="o">.</span><span class="n">loc</span><span class="p">[</span><span class="n">components</span><span class="o">.</span><span class="n">UWI</span> <span class="o">==</span> <span class="n">uwi</span><span class="p">,</span>
+                          <span class="n">pc_curve</span><span class="p">])</span>
+
+                <span class="n">log</span><span class="o">.</span><span class="n">add_curve</span><span class="p">(</span><span class="n">pc_curve</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">copy</span><span class="p">(</span><span class="n">data</span><span class="p">),</span>
+                                       <span class="n">descr</span> <span class="o">=</span> <span class="s1">&#39;Pricipal Component </span><span class="si">%i</span><span class="s1"> </span><span class="se">\</span>
+<span class="s1">                                       from electrofacies&#39;</span> <span class="o">%</span> <span class="n">v</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="n">curve_name</span> <span class="ow">in</span> <span class="n">log</span><span class="o">.</span><span class="n">keys</span><span class="p">():</span>
+            <span class="n">data</span> <span class="o">=</span> <span class="n">log</span><span class="p">[</span><span class="n">curve_name</span><span class="p">]</span>
+            <span class="n">depth_index</span> <span class="o">=</span> <span class="n">df</span><span class="o">.</span><span class="n">loc</span><span class="p">[</span><span class="n">df</span><span class="o">.</span><span class="n">UWI</span> <span class="o">==</span> <span class="n">uwi</span><span class="p">,</span> <span class="s1">&#39;DEPTH_INDEX&#39;</span><span class="p">]</span>
+            <span class="n">data</span><span class="p">[</span><span class="n">depth_index</span><span class="p">]</span> <span class="o">=</span> <span class="n">df</span><span class="o">.</span><span class="n">loc</span><span class="p">[</span><span class="n">df</span><span class="o">.</span><span class="n">UWI</span> <span class="o">==</span> <span class="n">uwi</span><span class="p">,</span> <span class="n">curve_name</span><span class="p">]</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">data</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">empty</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">log</span><span class="p">[</span><span class="mi">0</span><span class="p">]))</span>
+            <span class="n">data</span><span class="p">[:]</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">nan</span>
+            <span class="n">depth_index</span> <span class="o">=</span> <span class="n">components</span><span class="o">.</span><span class="n">loc</span><span class="p">[</span><span class="n">components</span><span class="o">.</span><span class="n">UWI</span> <span class="o">==</span> <span class="n">uwi</span><span class="p">,</span>
+                                         <span class="s1">&#39;DEPTH_INDEX&#39;</span><span class="p">]</span>
+
+            <span class="n">data</span><span class="p">[</span><span class="n">depth_index</span><span class="p">]</span> <span class="o">=</span> \
+               <span class="n">np</span><span class="o">.</span><span class="n">copy</span><span class="p">(</span><span class="n">components</span><span class="o">.</span><span class="n">loc</span><span class="p">[</span><span class="n">components</span><span class="o">.</span><span class="n">UWI</span> <span class="o">==</span> <span class="n">uwi</span><span class="p">,</span> <span class="n">pc_curve</span><span class="p">])</span>
+
+            <span class="n">log</span><span class="o">.</span><span class="n">add_curve</span><span class="p">(</span><span class="n">curve_name</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">copy</span><span class="p">(</span><span class="n">data</span><span class="p">),</span>
+                          <span class="n">descr</span> <span class="o">=</span> <span class="s1">&#39;Electrofacies&#39;</span><span class="p">)</span>
+
+    <span class="k">return</span> <span class="n">logs</span></div>
+</pre></div>
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+<h1 class="logo"><a href="../../index.html">PetroPy</a></h1>
+
+
+
+
+
+
+
+
+<h3>Navigation</h3>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../class/Log.html">Log</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../class/LogViewer.html">LogViewer</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../function/electrofacies.html">Electrofacies</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../function/dataset.html">Dataset</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../function/download.html">Downloads</a></li>
+</ul>
+
+
+<div id="searchbox" style="display: none" role="search">
+  <h3>Quick search</h3>
+    <form class="search" action="../../search.html" method="get">
+      <div><input type="text" name="q" /></div>
+      <div><input type="submit" value="Go" /></div>
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="footer">
+      &copy;2017, Todd Heitmann.
+      
+      |
+      Powered by <a href="http://sphinx-doc.org/">Sphinx 1.5.6</a>
+      &amp; <a href="https://github.com/bitprophet/alabaster">Alabaster 0.7.10</a>
+      
+    </div>
+
+    
+
+    
+  </body>
+</html>

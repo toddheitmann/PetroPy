@@ -1,0 +1,304 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>Installation &#8212; PetroPy 0.1 documentation</title>
+    
+    <link rel="stylesheet" href="_static/alabaster.css" type="text/css" />
+    <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    './',
+        VERSION:     '0.1',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true,
+        SOURCELINK_SUFFIX: '.txt'
+      };
+    </script>
+    <script type="text/javascript" src="_static/jquery.js"></script>
+    <script type="text/javascript" src="_static/underscore.js"></script>
+    <script type="text/javascript" src="_static/doctools.js"></script>
+    <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.0/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="next" title="Log" href="class/Log.html" />
+   
+  <link rel="stylesheet" href="_static/custom.css" type="text/css" />
+  
+  
+  <meta name="viewport" content="width=device-width, initial-scale=0.9, maximum-scale=0.9" />
+
+  </head>
+  <body role="document">
+  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <img alt="_images/petropy_logo.png" src="_images/petropy_logo.png" />
+<p>A petrophysics with python package allowing scientific python computing of conventional and unconventional formation evaluation. Reads las files using <a class="reference external" href="https://github.com/kinverarity1/lasio">lasio</a>. Includes a petrophysical workflow and a log viewer based on XML templates.</p>
+<img alt="_images/university_6-17_no1.png" src="_images/university_6-17_no1.png" />
+<div class="section" id="installation">
+<h1>Installation<a class="headerlink" href="#installation" title="Permalink to this headline">¶</a></h1>
+<p>Install PetroPy through pip via the command</p>
+<div class="highlight-bash"><div class="highlight"><pre><span></span>pip install petropy
+</pre></div>
+</div>
+<p>To read in an las file, pass the file reference:</p>
+<div class="highlight-python"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">petropy</span> <span class="kn">as</span> <span class="nn">ptr</span>
+<span class="n">file_path</span> <span class="o">=</span> <span class="s1">&#39;path/to/well.las&#39;</span>
+<span class="n">log</span> <span class="o">=</span> <span class="n">ptr</span><span class="o">.</span><span class="n">Log</span><span class="p">(</span><span class="n">file_path</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="section" id="api">
+<h1>API<a class="headerlink" href="#api" title="Permalink to this headline">¶</a></h1>
+<div class="toctree-wrapper compound">
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="class/Log.html">Log</a></li>
+<li class="toctree-l1"><a class="reference internal" href="class/LogViewer.html">LogViewer</a></li>
+<li class="toctree-l1"><a class="reference internal" href="function/electrofacies.html">Electrofacies</a></li>
+<li class="toctree-l1"><a class="reference internal" href="function/dataset.html">Dataset</a></li>
+<li class="toctree-l1"><a class="reference internal" href="function/download.html">Downloads</a></li>
+</ul>
+</div>
+</div>
+<div class="section" id="petrophysical-model-default-example">
+<h1>Petrophysical Model Default Example<a class="headerlink" href="#petrophysical-model-default-example" title="Permalink to this headline">¶</a></h1>
+<div class="highlight-python"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">import</span> <span class="nn">petropy</span> <span class="kn">as</span> <span class="nn">ptr</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">log</span> <span class="o">=</span> <span class="n">ptr</span><span class="o">.</span><span class="n">log_data</span><span class="p">(</span><span class="s1">&#39;WFMP&#39;</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="k">print</span><span class="p">(</span><span class="n">log</span><span class="o">.</span><span class="n">curves</span><span class="p">)</span>
+<span class="go">Mnemonic   Unit  Value         Description</span>
+<span class="go">--------   ----  -----         -----------</span>
+<span class="go">DEPT       F     00 000 00 00  1  Depth Curve</span>
+<span class="go">CALI       INCH  99 075 22 05  2  CALIPER</span>
+<span class="go">DPHI       DECP  99 075 22 05  3  DENSITY POROSITY -LIME-</span>
+<span class="go">GR         GAPI  99 075 22 05  4  GAMMA RAY</span>
+<span class="go">NPHI       DECP  99 075 22 05  5  NEUTRON POROSITY -LIME-</span>
+<span class="go">PE         B/E   99 075 22 05  6  PHOTO-ELECTRIC FACTOR</span>
+<span class="go">RHOB       G/C3  99 075 22 05  7  BULK DENSITY</span>
+<span class="go">PHIX       DECP  99 075 22 05  8  CROSSPLOT POROSITY</span>
+<span class="go">C13        INCH  99 075 22 05  9  CALIPER PADS 1 - 3    -FACT-</span>
+<span class="go">C24        INCH  99 075 22 05  10  CALIPER PADS 2 - 4    -FACT-</span>
+<span class="go">DT         US/F  99 075 22 05  11  SONIC TRANSIT TIME</span>
+<span class="go">SPHI       DECP  99 075 22 05  12  SONIC POROSITY  -LIME-</span>
+<span class="go">GR3              99 075 22 05  13  GAMMA RAY</span>
+<span class="go">ILD        OHMM  99 075 22 05  14  IL, DEEP RESISTIVITY</span>
+<span class="go">ILM        OHMM  99 075 22 05  15  IL, MEDIUM RESISTIVITY</span>
+<span class="go">SGRD       OHMM  99 075 22 05  16  SHORT GUARD RESISTIVITY</span>
+<span class="go">SP         MV    99 075 22 05  17  SPONTANEOUS POTENTIAL</span>
+<span class="go">CAL_N      INCH  99 075 22 05  9  CALIPER PADS 1 - 3    -FACT-</span>
+<span class="go">GR_N       GAPI  99 075 22 05  4  GAMMA RAY</span>
+<span class="go">RESMED_N   OHMM  99 075 22 05  15  IL, MEDIUM RESISTIVITY</span>
+<span class="go">RESDEEP_N  OHMM  99 075 22 05  14  IL, DEEP RESISTIVITY</span>
+<span class="go">NPHI_N     DECP  99 075 22 05  5  NEUTRON POROSITY -LIME-</span>
+<span class="go">DPHI_N     DECP  99 075 22 05  3  DENSITY POROSITY -LIME-</span>
+<span class="go">SPHI_N     DECP  99 075 22 05  12  SONIC POROSITY  -LIME-</span>
+<span class="go">PE_N       B/E   99 075 22 05  6  PHOTO-ELECTRIC FACTOR</span>
+<span class="go">RHOB_N     G/C3  99 075 22 05  7  BULK DENSITY</span>
+<span class="go">DTC_N      US/F  99 075 22 05  11  SONIC TRANSIT TIME</span>
+<span class="go">SP_N       MV    99 075 22 05  17  SPONTANEOUS POTENTIAL</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">log</span><span class="o">.</span><span class="n">tops_from_csv</span><span class="p">()</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="k">print</span><span class="p">(</span><span class="n">log</span><span class="o">.</span><span class="n">tops</span><span class="p">)</span>
+<span class="go">{&#39;WFMPA&#39;: 6993.5, &#39;WFMPB&#39;: 7294.0, &#39;WFMPC&#39;: 7690.5, &#39;WFMPD&#39;: 8028.0}</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">log</span><span class="o">.</span><span class="n">fluid_properties_parameters_from_csv</span><span class="p">()</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="k">print</span><span class="p">(</span><span class="n">log</span><span class="o">.</span><span class="n">fluid_properties_parameters</span><span class="o">.</span><span class="n">keys</span><span class="p">())</span>
+<span class="go">dict_keys([&#39;default&#39;, &#39;WFMP&#39;])</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">f</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;WFMPA&#39;</span><span class="p">,</span> <span class="s1">&#39;WFMPB&#39;</span><span class="p">,</span> <span class="s1">&#39;WFMPC&#39;</span><span class="p">]</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">log</span><span class="o">.</span><span class="n">formation_fluid_properties</span><span class="p">(</span><span class="n">f</span><span class="p">,</span> <span class="n">parameter</span> <span class="o">=</span> <span class="s1">&#39;WFMP&#39;</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="k">print</span><span class="p">(</span><span class="n">log</span><span class="o">.</span><span class="n">curves</span><span class="p">)</span>
+<span class="go">Mnemonic    Unit  Value         Description</span>
+<span class="go">--------    ----  -----         -----------</span>
+<span class="go">DEPT        F     00 000 00 00  1  Depth Curve</span>
+<span class="go">CALI        INCH  99 075 22 05  2  CALIPER</span>
+<span class="go">DPHI        DECP  99 075 22 05  3  DENSITY POROSITY -LIME-</span>
+<span class="go">GR          GAPI  99 075 22 05  4  GAMMA RAY</span>
+<span class="go">NPHI        DECP  99 075 22 05  5  NEUTRON POROSITY -LIME-</span>
+<span class="go">PE          B/E   99 075 22 05  6  PHOTO-ELECTRIC FACTOR</span>
+<span class="go">RHOB        G/C3  99 075 22 05  7  BULK DENSITY</span>
+<span class="go">PHIX        DECP  99 075 22 05  8  CROSSPLOT POROSITY</span>
+<span class="go">C13         INCH  99 075 22 05  9  CALIPER PADS 1 - 3    -FACT-</span>
+<span class="go">C24         INCH  99 075 22 05  10  CALIPER PADS 2 - 4    -FACT-</span>
+<span class="go">DT          US/F  99 075 22 05  11  SONIC TRANSIT TIME</span>
+<span class="go">SPHI        DECP  99 075 22 05  12  SONIC POROSITY  -LIME-</span>
+<span class="go">GR3               99 075 22 05  13  GAMMA RAY</span>
+<span class="go">ILD         OHMM  99 075 22 05  14  IL, DEEP RESISTIVITY</span>
+<span class="go">ILM         OHMM  99 075 22 05  15  IL, MEDIUM RESISTIVITY</span>
+<span class="go">SGRD        OHMM  99 075 22 05  16  SHORT GUARD RESISTIVITY</span>
+<span class="go">SP          MV    99 075 22 05  17  SPONTANEOUS POTENTIAL</span>
+<span class="go">CAL_N       INCH  99 075 22 05  9  CALIPER PADS 1 - 3    -FACT-</span>
+<span class="go">GR_N        GAPI  99 075 22 05  4  GAMMA RAY</span>
+<span class="go">RESMED_N    OHMM  99 075 22 05  15  IL, MEDIUM RESISTIVITY</span>
+<span class="go">RESDEEP_N   OHMM  99 075 22 05  14  IL, DEEP RESISTIVITY</span>
+<span class="go">NPHI_N      DECP  99 075 22 05  5  NEUTRON POROSITY -LIME-</span>
+<span class="go">DPHI_N      DECP  99 075 22 05  3  DENSITY POROSITY -LIME-</span>
+<span class="go">SPHI_N      DECP  99 075 22 05  12  SONIC POROSITY  -LIME-</span>
+<span class="go">PE_N        B/E   99 075 22 05  6  PHOTO-ELECTRIC FACTOR</span>
+<span class="go">RHOB_N      G/C3  99 075 22 05  7  BULK DENSITY</span>
+<span class="go">DTC_N       US/F  99 075 22 05  11  SONIC TRANSIT TIME</span>
+<span class="go">SP_N        MV    99 075 22 05  17  SPONTANEOUS POTENTIAL</span>
+<span class="go">PORE_PRESS  psi                 Calculated Pore Pressure</span>
+<span class="go">RES_TEMP    F                   Calculated Reservoir Temperature</span>
+<span class="go">NES         psi                 Calculated Net Effective Stress</span>
+<span class="go">RW          ohmm                Calculated Resistivity Water</span>
+<span class="go">RMF         ohmm                Calculated Resistivity Mud Filtrate</span>
+<span class="go">RHO_HC      g/cc                Calculated Density of Hydrocarbon</span>
+<span class="go">RHO_W       g/cc                Calculated Density of Water</span>
+<span class="go">RHO_MF      g/cc                Calculated Density of Mud Filtrate</span>
+<span class="go">NPHI_HC     v/v                 Calculated Neutron Log Response of Hydrocarbon</span>
+<span class="go">NPHI_W      v/v                 Calculated Neutron Log Response of Water</span>
+<span class="go">NPHI_MF     v/v                 Calculated Neutron Log Response of Mud Filtrate</span>
+<span class="go">MU_HC       cP                  Calculated Viscosity of Hydrocarbon</span>
+<span class="go">BO                              Calculated Oil Formation Volume Factor</span>
+<span class="go">BP          psi                 Calcualted Bubble Point</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">log</span><span class="o">.</span><span class="n">multimineral_parameters_from_csv</span><span class="p">()</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="k">print</span><span class="p">(</span><span class="n">log</span><span class="o">.</span><span class="n">multimineral_parameters</span><span class="o">.</span><span class="n">keys</span><span class="p">())</span>
+<span class="go">dict_keys([&#39;default&#39;, &#39;WFMP&#39;])</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">log</span><span class="o">.</span><span class="n">formation_multimineral_model</span><span class="p">(</span><span class="n">f</span><span class="p">,</span> <span class="n">parameter</span> <span class="o">=</span> <span class="s1">&#39;WFMP&#39;</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="k">print</span><span class="p">(</span><span class="n">log</span><span class="o">.</span><span class="n">curves</span><span class="p">)</span>
+<span class="go">Mnemonic    Unit   Value         Description</span>
+<span class="go">--------    ----   -----         -----------</span>
+<span class="go">DEPT        F      00 000 00 00  1  Depth Curve</span>
+<span class="go">CALI        INCH   99 075 22 05  2  CALIPER</span>
+<span class="go">DPHI        DECP   99 075 22 05  3  DENSITY POROSITY -LIME-</span>
+<span class="go">GR          GAPI   99 075 22 05  4  GAMMA RAY</span>
+<span class="go">NPHI        DECP   99 075 22 05  5  NEUTRON POROSITY -LIME-</span>
+<span class="go">PE          B/E    99 075 22 05  6  PHOTO-ELECTRIC FACTOR</span>
+<span class="go">RHOB        G/C3   99 075 22 05  7  BULK DENSITY</span>
+<span class="go">PHIX        DECP   99 075 22 05  8  CROSSPLOT POROSITY</span>
+<span class="go">C13         INCH   99 075 22 05  9  CALIPER PADS 1 - 3    -FACT-</span>
+<span class="go">C24         INCH   99 075 22 05  10  CALIPER PADS 2 - 4    -FACT-</span>
+<span class="go">DT          US/F   99 075 22 05  11  SONIC TRANSIT TIME</span>
+<span class="go">SPHI        DECP   99 075 22 05  12  SONIC POROSITY  -LIME-</span>
+<span class="go">GR3                99 075 22 05  13  GAMMA RAY</span>
+<span class="go">ILD         OHMM   99 075 22 05  14  IL, DEEP RESISTIVITY</span>
+<span class="go">ILM         OHMM   99 075 22 05  15  IL, MEDIUM RESISTIVITY</span>
+<span class="go">SGRD        OHMM   99 075 22 05  16  SHORT GUARD RESISTIVITY</span>
+<span class="go">SP          MV     99 075 22 05  17  SPONTANEOUS POTENTIAL</span>
+<span class="go">CAL_N       INCH   99 075 22 05  9  CALIPER PADS 1 - 3    -FACT-</span>
+<span class="go">GR_N        GAPI   99 075 22 05  4  GAMMA RAY</span>
+<span class="go">RESMED_N    OHMM   99 075 22 05  15  IL, MEDIUM RESISTIVITY</span>
+<span class="go">RESDEEP_N   OHMM   99 075 22 05  14  IL, DEEP RESISTIVITY</span>
+<span class="go">NPHI_N      DECP   99 075 22 05  5  NEUTRON POROSITY -LIME-</span>
+<span class="go">DPHI_N      DECP   99 075 22 05  3  DENSITY POROSITY -LIME-</span>
+<span class="go">SPHI_N      DECP   99 075 22 05  12  SONIC POROSITY  -LIME-</span>
+<span class="go">PE_N        B/E    99 075 22 05  6  PHOTO-ELECTRIC FACTOR</span>
+<span class="go">RHOB_N      G/C3   99 075 22 05  7  BULK DENSITY</span>
+<span class="go">DTC_N       US/F   99 075 22 05  11  SONIC TRANSIT TIME</span>
+<span class="go">SP_N        MV     99 075 22 05  17  SPONTANEOUS POTENTIAL</span>
+<span class="go">PORE_PRESS  psi                  Calculated Pore Pressure</span>
+<span class="go">RES_TEMP    F                    Calculated Reservoir Temperature</span>
+<span class="go">NES         psi                  Calculated Net Effective Stress</span>
+<span class="go">RW          ohmm                 Calculated Resistivity Water</span>
+<span class="go">RMF         ohmm                 Calculated Resistivity Mud Filtrate</span>
+<span class="go">RHO_HC      g/cc                 Calculated Density of Hydrocarbon</span>
+<span class="go">RHO_W       g/cc                 Calculated Density of Water</span>
+<span class="go">RHO_MF      g/cc                 Calculated Density of Mud Filtrate</span>
+<span class="go">NPHI_HC     v/v                  Calculated Neutron Log Response of Hydrocarbon</span>
+<span class="go">NPHI_W      v/v                  Calculated Neutron Log Response of Water</span>
+<span class="go">NPHI_MF     v/v                  Calculated Neutron Log Response of Mud Filtrate</span>
+<span class="go">MU_HC       cP                   Calculated Viscosity of Hydrocarbon</span>
+<span class="go">BO                               Calculated Oil Formation Volume Factor</span>
+<span class="go">BP          psi                  Calcualted Bubble Point</span>
+<span class="go">PHIE        v/v                  Effective Porosity</span>
+<span class="go">SW          v/v                  Water Saturation</span>
+<span class="go">SHC         v/v                  Hydrocarbon Saturation</span>
+<span class="go">BVH         v/v                  Bulk Volume Hydrocarbon</span>
+<span class="go">BVW         v/v                  Bulk Volume Water</span>
+<span class="go">BVWI        v/v                  Bulk Volume Water Irreducible</span>
+<span class="go">BVWF        v/v                  Bulk Volume Water Free</span>
+<span class="go">BVOM        v/v                  Bulk Volume Fraction Organic Matter</span>
+<span class="go">BVCLAY      v/v                  Bulk Volume Fraction Clay</span>
+<span class="go">BVPYR       v/v                  Bulk Volume Fraction Pyrite</span>
+<span class="go">VOM         v/v                  Matrix Volume Fraction Organic Matter</span>
+<span class="go">VCLAY       v/v                  Matrix Volume Fraction Clay</span>
+<span class="go">VPYR        v/v                  Matrix Volume Fraction Pyrite</span>
+<span class="go">RHOM        g/cc                 Matrix Density</span>
+<span class="go">TOC         wt/wt                Matrix Weight Fraction Organic Matter</span>
+<span class="go">WTCLAY      wt/wt                Matrix Weight Fraction Clay</span>
+<span class="go">WTPYR       wt/wt                Matrix Weight Fraction Pyrite</span>
+<span class="go">BVQTZ       v/v                  Bulk Volume Fraction Quartz</span>
+<span class="go">VQTZ        v/v                  Matrix Volume Fraction Quartz</span>
+<span class="go">WTQTZ       wt/wt                Matrix Weight Fraction Quartz</span>
+<span class="go">BVCLC       v/v                  Bulk Volume Fraction Calcite</span>
+<span class="go">VCLC        v/v                  Matrix Volume Fraction Calcite</span>
+<span class="go">WTCLC       wt/wt                Matrix Weight Fraction Calcite</span>
+<span class="go">BVDOL       v/v                  Bulk Volume Fraction Dolomite</span>
+<span class="go">VDOL        v/v                  Matrix Volume Fraction Dolomite</span>
+<span class="go">WTDOL       wt/wt                Matrix Weight Fraction Dolomite</span>
+<span class="go">OIP         wt/wt                Matrix Weight Fraction Dolomite</span>
+</pre></div>
+</div>
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+<h1 class="logo"><a href="#">PetroPy</a></h1>
+
+
+
+
+
+
+
+
+<h3>Navigation</h3>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="class/Log.html">Log</a></li>
+<li class="toctree-l1"><a class="reference internal" href="class/LogViewer.html">LogViewer</a></li>
+<li class="toctree-l1"><a class="reference internal" href="function/electrofacies.html">Electrofacies</a></li>
+<li class="toctree-l1"><a class="reference internal" href="function/dataset.html">Dataset</a></li>
+<li class="toctree-l1"><a class="reference internal" href="function/download.html">Downloads</a></li>
+</ul>
+
+
+  <h3><a href="#">Table Of Contents</a></h3>
+  <ul>
+<li><a class="reference internal" href="#">Installation</a></li>
+<li><a class="reference internal" href="#api">API</a></li>
+<li><a class="reference internal" href="#petrophysical-model-default-example">Petrophysical Model Default Example</a></li>
+</ul>
+
+<div id="searchbox" style="display: none" role="search">
+  <h3>Quick search</h3>
+    <form class="search" action="search.html" method="get">
+      <div><input type="text" name="q" /></div>
+      <div><input type="submit" value="Go" /></div>
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="footer">
+      &copy;2017, Todd Heitmann.
+      
+      |
+      Powered by <a href="http://sphinx-doc.org/">Sphinx 1.5.6</a>
+      &amp; <a href="https://github.com/bitprophet/alabaster">Alabaster 0.7.10</a>
+      
+      |
+      <a href="_sources/index.rst.txt"
+          rel="nofollow">Page source</a>
+    </div>
+
+    
+
+    
+  </body>
+</html>
