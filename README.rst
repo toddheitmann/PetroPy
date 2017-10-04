@@ -120,6 +120,7 @@ Petrophysical Model Default Example
   {'WFMPA': 6993.5, 'WFMPB': 7294.0, 'WFMPC': 7690.5, 'WFMPD': 8028.0}
 
 .. code-block:: python
+
   >>> log.fluid_properties_parameters_from_csv()
   >>> print(log.fluid_properties_parameters.keys())
 
