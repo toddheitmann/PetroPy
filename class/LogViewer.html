@@ -19,7 +19,7 @@
     <script type="text/javascript">
       var DOCUMENTATION_OPTIONS = {
         URL_ROOT:    '../',
-        VERSION:     '0.1.3',
+        VERSION:     '0.1.4',
         COLLAPSE_INDEX: false,
         FILE_SUFFIX: '.html',
         HAS_SOURCE:  true,
@@ -78,12 +78,6 @@ within LogViewer</p>
 curve track</p>
 </dd></dl>
 
-<dl class="attribute">
-<dt id="LogViewer.edit_mode">
-<code class="descname">edit_mode</code><a class="headerlink" href="#LogViewer.edit_mode" title="Permalink to this definition">¶</a></dt>
-<dd><p><em>bool (default False)</em> &#8211; bool to display editing tools or not</p>
-</dd></dl>
-
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
 <col class="field-body" />
@@ -91,8 +85,7 @@ curve track</p>
 <tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
 <li><strong>log</strong> (<a class="reference internal" href="Log.html#petropy.Log" title="petropy.Log"><em>Log</em></a>) &#8211; A <cite>Log</cite> object with curve data to display in the LogViewer</li>
 <li><strong>template_xml_path</strong> (<a class="reference external" href="https://docs.python.org/2/library/functions.html#str" title="(in Python v2.7)"><em>str</em></a><em> (</em><em>default None</em><em>)</em>) &#8211; Path to xml template.</li>
-<li><strong>template_defaults</strong> (<em>str {'raw'</em><em>, </em><em>'multimin_oil'</em><em>, </em><em>'multimin_gas'</em><em>,</em>) &#8211; </li>
-<li><strong>'multimin_gas_sum'}</strong><strong> (</strong><strong>default None</strong><strong>)</strong> (<em>'multimin_oil_sum'</em><em>,</em>) &#8211; Name of default template options. Uses prebuilt template to
+<li><strong>template_defaults</strong> (<em>str {'raw'</em><em>, </em><em>'multimin_oil'</em><em>, </em><em>'multimin_gas'</em><em>, </em><em>'multimin_oil_sum'</em><em>, </em><em>'multimin_gas_sum'}</em><em> (</em><em>default None</em><em>)</em>) &#8211; Name of default template options. Uses prebuilt template to
 display data</li>
 <li><strong>top</strong> (<a class="reference external" href="https://docs.python.org/2/library/functions.html#float" title="(in Python v2.7)"><em>float</em></a><em> (</em><em>default None</em><em>)</em>) &#8211; Setting to set initial top of graph</li>
 <li><strong>height</strong> (<a class="reference external" href="https://docs.python.org/2/library/functions.html#float" title="(in Python v2.7)"><em>float</em></a><em> (</em><em>default None</em><em>)</em>) &#8211; Setting to set amout of feet to display</li>
