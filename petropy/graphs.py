@@ -30,9 +30,6 @@ class LogViewer(object):
     axes : ndarray
         numpy ndarray of AxesSubplot objects where each axes is a
         curve track
-    edit_mode : bool (default False)
-        bool to display editing tools or not
-
 
     Parameters
     ----------
@@ -40,8 +37,7 @@ class LogViewer(object):
         A `Log` object with curve data to display in the LogViewer
     template_xml_path : str (default None)
         Path to xml template.
-    template_defaults : str {'raw', 'multimin_oil', 'multimin_gas',
-    'multimin_oil_sum', 'multimin_gas_sum'} (default None)
+    template_defaults : str {'raw', 'multimin_oil', 'multimin_gas', 'multimin_oil_sum', 'multimin_gas_sum'} (default None)
         Name of default template options. Uses prebuilt template to
         display data
     top : float (default None)
@@ -667,8 +663,8 @@ class LogViewer(object):
         mngr = self.fig.canvas.manager
         geom = mngr.window.geometry()
         x, y, dx, dy = geom.getRect()
-        x = edits_window_location[0]
-        y = edits_window_location[1]
+        x = window_location[0]
+        y = window_location[1]
         mngr.window.setGeometry(x, y, dx, dy)
 
         if edit_mode:

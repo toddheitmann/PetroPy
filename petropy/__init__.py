@@ -4,7 +4,7 @@ from .electrofacies import electrofacies
 from .graphs import LogViewer
 from .log import Log
 
-__version__ = '0.1.3'
+__version__ = '0.1.4'
 
 def version():
     print(__version__)
