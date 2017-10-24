@@ -37,8 +37,23 @@ To read in an las file, pass the file reference:
   file_path = r'path/to/well.las'
   log = ptr.Log(file_path)
 
-Petrophysical Model Default Example
------------------------------------
+Documentation
+-------------
+
+View the `online documentation`_ for classes and methods.
+
+.. online documentation: https://toddheitmann.github.io/PetroPy/
+
+Las File Processing
+-------------------
+
+To understanding using petropy in a petrophysical workflow for las file
+processings, see the `example page`_.
+
+.. _example page: https://toddheitmann.github.io/PetroPy/auto_examples/
+
+Petrophysical Model Quick Look
+------------------------------
 
 .. code-block:: python
 
