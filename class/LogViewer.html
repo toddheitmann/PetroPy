@@ -15,6 +15,7 @@
     
     <link rel="stylesheet" href="../_static/alabaster.css" type="text/css" />
     <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+    <link rel="stylesheet" href="../_static/gallery.css" type="text/css" />
     
     <script type="text/javascript">
       var DOCUMENTATION_OPTIONS = {
@@ -85,7 +86,7 @@ curve track</p>
 <tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
 <li><strong>log</strong> (<a class="reference internal" href="Log.html#petropy.Log" title="petropy.Log"><em>Log</em></a>) &#8211; A <cite>Log</cite> object with curve data to display in the LogViewer</li>
 <li><strong>template_xml_path</strong> (<a class="reference external" href="https://docs.python.org/2/library/functions.html#str" title="(in Python v2.7)"><em>str</em></a><em> (</em><em>default None</em><em>)</em>) &#8211; Path to xml template.</li>
-<li><strong>template_defaults</strong> (<em>str {'raw'</em><em>, </em><em>'multimin_oil'</em><em>, </em><em>'multimin_gas'</em><em>, </em><em>'multimin_oil_sum'</em><em>, </em><em>'multimin_gas_sum'}</em><em> (</em><em>default None</em><em>)</em>) &#8211; Name of default template options. Uses prebuilt template to
+<li><strong>template_defaults</strong> (<a class="reference external" href="https://docs.python.org/2/library/functions.html#str" title="(in Python v2.7)"><em>str</em></a>) &#8211; Name of default template options. Uses prebuilt template to
 display data</li>
 <li><strong>top</strong> (<a class="reference external" href="https://docs.python.org/2/library/functions.html#float" title="(in Python v2.7)"><em>float</em></a><em> (</em><em>default None</em><em>)</em>) &#8211; Setting to set initial top of graph</li>
 <li><strong>height</strong> (<a class="reference external" href="https://docs.python.org/2/library/functions.html#float" title="(in Python v2.7)"><em>float</em></a><em> (</em><em>default None</em><em>)</em>) &#8211; Setting to set amout of feet to display</li>
@@ -94,6 +95,17 @@ display data</li>
 </tr>
 </tbody>
 </table>
+<div class="admonition note">
+<p class="first admonition-title">Note</p>
+<p>template_defaults string must be from these options</p>
+<div class="last highlight-bash"><div class="highlight"><pre><span></span>raw
+multimin_oil
+multimin_gas
+multimin_oil_sum
+multimin_gas_sum
+</pre></div>
+</div>
+</div>
 <p class="rubric">Examples</p>
 <div class="highlight-default"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">import</span> <span class="nn">petropy</span> <span class="k">as</span> <span class="nn">ptr</span>
 <span class="go"># create LogViewer with default triple-combo template and display</span>
@@ -176,9 +188,11 @@ template</li>
 <dl class="method">
 <dt id="petropy.LogViewer.show">
 <code class="descname">show</code><span class="sig-paren">(</span><em>edit_mode=False</em>, <em>window_location=(10</em>, <em>30)</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/petropy/graphs.html#LogViewer.show"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#petropy.LogViewer.show" title="Permalink to this definition">¶</a></dt>
-<dd><p>Calls matplotlib.pyplot.show() to display log viewer. If edit_mode == True, it includes options
-to graphically edit curve data, and stores these changes within the LogViewer object. After
-editing is finished, access the updated data with the .log property.</p>
+<dd><p>Calls matplotlib.pyplot.show() to display log viewer. If
+edit_mode == True, it includes options to graphically edit
+curve data, and stores these changes within the LogViewer
+object. After editing is finished, access the updated
+<a class="reference internal" href="Log.html#petropy.Log" title="petropy.Log"><code class="xref py py-class docutils literal"><span class="pre">petropy.Log</span></code></a> data with the .log property.</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
 <col class="field-body" />
@@ -238,6 +252,7 @@ Second value is pixels from the top of the screen.</li>
 <li class="toctree-l1"><a class="reference internal" href="../function/electrofacies.html">Electrofacies</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../function/dataset.html">Dataset</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../function/download.html">Downloads</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../auto_examples/index.html">Examples</a></li>
 </ul>
 
 

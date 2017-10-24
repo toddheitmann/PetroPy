@@ -6,10 +6,10 @@
   <head>
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
     
-    <title>Dataset &#8212; PetroPy</title>
+    <title>Examples &#8212; PetroPy</title>
     <meta property="og:title" content="PetroPy | A Python Petrophysics Package" />
     <meta property="og:description" content="A petrophysics with python package allowing scientific python computing of conventional and unconventional formation evaluation and reservoir characterization. Reads las files and caluclates log properties. Displays data in a customizeable Log Viewer." />
-    <meta property="og:url" content="https://toddheitmann.github.io/PetroPy/function/dataset.html" />
+    <meta property="og:url" content="https://toddheitmann.github.io/PetroPy/auto_examples/index.html" />
     <meta property="og:image" content="https://www.toddheitmann.com/images/petropy_logo.png"/>
     <meta property="og:type" content="article"/>
     
@@ -34,8 +34,8 @@
     <link rel="shortcut icon" href="../_static/petropy_logo_icon.ico"/>
     <link rel="index" title="Index" href="../genindex.html" />
     <link rel="search" title="Search" href="../search.html" />
-    <link rel="next" title="Downloads" href="download.html" />
-    <link rel="prev" title="Electrofacies" href="electrofacies.html" />
+    <link rel="next" title="Wolfcamp Example - Single las file" href="wolfcamp_single.html" />
+    <link rel="prev" title="Downloads" href="../function/download.html" />
    
   <link rel="stylesheet" href="../_static/custom.css" type="text/css" />
   
@@ -51,34 +51,27 @@
         <div class="bodywrapper">
           <div class="body" role="main">
             
-  <div class="section" id="dataset">
-<h1>Dataset<a class="headerlink" href="#dataset" title="Permalink to this headline">¶</a></h1>
-<dl class="function">
-<dt id="petropy.log_data">
-<code class="descclassname">petropy.</code><code class="descname">log_data</code><span class="sig-paren">(</span><em>source</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/petropy/datasets.html#log_data"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#petropy.log_data" title="Permalink to this definition">¶</a></dt>
-<dd><p>retrieves log data for a formation</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>source</strong> (<em>str {'WFMP'}</em>) &#8211; source location for log data</td>
-</tr>
-<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body">Log object of data source</td>
-</tr>
-<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><a class="reference internal" href="../class/Log.html#petropy.Log" title="petropy.Log"><code class="xref py py-class docutils literal"><span class="pre">petropy.Log</span></code></a></td>
-</tr>
-<tr class="field-even field"><th class="field-name">Raises:</th><td class="field-body"><code class="xref py py-exc docutils literal"><span class="pre">ValueError</span></code> &#8211; If source is not in dictionary key</td>
-</tr>
-</tbody>
-</table>
-<p class="rubric">Example</p>
-<div class="highlight-default"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">import</span> <span class="nn">petropy</span> <span class="k">as</span> <span class="nn">ptr</span>
-<span class="go"># reads sample Wolfcamp Log from las file</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">log</span> <span class="o">=</span> <span class="n">ptr</span><span class="o">.</span><span class="n">log_data</span><span class="p">(</span><span class="s1">&#39;WFMP&#39;</span><span class="p">)</span>
-</pre></div>
+  <div class="section" id="examples">
+<span id="examples-index"></span><h1>Examples<a class="headerlink" href="#examples" title="Permalink to this headline">¶</a></h1>
+<div class="sphx-glr-thumbcontainer" tooltip="This example shows the full petrophysical workflow avaiable in PetroPy for a single wolfcamp la..."><div class="figure" id="id1">
+<img alt="../_images/sphx_glr_wolfcamp_single_thumb.png" src="../_images/sphx_glr_wolfcamp_single_thumb.png" />
+<p class="caption"><span class="caption-text"><a class="reference internal" href="wolfcamp_single.html#sphx-glr-auto-examples-wolfcamp-single-py"><span class="std std-ref">Wolfcamp Example - Single las file</span></a></span></p>
 </div>
-</dd></dl>
-
+</div><div class="toctree-wrapper compound">
+</div>
+<div class="sphx-glr-thumbcontainer" tooltip="This example shows the full petrophysical workflow avaiable in PetroPy for a folder of wolfcamp..."><div class="figure" id="id2">
+<img alt="../_images/sphx_glr_wolfcamp_bulk_thumb.png" src="../_images/sphx_glr_wolfcamp_bulk_thumb.png" />
+<p class="caption"><span class="caption-text"><a class="reference internal" href="wolfcamp_bulk.html#sphx-glr-auto-examples-wolfcamp-bulk-py"><span class="std std-ref">Wolfcamp Example - Bulk Process las files</span></a></span></p>
+</div>
+</div><div class="toctree-wrapper compound">
+</div>
+<div style='clear:both'></div><div class="sphx-glr-footer docutils container">
+<div class="sphx-glr-download docutils container">
+<a class="reference download internal" href="../_downloads/auto_examples_python.zip" download=""><code class="xref download docutils literal"><span class="pre">Download</span> <span class="pre">all</span> <span class="pre">examples</span> <span class="pre">in</span> <span class="pre">Python</span> <span class="pre">source</span> <span class="pre">code:</span> <span class="pre">auto_examples_python.zip</span></code></a></div>
+<div class="sphx-glr-download docutils container">
+<a class="reference download internal" href="../_downloads/auto_examples_jupyter.zip" download=""><code class="xref download docutils literal"><span class="pre">Download</span> <span class="pre">all</span> <span class="pre">examples</span> <span class="pre">in</span> <span class="pre">Jupyter</span> <span class="pre">notebooks:</span> <span class="pre">auto_examples_jupyter.zip</span></code></a></div>
+</div>
+<p class="sphx-glr-signature"><a class="reference external" href="https://sphinx-gallery.readthedocs.io">Gallery generated by Sphinx-Gallery</a></p>
 </div>
 
 
@@ -100,10 +93,14 @@
 <ul class="current">
 <li class="toctree-l1"><a class="reference internal" href="../class/Log.html">Log</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../class/LogViewer.html">LogViewer</a></li>
-<li class="toctree-l1"><a class="reference internal" href="electrofacies.html">Electrofacies</a></li>
-<li class="toctree-l1 current"><a class="current reference internal" href="#">Dataset</a></li>
-<li class="toctree-l1"><a class="reference internal" href="download.html">Downloads</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../auto_examples/index.html">Examples</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../function/electrofacies.html">Electrofacies</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../function/dataset.html">Dataset</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../function/download.html">Downloads</a></li>
+<li class="toctree-l1 current"><a class="current reference internal" href="#">Examples</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="wolfcamp_single.html">Wolfcamp Example - Single las file</a></li>
+<li class="toctree-l2"><a class="reference internal" href="wolfcamp_bulk.html">Wolfcamp Example - Bulk Process las files</a></li>
+</ul>
+</li>
 </ul>
 
 
@@ -129,7 +126,7 @@
       &amp; <a href="https://github.com/bitprophet/alabaster">Alabaster 0.7.10</a>
       
       |
-      <a href="../_sources/function/dataset.rst.txt"
+      <a href="../_sources/auto_examples/index.rst.txt"
           rel="nofollow">Page source</a>
     </div>
 

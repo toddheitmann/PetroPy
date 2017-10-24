@@ -1,0 +1,402 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>Wolfcamp Example - Bulk Process las files &#8212; PetroPy</title>
+    <meta property="og:title" content="PetroPy | A Python Petrophysics Package" />
+    <meta property="og:description" content="A petrophysics with python package allowing scientific python computing of conventional and unconventional formation evaluation and reservoir characterization. Reads las files and caluclates log properties. Displays data in a customizeable Log Viewer." />
+    <meta property="og:url" content="https://toddheitmann.github.io/PetroPy/auto_examples/wolfcamp_bulk.html" />
+    <meta property="og:image" content="https://www.toddheitmann.com/images/petropy_logo.png"/>
+    <meta property="og:type" content="article"/>
+    
+    <link rel="stylesheet" href="../_static/alabaster.css" type="text/css" />
+    <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+    <link rel="stylesheet" href="../_static/gallery.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../',
+        VERSION:     '0.1.4',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true,
+        SOURCELINK_SUFFIX: '.txt'
+      };
+    </script>
+    <script type="text/javascript" src="../_static/jquery.js"></script>
+    <script type="text/javascript" src="../_static/underscore.js"></script>
+    <script type="text/javascript" src="../_static/doctools.js"></script>
+    <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.0/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    <link rel="shortcut icon" href="../_static/petropy_logo_icon.ico"/>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="prev" title="Wolfcamp Example - Single las file" href="wolfcamp_single.html" />
+   
+  <link rel="stylesheet" href="../_static/custom.css" type="text/css" />
+  
+  
+  <meta name="viewport" content="width=device-width, initial-scale=0.9, maximum-scale=0.9" />
+
+  </head>
+  <body role="document">
+  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <div class="section" id="wolfcamp-example-bulk-process-las-files">
+<span id="sphx-glr-auto-examples-wolfcamp-bulk-py"></span><h1>Wolfcamp Example - Bulk Process las files<a class="headerlink" href="#wolfcamp-example-bulk-process-las-files" title="Permalink to this headline">¶</a></h1>
+<p>This example shows the full petrophysical workflow avaiable in PetroPy
+for a folder of wolfcamp las file courtesy of University Lands Texas.</p>
+<p>The workflow progresses in 3 iterations to edit data, calculate the
+petrophysical model, and to calculate statistics and save. To better
+understand the worflow first read through the <a class="reference external" href="wolfcamp_single.html">single well</a> example.</p>
+<p>The First Iteration</p>
+<ol class="arabic simple">
+<li>Read las file and create a <a class="reference internal" href="../class/Log.html#petropy.Log" title="petropy.Log"><code class="xref py py-class docutils literal"><span class="pre">petropy.Log</span></code></a> object</li>
+<li>Create a <a class="reference internal" href="../class/LogViewer.html#petropy.LogViewer" title="petropy.LogViewer"><code class="xref py py-class docutils literal"><span class="pre">petropy.LogViewer</span></code></a> show in edit_mode to fix data</li>
+<li>Writes updated data to new folder via <a class="reference internal" href="../class/Log.html#petropy.Log.write" title="petropy.Log.write"><code class="xref py py-meth docutils literal"><span class="pre">petropy.Log.write()</span></code></a></li>
+</ol>
+<p>The Second Iteration</p>
+<ol class="arabic simple">
+<li>Read las file and create a <a class="reference internal" href="../class/Log.html#petropy.Log" title="petropy.Log"><code class="xref py py-class docutils literal"><span class="pre">petropy.Log</span></code></a> object</li>
+<li>Load tops from a csv file using <a class="reference internal" href="../class/Log.html#petropy.Log.tops_from_csv" title="petropy.Log.tops_from_csv"><code class="xref py py-meth docutils literal"><span class="pre">petropy.Log.tops_from_csv()</span></code></a></li>
+<li><dl class="first docutils">
+<dt>Calculate fluid properties by</dt>
+<dd><ol class="first last arabic">
+<li>Loading parameters via <a class="reference internal" href="../class/Log.html#petropy.Log.fluid_properties_parameters_from_csv" title="petropy.Log.fluid_properties_parameters_from_csv"><code class="xref py py-meth docutils literal"><span class="pre">petropy.Log.fluid_properties_parameters_from_csv()</span></code></a></li>
+<li>Calculating over formations via <a class="reference internal" href="../class/Log.html#petropy.Log.formation_fluid_properties" title="petropy.Log.formation_fluid_properties"><code class="xref py py-meth docutils literal"><span class="pre">petropy.Log.formation_fluid_properties()</span></code></a></li>
+</ol>
+</dd>
+</dl>
+</li>
+<li><dl class="first docutils">
+<dt>Calculate mulitmineral properties by</dt>
+<dd><ol class="first last arabic">
+<li>Loading parameters via <a class="reference internal" href="../class/Log.html#petropy.Log.multimineral_parameters_from_csv" title="petropy.Log.multimineral_parameters_from_csv"><code class="xref py py-meth docutils literal"><span class="pre">petropy.Log.multimineral_parameters_from_csv()</span></code></a></li>
+<li>Calculating over formations via <a class="reference internal" href="../class/Log.html#petropy.Log.formation_multimineral_model" title="petropy.Log.formation_multimineral_model"><code class="xref py py-meth docutils literal"><span class="pre">petropy.Log.formation_multimineral_model()</span></code></a></li>
+</ol>
+</dd>
+</dl>
+</li>
+<li>Curve summations via <a class="reference internal" href="../class/Log.html#petropy.Log.summations" title="petropy.Log.summations"><code class="xref py py-meth docutils literal"><span class="pre">petropy.Log.summations()</span></code></a></li>
+<li>Adding pay flags via <a class="reference internal" href="../class/Log.html#petropy.Log.add_pay_flag" title="petropy.Log.add_pay_flag"><code class="xref py py-meth docutils literal"><span class="pre">petropy.Log.add_pay_flag()</span></code></a></li>
+</ol>
+<p>After the second iteration, the list processed_logs is used to perform
+electrofacies calculations via <a class="reference internal" href="../function/electrofacies.html#petropy.electrofacies" title="petropy.electrofacies"><code class="xref py py-meth docutils literal"><span class="pre">petropy.electrofacies()</span></code></a></p>
+<p>The Third Iteration</p>
+<ol class="arabic simple">
+<li>Exporting log statistics via <a class="reference internal" href="../class/Log.html#petropy.Log.statistics" title="petropy.Log.statistics"><code class="xref py py-meth docutils literal"><span class="pre">petropy.Log.statistics()</span></code></a></li>
+<li>Saving LogViewer to png and Log to las</li>
+</ol>
+<div class="highlight-python"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">petropy</span> <span class="kn">as</span> <span class="nn">ptr</span>
+
+<span class="c1"># use glob to get file paths</span>
+<span class="kn">import</span> <span class="nn">glob</span>
+
+<span class="c1"># import pyplot to add logo to figure</span>
+<span class="kn">import</span> <span class="nn">matplotlib.pyplot</span> <span class="kn">as</span> <span class="nn">plt</span>
+
+
+<span class="c1"># define parameters                           #</span>
+
+<span class="n">f</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;WFMPA&#39;</span><span class="p">,</span> <span class="s1">&#39;WFMPB&#39;</span><span class="p">,</span> <span class="s1">&#39;WFMPC&#39;</span><span class="p">]</span>
+<span class="n">sum_curves</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;OIP&#39;</span><span class="p">,</span> <span class="s1">&#39;BVH&#39;</span><span class="p">,</span> <span class="s1">&#39;PHIE&#39;</span><span class="p">]</span>
+<span class="n">stats_curves</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;OIP&#39;</span><span class="p">,</span> <span class="s1">&#39;BVH&#39;</span><span class="p">,</span> <span class="s1">&#39;PHIE&#39;</span><span class="p">,</span> <span class="s1">&#39;SW&#39;</span><span class="p">,</span> <span class="s1">&#39;VCLAY&#39;</span><span class="p">,</span> <span class="s1">&#39;TOC&#39;</span><span class="p">]</span>
+
+<span class="n">flag_1_gtoe</span> <span class="o">=</span> <span class="p">[(</span><span class="s1">&#39;PHIE&#39;</span><span class="p">,</span> <span class="mf">0.03</span><span class="p">)]</span>
+<span class="n">flag_2_gtoe</span> <span class="o">=</span> <span class="p">[(</span><span class="s1">&#39;PAY_FLAG_1&#39;</span><span class="p">,</span> <span class="mi">1</span><span class="p">),</span> <span class="p">(</span><span class="s1">&#39;BVH&#39;</span><span class="p">,</span> <span class="mf">0.02</span><span class="p">)]</span>
+<span class="n">flag_3_gtoe</span> <span class="o">=</span> <span class="p">[(</span><span class="s1">&#39;PAY_FLAG_2&#39;</span><span class="p">,</span> <span class="mi">1</span><span class="p">)]</span>
+<span class="n">flag_3_ltoe</span> <span class="o">=</span> <span class="p">[(</span><span class="s1">&#39;SW&#39;</span><span class="p">,</span> <span class="mf">0.2</span><span class="p">)]</span>
+
+<span class="c1"># get paths for all las files in folder       #</span>
+<span class="c1"># wfmp_raw_las                                #</span>
+
+<span class="n">raw_las_folder</span> <span class="o">=</span> <span class="sa">r</span><span class="s1">&#39;wfmp_raw_las/&#39;</span>
+<span class="n">las_files</span> <span class="o">=</span> <span class="n">glob</span><span class="o">.</span><span class="n">glob</span><span class="p">(</span><span class="n">raw_las_folder</span> <span class="o">+</span> <span class="sa">r</span><span class="s1">&#39;*.las&#39;</span><span class="p">)</span>
+
+
+<span class="c1">### First Iteration ###</span>
+
+<span class="k">for</span> <span class="n">las_file</span> <span class="ow">in</span> <span class="n">las_files</span><span class="p">:</span>
+
+
+    <span class="c1">### 1. read raw las file ###</span>
+
+    <span class="c1"># create a Log object by reading a file path  #</span>
+
+    <span class="n">log</span> <span class="o">=</span> <span class="n">ptr</span><span class="o">.</span><span class="n">Log</span><span class="p">(</span><span class="n">las_file</span><span class="p">)</span>
+
+    <span class="c1">### 2. graphically edit raw log ###</span>
+
+    <span class="c1"># use manual mode for fixing borehole washout #</span>
+    <span class="c1"># and other changes requiring redrawing data  #</span>
+
+    <span class="c1"># use bulk shift mode to linearly adjust all  #</span>
+    <span class="c1"># curve data                                  #</span>
+
+    <span class="c1"># close both windows to continue program      #</span>
+
+    <span class="n">viewer</span> <span class="o">=</span> <span class="n">ptr</span><span class="o">.</span><span class="n">LogViewer</span><span class="p">(</span><span class="n">log</span><span class="p">,</span> <span class="n">top</span> <span class="o">=</span> <span class="mi">6950</span><span class="p">,</span> <span class="n">height</span> <span class="o">=</span> <span class="mi">100</span><span class="p">)</span>
+    <span class="n">viewer</span><span class="o">.</span><span class="n">show</span><span class="p">(</span><span class="n">edit_mode</span> <span class="o">=</span> <span class="bp">True</span><span class="p">)</span>
+
+    <span class="c1"># overwrite log variable with updated log     #</span>
+    <span class="c1"># from LogViewer edits                        #</span>
+
+    <span class="n">log</span> <span class="o">=</span> <span class="n">viewer</span><span class="o">.</span><span class="n">log</span>
+
+    <span class="c1"># find way to name well, looking for well name#</span>
+    <span class="c1"># or UWI or API                               #</span>
+
+    <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">log</span><span class="o">.</span><span class="n">well</span><span class="p">[</span><span class="s1">&#39;WELL&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">value</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
+        <span class="n">well_name</span> <span class="o">=</span> <span class="n">log</span><span class="o">.</span><span class="n">well</span><span class="p">[</span><span class="s1">&#39;WELL&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">value</span>
+    <span class="k">elif</span> <span class="nb">len</span><span class="p">(</span><span class="n">log</span><span class="o">.</span><span class="n">well</span><span class="p">[</span><span class="s1">&#39;UWI&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">value</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
+        <span class="n">well_name</span> <span class="o">=</span> <span class="nb">str</span><span class="p">(</span><span class="n">log</span><span class="o">.</span><span class="n">well</span><span class="p">[</span><span class="s1">&#39;UWI&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">value</span><span class="p">)</span>
+    <span class="k">elif</span> <span class="nb">len</span><span class="p">(</span><span class="n">log</span><span class="o">.</span><span class="n">well</span><span class="p">[</span><span class="s1">&#39;API&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">value</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
+        <span class="n">well_name</span> <span class="o">=</span> <span class="nb">str</span><span class="p">(</span><span class="n">log</span><span class="o">.</span><span class="n">well</span><span class="p">[</span><span class="s1">&#39;API&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">value</span><span class="p">)</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">well_name</span> <span class="o">=</span> <span class="s1">&#39;UNKNOWN&#39;</span>
+    <span class="n">well_name</span> <span class="o">=</span> <span class="n">well_name</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s1">&#39;.&#39;</span><span class="p">,</span> <span class="s1">&#39;&#39;</span><span class="p">)</span>
+
+    <span class="c1"># save changes to edited folder in case   #</span>
+    <span class="c1"># reprocessing after editing is needed    #</span>
+
+    <span class="n">edited_log_file_name</span> <span class="o">=</span> <span class="s1">&#39;wfmp_edited_las/</span><span class="si">%s</span><span class="s1">_edited.las&#39;</span> <span class="o">%</span> <span class="n">well_name</span>
+    <span class="c1"># log.write(edited_log_file_name)</span>
+
+<span class="c1">### Second Iteration ###</span>
+
+<span class="n">edited_file_folder</span> <span class="o">=</span> <span class="sa">r</span><span class="s1">&#39;wfmp_edited_las/&#39;</span>
+<span class="n">edited_las_files</span> <span class="o">=</span> <span class="n">glob</span><span class="o">.</span><span class="n">glob</span><span class="p">(</span><span class="n">edited_file_folder</span> <span class="o">+</span> <span class="sa">r</span><span class="s1">&#39;*.las&#39;</span><span class="p">)</span>
+
+<span class="c1"># create list to hold processed log objects   #</span>
+
+<span class="n">processed_logs</span> <span class="o">=</span> <span class="p">[]</span>
+
+<span class="k">for</span> <span class="n">las_file</span> <span class="ow">in</span> <span class="n">edited_las_files</span><span class="p">:</span>
+
+    <span class="c1">### 1. Read las file ###</span>
+
+    <span class="n">log</span> <span class="o">=</span> <span class="n">ptr</span><span class="o">.</span><span class="n">Log</span><span class="p">(</span><span class="n">las_file</span><span class="p">)</span>
+
+    <span class="c1">### 2. load tops ###</span>
+
+    <span class="n">log</span><span class="o">.</span><span class="n">tops_from_csv</span><span class="p">(</span><span class="s1">&#39;wfmp_raw_las/wfmp_tops.csv&#39;</span><span class="p">)</span>
+
+    <span class="c1">### 3. fluid properties ###</span>
+
+    <span class="c1"># load fluid properties from a csv file       #</span>
+    <span class="c1"># since path is not specified, load default   #</span>
+    <span class="c1"># csv file included with petropy              #</span>
+
+    <span class="n">log</span><span class="o">.</span><span class="n">fluid_properties_parameters_from_csv</span><span class="p">()</span>
+
+    <span class="c1"># calculate fluid properties over defined     #</span>
+    <span class="c1"># formations with parameter WFMP from         #</span>
+    <span class="c1"># previously loaded csv                       #</span>
+
+    <span class="n">log</span><span class="o">.</span><span class="n">formation_fluid_properties</span><span class="p">(</span><span class="n">f</span><span class="p">,</span> <span class="n">parameter</span> <span class="o">=</span> <span class="s1">&#39;WFMP&#39;</span><span class="p">)</span>
+
+    <span class="c1">### 4. multimineral model ###</span>
+
+    <span class="c1"># load multimineral parameters from csv file  #</span>
+    <span class="c1"># since path is not specified, load default   #</span>
+    <span class="c1"># csv file included with petropy              #</span>
+
+    <span class="n">log</span><span class="o">.</span><span class="n">multimineral_parameters_from_csv</span><span class="p">()</span>
+
+    <span class="c1"># calculate multiminearl model over defined   #</span>
+    <span class="c1"># formations with parameter WFMP from         #</span>
+    <span class="c1"># previously loaded csv                       #</span>
+
+    <span class="n">log</span><span class="o">.</span><span class="n">formation_multimineral_model</span><span class="p">(</span><span class="n">f</span><span class="p">,</span> <span class="n">parameter</span> <span class="o">=</span> <span class="s1">&#39;WFMP&#39;</span><span class="p">)</span>
+
+    <span class="c1">### 5. summations ###</span>
+
+    <span class="n">log</span><span class="o">.</span><span class="n">summations</span><span class="p">(</span><span class="n">f</span><span class="p">,</span> <span class="n">curves</span> <span class="o">=</span> <span class="n">sum_curves</span><span class="p">)</span>
+
+    <span class="c1">### 6. pay flags ###</span>
+
+    <span class="n">log</span><span class="o">.</span><span class="n">add_pay_flag</span><span class="p">(</span><span class="n">f</span><span class="p">,</span> <span class="n">greater_than_or_equal</span> <span class="o">=</span> <span class="n">flag_1_gtoe</span><span class="p">)</span>
+    <span class="n">log</span><span class="o">.</span><span class="n">add_pay_flag</span><span class="p">(</span><span class="n">f</span><span class="p">,</span> <span class="n">greater_than_or_equal</span> <span class="o">=</span> <span class="n">flag_2_gtoe</span><span class="p">)</span>
+    <span class="n">log</span><span class="o">.</span><span class="n">add_pay_flag</span><span class="p">(</span><span class="n">f</span><span class="p">,</span> <span class="n">greater_than_or_equal</span> <span class="o">=</span> <span class="n">flag_3_gtoe</span><span class="p">,</span>
+                     <span class="n">less_than_or_equal</span> <span class="o">=</span> <span class="n">flag_3_ltoe</span><span class="p">)</span>
+
+    <span class="c1"># add log to processed_logs list              #</span>
+
+    <span class="n">processed_logs</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">log</span><span class="p">)</span>
+
+
+<span class="c1">### 9. electrofacies ###</span>
+
+<span class="c1"># define curves to use in electofaceis module #</span>
+
+<span class="n">electro_logs</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;GR_N&#39;</span><span class="p">,</span> <span class="s1">&#39;RESDEEP_N&#39;</span><span class="p">,</span> <span class="s1">&#39;NPHI_N&#39;</span><span class="p">,</span> <span class="s1">&#39;RHOB_N&#39;</span><span class="p">,</span> <span class="s1">&#39;PE_N&#39;</span><span class="p">]</span>
+
+<span class="c1"># specifiy to use logarithmically scaled RESDEEP_N #</span>
+
+<span class="n">scaled</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;RESDEEP_N&#39;</span><span class="p">]</span>
+
+<span class="c1"># calculate electrofacies for the processed logs #</span>
+<span class="n">final_logs</span> <span class="o">=</span> <span class="n">ptr</span><span class="o">.</span><span class="n">electrofacies</span><span class="p">(</span><span class="n">processed_logs</span><span class="p">,</span> <span class="n">f</span><span class="p">,</span>
+                               <span class="n">electro_logs</span><span class="p">,</span> <span class="mi">6</span><span class="p">,</span> <span class="n">log_scale</span> <span class="o">=</span> <span class="n">scaled</span><span class="p">)</span>
+
+
+<span class="c1">### Third Iteration ###</span>
+
+<span class="k">for</span> <span class="n">log</span> <span class="ow">in</span> <span class="n">final_logs</span><span class="p">:</span>
+
+    <span class="c1">### 1. export statistics ###</span>
+
+    <span class="n">log</span><span class="o">.</span><span class="n">statistics_to_csv</span><span class="p">(</span><span class="s1">&#39;wfmp_processed_las/wfmp_statistics.csv&#39;</span><span class="p">,</span>
+                          <span class="n">replace</span> <span class="o">=</span> <span class="bp">True</span><span class="p">,</span> <span class="n">formations</span> <span class="o">=</span> <span class="n">f</span><span class="p">,</span>
+                          <span class="n">curves</span> <span class="o">=</span> <span class="n">stats_curves</span><span class="p">)</span>
+
+    <span class="c1">### 2. export data ###</span>
+
+    <span class="c1"># find way to name well, looking for well name#</span>
+    <span class="c1"># or UWI or API                               #</span>
+
+    <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">log</span><span class="o">.</span><span class="n">well</span><span class="p">[</span><span class="s1">&#39;WELL&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">value</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
+        <span class="n">well_name</span> <span class="o">=</span> <span class="n">log</span><span class="o">.</span><span class="n">well</span><span class="p">[</span><span class="s1">&#39;WELL&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">value</span>
+    <span class="k">elif</span> <span class="nb">len</span><span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="n">log</span><span class="o">.</span><span class="n">well</span><span class="p">[</span><span class="s1">&#39;UWI&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">value</span><span class="p">))</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
+        <span class="n">well_name</span> <span class="o">=</span> <span class="nb">str</span><span class="p">(</span><span class="n">log</span><span class="o">.</span><span class="n">well</span><span class="p">[</span><span class="s1">&#39;UWI&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">value</span><span class="p">)</span>
+    <span class="k">elif</span> <span class="nb">len</span><span class="p">(</span><span class="n">log</span><span class="o">.</span><span class="n">well</span><span class="p">[</span><span class="s1">&#39;API&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">value</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
+        <span class="n">well_name</span> <span class="o">=</span> <span class="nb">str</span><span class="p">(</span><span class="n">log</span><span class="o">.</span><span class="n">well</span><span class="p">[</span><span class="s1">&#39;API&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">value</span><span class="p">)</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">well_name</span> <span class="o">=</span> <span class="s1">&#39;UNKNOWN&#39;</span>
+    <span class="n">well_name</span> <span class="o">=</span> <span class="n">well_name</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s1">&#39;.&#39;</span><span class="p">,</span> <span class="s1">&#39;&#39;</span><span class="p">)</span>
+
+    <span class="c1"># scale height of viewer to top and bottom    #</span>
+    <span class="c1"># of calculated values                        #</span>
+
+    <span class="n">wfmpa_top</span> <span class="o">=</span> <span class="n">log</span><span class="o">.</span><span class="n">tops</span><span class="p">[</span><span class="s1">&#39;WFMPA&#39;</span><span class="p">]</span>
+    <span class="n">wfmpc_base</span> <span class="o">=</span> <span class="n">log</span><span class="o">.</span><span class="n">next_formation_depth</span><span class="p">(</span><span class="s1">&#39;WFMPC&#39;</span><span class="p">)</span>
+
+    <span class="n">top</span> <span class="o">=</span> <span class="n">wfmpa_top</span>
+    <span class="n">height</span> <span class="o">=</span> <span class="n">wfmpc_base</span> <span class="o">-</span> <span class="n">wfmpa_top</span>
+
+    <span class="c1"># create LogViewer with the default full_oil #</span>
+    <span class="c1"># template included in petropy               #</span>
+
+    <span class="n">viewer</span> <span class="o">=</span> <span class="n">ptr</span><span class="o">.</span><span class="n">LogViewer</span><span class="p">(</span><span class="n">log</span><span class="p">,</span> <span class="n">top</span> <span class="o">=</span> <span class="n">top</span><span class="p">,</span> <span class="n">height</span> <span class="o">=</span> <span class="n">height</span><span class="p">,</span>
+                           <span class="n">template_defaults</span> <span class="o">=</span> <span class="s1">&#39;full_oil&#39;</span><span class="p">)</span>
+
+    <span class="c1"># set viewer to 17x11 inches size for use in #</span>
+    <span class="c1"># PowerPoint or printing to larger paper     #</span>
+
+    <span class="n">viewer</span><span class="o">.</span><span class="n">fig</span><span class="o">.</span><span class="n">set_size_inches</span><span class="p">(</span><span class="mi">17</span><span class="p">,</span> <span class="mi">11</span><span class="p">)</span>
+
+    <span class="c1"># add well_name to title of LogViewer        #</span>
+
+    <span class="n">viewer</span><span class="o">.</span><span class="n">fig</span><span class="o">.</span><span class="n">suptitle</span><span class="p">(</span><span class="n">well_name</span><span class="p">,</span> <span class="n">fontweight</span> <span class="o">=</span> <span class="s1">&#39;bold&#39;</span><span class="p">,</span> <span class="n">fontsize</span> <span class="o">=</span> <span class="mi">30</span><span class="p">)</span>
+
+    <span class="c1"># add logo to top left corner                #</span>
+
+    <span class="n">logo_im</span> <span class="o">=</span> <a href="http://matplotlib.org/api/_as_gen/matplotlib.pyplot.imread.html#matplotlib.pyplot.imread" title="View documentation for matplotlib.pyplot.imread"><span class="n">plt</span><span class="o">.</span><span class="n">imread</span></a><span class="p">(</span><span class="s1">&#39;company_logo.png&#39;</span><span class="p">)</span>
+    <span class="n">logo_ax</span> <span class="o">=</span> <span class="n">viewer</span><span class="o">.</span><span class="n">fig</span><span class="o">.</span><span class="n">add_axes</span><span class="p">([</span><span class="mi">0</span><span class="p">,</span> <span class="mf">0.85</span><span class="p">,</span> <span class="mf">0.2</span><span class="p">,</span> <span class="mf">0.2</span><span class="p">])</span>
+    <span class="n">logo_ax</span><span class="o">.</span><span class="n">imshow</span><span class="p">(</span><span class="n">logo_im</span><span class="p">)</span>
+    <span class="n">logo_ax</span><span class="o">.</span><span class="n">axis</span><span class="p">(</span><span class="s1">&#39;off&#39;</span><span class="p">)</span>
+
+    <span class="c1"># add text to top right corner               #</span>
+
+    <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="n">log</span><span class="o">.</span><span class="n">well</span><span class="p">[</span><span class="s1">&#39;UWI&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">value</span><span class="p">))</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
+        <span class="n">label</span> <span class="o">=</span> <span class="s1">&#39;UWI: &#39;</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="n">log</span><span class="o">.</span><span class="n">well</span><span class="p">[</span><span class="s1">&#39;UWI&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">value</span><span class="p">)</span> <span class="o">+</span> <span class="s1">&#39;</span><span class="se">\n</span><span class="s1">&#39;</span>
+    <span class="k">elif</span> <span class="nb">len</span><span class="p">(</span><span class="n">log</span><span class="o">.</span><span class="n">well</span><span class="p">[</span><span class="s1">&#39;API&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">value</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
+        <span class="n">label</span> <span class="o">=</span> <span class="s1">&#39;API: &#39;</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="n">log</span><span class="o">.</span><span class="n">well</span><span class="p">[</span><span class="s1">&#39;API&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">value</span><span class="p">)</span> <span class="o">+</span> <span class="s1">&#39;</span><span class="se">\n</span><span class="s1">&#39;</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">label</span> <span class="o">=</span> <span class="s1">&#39;&#39;</span>
+
+    <span class="n">label</span> <span class="o">+=</span> <span class="s1">&#39;County: Reagan</span><span class="se">\n</span><span class="s1">Created By: Todd Heitmann</span><span class="se">\n</span><span class="s1">&#39;</span>
+    <span class="n">label</span> <span class="o">+=</span> <span class="s1">&#39;Creation Date: October 23, 2017&#39;</span>
+    <span class="n">viewer</span><span class="o">.</span><span class="n">axes</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">annotate</span><span class="p">(</span><span class="n">label</span><span class="p">,</span> <span class="n">xy</span> <span class="o">=</span> <span class="p">(</span><span class="mf">0.99</span><span class="p">,</span><span class="mf">0.99</span><span class="p">),</span>
+                        <span class="n">xycoords</span> <span class="o">=</span> <span class="s1">&#39;figure fraction&#39;</span><span class="p">,</span>
+                        <span class="n">horizontalalignment</span> <span class="o">=</span> <span class="s1">&#39;right&#39;</span><span class="p">,</span>
+                        <span class="n">verticalalignment</span> <span class="o">=</span> <span class="s1">&#39;top&#39;</span><span class="p">,</span>
+                        <span class="n">fontsize</span> <span class="o">=</span> <span class="mi">14</span><span class="p">)</span>
+
+    <span class="c1"># save figure and log                        #</span>
+
+    <span class="n">viewer_file_name</span><span class="o">=</span><span class="sa">r</span><span class="s1">&#39;wfmp_processed_las/</span><span class="si">%s</span><span class="s1">_processed.png&#39;</span> <span class="o">%</span> <span class="n">well_name</span>
+    <span class="n">las_file_name</span> <span class="o">=</span> <span class="sa">r</span><span class="s1">&#39;wfmp_processed_las/</span><span class="si">%s</span><span class="s1">_processed.las&#39;</span> <span class="o">%</span> <span class="n">well_name</span>
+
+    <span class="n">viewer</span><span class="o">.</span><span class="n">fig</span><span class="o">.</span><span class="n">savefig</span><span class="p">(</span><span class="n">viewer_file_name</span><span class="p">)</span>
+    <span class="n">viewer</span><span class="o">.</span><span class="n">log</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">las_file_name</span><span class="p">)</span>
+</pre></div>
+</div>
+<div class="sphx-glr-footer docutils container">
+<div class="sphx-glr-download docutils container">
+<a class="reference download internal" href="../_downloads/wolfcamp_bulk.py" download=""><code class="xref download docutils literal"><span class="pre">Download</span> <span class="pre">Python</span> <span class="pre">source</span> <span class="pre">code:</span> <span class="pre">wolfcamp_bulk.py</span></code></a></div>
+<div class="sphx-glr-download docutils container">
+<a class="reference download internal" href="../_downloads/wolfcamp_bulk.ipynb" download=""><code class="xref download docutils literal"><span class="pre">Download</span> <span class="pre">Jupyter</span> <span class="pre">notebook:</span> <span class="pre">wolfcamp_bulk.ipynb</span></code></a></div>
+</div>
+<p class="sphx-glr-signature"><a class="reference external" href="https://sphinx-gallery.readthedocs.io">Gallery generated by Sphinx-Gallery</a></p>
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+<h1 class="logo"><a href="../index.html">PetroPy</a></h1>
+
+
+
+
+
+
+
+
+<h3>Navigation</h3>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="../class/Log.html">Log</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../class/LogViewer.html">LogViewer</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../function/electrofacies.html">Electrofacies</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../function/dataset.html">Dataset</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../function/download.html">Downloads</a></li>
+<li class="toctree-l1 current"><a class="reference internal" href="index.html">Examples</a><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="wolfcamp_single.html">Wolfcamp Example - Single las file</a></li>
+<li class="toctree-l2 current"><a class="current reference internal" href="#">Wolfcamp Example - Bulk Process las files</a></li>
+</ul>
+</li>
+</ul>
+
+
+<div id="searchbox" style="display: none" role="search">
+  <h3>Quick search</h3>
+    <form class="search" action="../search.html" method="get">
+      <div><input type="text" name="q" /></div>
+      <div><input type="submit" value="Go" /></div>
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="footer">
+      &copy;2017, Todd Heitmann.
+      
+      |
+      Powered by <a href="http://sphinx-doc.org/">Sphinx 1.5.6</a>
+      &amp; <a href="https://github.com/bitprophet/alabaster">Alabaster 0.7.10</a>
+      
+      |
+      <a href="../_sources/auto_examples/wolfcamp_bulk.rst.txt"
+          rel="nofollow">Page source</a>
+    </div>
+
+    
+
+    
+  </body>
+</html>

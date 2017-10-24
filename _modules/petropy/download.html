@@ -15,6 +15,7 @@
     
     <link rel="stylesheet" href="../../_static/alabaster.css" type="text/css" />
     <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
+    <link rel="stylesheet" href="../../_static/gallery.css" type="text/css" />
     
     <script type="text/javascript">
       var DOCUMENTATION_OPTIONS = {
@@ -61,14 +62,19 @@
 
 <span class="kn">import</span> <span class="nn">os</span>
 <span class="kn">import</span> <span class="nn">sys</span>
+<span class="kn">import</span> <span class="nn">time</span>
+<span class="kn">import</span> <span class="nn">fnmatch</span>
 <span class="kn">from</span> <span class="nn">ftplib</span> <span class="k">import</span> <span class="n">FTP</span>
 <span class="kn">from</span> <span class="nn">zipfile</span> <span class="k">import</span> <span class="n">ZipFile</span>
 <span class="kn">from</span> <span class="nn">io</span> <span class="k">import</span> <span class="n">BytesIO</span>
+<span class="kn">import</span> <span class="nn">pandas</span> <span class="k">as</span> <span class="nn">pd</span>
 
 <span class="k">if</span> <span class="n">sys</span><span class="o">.</span><span class="n">version_info</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">&lt;</span> <span class="mi">3</span><span class="p">:</span>
     <span class="kn">from</span> <span class="nn">urllib2</span> <span class="k">import</span> <span class="n">urlopen</span>
 <span class="k">else</span><span class="p">:</span>
     <span class="kn">from</span> <span class="nn">urllib.request</span> <span class="k">import</span> <span class="n">urlopen</span>
+
+<span class="kn">from</span> <span class="nn">.log</span> <span class="k">import</span> <span class="n">Log</span>
 
 
 <div class="viewcode-block" id="ul_lands_download"><a class="viewcode-back" href="../../function/download.html#petropy.ul_lands_download">[docs]</a><span class="k">def</span> <span class="nf">ul_lands_download</span><span class="p">(</span><span class="n">save_dir</span> <span class="o">=</span> <span class="kc">None</span><span class="p">):</span>
@@ -76,13 +82,14 @@
 <span class="sd">    Downloads las files from University Lands Texas</span>
 
 <span class="sd">    This function downloads files from the university lands ftp</span>
-<span class="sd">    website located at publiftp.utlands.utsystem.edu.</span>
+<span class="sd">    website located at publiftp.utlands.utsystem.edu.  It inventories</span>
+<span class="sd">    readable logs into a csv file containing header data in the</span>
+<span class="sd">    save_dir. This inventory data is also returned as a DataFrame.</span>
 
 <span class="sd">    The bulk of this script is provided courtesy of Jon Reynolds,</span>
 <span class="sd">    with Glacier Geosciences at:</span>
 
 <span class="sd">    http://www.glaciergeosciences.com/</span>
-
 
 <span class="sd">    Parameters</span>
 <span class="sd">    ----------</span>
@@ -92,8 +99,8 @@
 
 <span class="sd">    Returns</span>
 <span class="sd">    -------</span>
-<span class="sd">    bool</span>
-<span class="sd">        True if successful</span>
+<span class="sd">    DataFrame</span>
+<span class="sd">        DataFrame of header data for all logs downloaded and read.</span>
 
 <span class="sd">    Examples</span>
 <span class="sd">    --------</span>
@@ -101,11 +108,17 @@
 <span class="sd">    &gt;&gt;&gt; ptr.ul_lands_download()</span>
 
 <span class="sd">    &gt;&gt;&gt; import petropy as ptr</span>
-<span class="sd">    &gt;&gt;&gt; p = &#39;path/to/my/folder/&#39;</span>
+<span class="sd">    &gt;&gt;&gt; p = r&#39;path/to/my/folder/&#39;</span>
 <span class="sd">    &gt;&gt;&gt; ptr.ul_lands_download(p)</span>
 
-<span class="sd">    &quot;&quot;&quot;</span>
+<span class="sd">    Note</span>
+<span class="sd">    ----</span>
+<span class="sd">    Function takes approximately twelve hours to scan ftp site,</span>
+<span class="sd">    download, and inventory 30 GB of log data. YMMV depending on</span>
+<span class="sd">    internet and processor speed.</span>
 
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">start_time</span> <span class="o">=</span> <span class="n">time</span><span class="o">.</span><span class="n">time</span><span class="p">()</span>
     <span class="n">ftp_site</span> <span class="o">=</span> <span class="s1">&#39;publicftp.utlands.utsystem.edu&#39;</span>
 
     <span class="k">if</span> <span class="n">save_dir</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
@@ -116,24 +129,59 @@
     <span class="n">ftp</span><span class="o">.</span><span class="n">login</span><span class="p">()</span>
     <span class="n">root_dir</span> <span class="o">=</span> <span class="s1">&#39;ScannedLogs&#39;</span>
 
+    <span class="n">ftp_source_files</span> <span class="o">=</span> <span class="p">[]</span>
     <span class="k">for</span> <span class="n">direct</span> <span class="ow">in</span> <span class="n">ftp</span><span class="o">.</span><span class="n">nlst</span><span class="p">(</span><span class="n">root_dir</span><span class="p">):</span>
+        <span class="nb">print</span><span class="p">(</span><span class="n">direct</span><span class="p">)</span>
         <span class="k">for</span> <span class="n">subdir</span> <span class="ow">in</span> <span class="n">ftp</span><span class="o">.</span><span class="n">nlst</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">root_dir</span><span class="p">,</span> <span class="n">direct</span><span class="p">)):</span>
             <span class="n">files</span> <span class="o">=</span> <span class="n">ftp</span><span class="o">.</span><span class="n">nlst</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">root_dir</span><span class="p">,</span> <span class="n">direct</span><span class="p">,</span> <span class="n">subdir</span><span class="p">))</span>
-            <span class="k">for</span> <span class="n">f</span> <span class="ow">in</span> <span class="n">files</span><span class="p">:</span>
-                <span class="k">if</span> <span class="s1">&#39;.las&#39;</span> <span class="ow">in</span> <span class="n">f</span> <span class="ow">or</span> <span class="s1">&#39;.LAS&#39;</span> <span class="ow">in</span> <span class="n">f</span><span class="p">:</span>
-                    <span class="n">src</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">root_dir</span><span class="p">,</span> <span class="n">direct</span><span class="p">,</span> <span class="n">subdir</span><span class="p">,</span> <span class="n">f</span><span class="p">)</span>
-                    <span class="n">dest</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">save_dir</span><span class="p">,</span> <span class="n">direct</span><span class="p">,</span> <span class="n">subdir</span><span class="p">,</span> <span class="n">f</span><span class="p">)</span>
-                    <span class="k">if</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">exists</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">save_dir</span><span class="p">,</span>
-                                      <span class="n">direct</span><span class="p">,</span> <span class="n">subdir</span><span class="p">))</span> <span class="o">==</span> <span class="kc">False</span><span class="p">:</span>
-                        <span class="n">os</span><span class="o">.</span><span class="n">makedirs</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">save_dir</span><span class="p">,</span> <span class="n">direct</span><span class="p">,</span>
-                                                 <span class="n">subdir</span><span class="p">))</span>
-                    <span class="k">if</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">exists</span><span class="p">(</span><span class="n">dest</span><span class="p">)</span> <span class="o">==</span> <span class="kc">False</span><span class="p">:</span>
-                        <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">dest</span><span class="p">,</span> <span class="s1">&#39;wb&#39;</span><span class="p">)</span> <span class="k">as</span> <span class="n">las_file</span><span class="p">:</span>
-                            <span class="n">ftp</span><span class="o">.</span><span class="n">retrbinary</span><span class="p">(</span><span class="s1">&#39;RETR &#39;</span> <span class="o">+</span> <span class="n">src</span><span class="p">,</span>
-                                           <span class="n">las_file</span><span class="o">.</span><span class="n">write</span><span class="p">)</span>
+            <span class="n">ftp_source_files</span><span class="o">.</span><span class="n">append</span><span class="p">((</span><span class="n">direct</span><span class="p">,</span> <span class="n">subdir</span><span class="p">,</span> <span class="n">files</span><span class="p">))</span>
     <span class="n">ftp</span><span class="o">.</span><span class="n">quit</span><span class="p">()</span>
 
-    <span class="k">return</span> <span class="kc">True</span></div>
+    <span class="n">time</span><span class="o">.</span><span class="n">sleep</span><span class="p">(</span><span class="mi">2</span><span class="p">)</span>
+
+    <span class="n">total_time</span> <span class="o">=</span> <span class="p">(</span><span class="n">time</span><span class="o">.</span><span class="n">time</span><span class="p">()</span> <span class="o">-</span> <span class="n">start_time</span><span class="p">)</span> <span class="o">/</span> <span class="mf">60.0</span>
+    <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;Find Files Time: </span><span class="si">%.2f</span><span class="s1"> minutes&#39;</span> <span class="o">%</span> <span class="n">total_time</span><span class="p">)</span>
+
+    <span class="n">process_time</span> <span class="o">=</span> <span class="n">time</span><span class="o">.</span><span class="n">time</span><span class="p">()</span>
+
+    <span class="n">paths</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="k">for</span> <span class="n">direct</span><span class="p">,</span> <span class="n">subdir</span><span class="p">,</span> <span class="n">files</span> <span class="ow">in</span> <span class="n">ftp_source_files</span><span class="p">:</span>
+        <span class="n">las_files</span> <span class="o">=</span> <span class="p">[</span><span class="n">f</span> <span class="k">for</span> <span class="n">f</span> <span class="ow">in</span> <span class="n">files</span> <span class="k">if</span> <span class="s1">&#39;.las&#39;</span> <span class="ow">in</span> <span class="n">f</span><span class="o">.</span><span class="n">lower</span><span class="p">()]</span>
+        <span class="k">for</span> <span class="n">f</span> <span class="ow">in</span> <span class="n">las_files</span><span class="p">:</span>
+            <span class="n">src</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">root_dir</span><span class="p">,</span> <span class="n">direct</span><span class="p">,</span> <span class="n">subdir</span><span class="p">,</span> <span class="n">f</span><span class="p">)</span>
+            <span class="n">dest</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">save_dir</span><span class="p">,</span> <span class="n">direct</span><span class="p">,</span> <span class="n">subdir</span><span class="p">,</span> <span class="n">f</span><span class="p">)</span>
+            <span class="n">paths</span><span class="o">.</span><span class="n">append</span><span class="p">((</span><span class="n">src</span><span class="p">,</span> <span class="n">dest</span><span class="p">))</span>
+
+    <span class="n">chunk_time</span> <span class="o">=</span> <span class="n">time</span><span class="o">.</span><span class="n">time</span><span class="p">()</span>
+    <span class="c1"># chunck paths into groups of 1000 las files</span>
+    <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;Number of las files: </span><span class="si">%i</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="nb">len</span><span class="p">(</span><span class="n">paths</span><span class="p">))</span>
+    <span class="n">total_time</span> <span class="o">=</span> <span class="p">(</span><span class="n">time</span><span class="o">.</span><span class="n">time</span><span class="p">()</span> <span class="o">-</span> <span class="n">process_time</span><span class="p">)</span> <span class="o">/</span> <span class="mf">60.0</span>
+    <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;Prcoess Filenames Time: </span><span class="si">%.2f</span><span class="s1"> minutes&#39;</span> <span class="o">%</span> <span class="n">total_time</span><span class="p">)</span>
+
+    <span class="n">n</span> <span class="o">=</span> <span class="mi">400</span>
+    <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="nb">len</span><span class="p">(</span><span class="n">paths</span><span class="p">),</span> <span class="n">n</span><span class="p">):</span>
+        <span class="n">ftp</span> <span class="o">=</span> <span class="n">FTP</span><span class="p">(</span><span class="n">ftp_site</span><span class="p">)</span>
+        <span class="n">ftp</span><span class="o">.</span><span class="n">login</span><span class="p">()</span>
+        <span class="n">files</span> <span class="o">=</span> <span class="n">paths</span><span class="p">[</span><span class="n">i</span><span class="p">:</span><span class="n">i</span> <span class="o">+</span> <span class="n">n</span><span class="p">]</span>
+        <span class="k">for</span> <span class="n">src</span><span class="p">,</span> <span class="n">dest</span> <span class="ow">in</span> <span class="n">files</span><span class="p">:</span>
+            <span class="n">direct</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">dirname</span><span class="p">(</span><span class="n">dest</span><span class="p">)</span>
+            <span class="k">if</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">exists</span><span class="p">(</span><span class="n">direct</span><span class="p">)</span> <span class="o">==</span> <span class="kc">False</span><span class="p">:</span>
+                <span class="n">os</span><span class="o">.</span><span class="n">makedirs</span><span class="p">(</span><span class="n">direct</span><span class="p">)</span>
+            <span class="k">if</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">exists</span><span class="p">(</span><span class="n">dest</span><span class="p">)</span> <span class="o">==</span> <span class="kc">False</span><span class="p">:</span>
+                <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">dest</span><span class="p">,</span> <span class="s1">&#39;wb&#39;</span><span class="p">)</span> <span class="k">as</span> <span class="n">las_file</span><span class="p">:</span>
+                    <span class="n">ftp</span><span class="o">.</span><span class="n">retrbinary</span><span class="p">(</span><span class="s1">&#39;RETR &#39;</span> <span class="o">+</span> <span class="n">src</span><span class="p">,</span> <span class="n">las_file</span><span class="o">.</span><span class="n">write</span><span class="p">)</span>
+        <span class="n">ftp</span><span class="o">.</span><span class="n">quit</span><span class="p">()</span>
+        <span class="n">time</span><span class="o">.</span><span class="n">sleep</span><span class="p">(</span><span class="mi">5</span><span class="p">)</span>
+
+    <span class="n">total_time</span> <span class="o">=</span> <span class="p">(</span><span class="n">time</span><span class="o">.</span><span class="n">time</span><span class="p">()</span> <span class="o">-</span> <span class="n">chunk_time</span><span class="p">)</span> <span class="o">/</span> <span class="mf">60.0</span>
+    <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;Chunk Files Time: </span><span class="si">%.2f</span><span class="s1"> minutes&#39;</span> <span class="o">%</span> <span class="n">total_time</span><span class="p">)</span>
+
+    <span class="n">inventory_time</span> <span class="o">=</span> <span class="n">time</span><span class="o">.</span><span class="n">time</span><span class="p">()</span>
+    <span class="n">df</span> <span class="o">=</span> <span class="n">create_log_inventory_table</span><span class="p">(</span><span class="n">save_dir</span><span class="p">)</span>
+    <span class="n">total_time</span> <span class="o">=</span> <span class="p">(</span><span class="n">time</span><span class="o">.</span><span class="n">time</span><span class="p">()</span> <span class="o">-</span> <span class="n">chunk_time</span><span class="p">)</span> <span class="o">/</span> <span class="mf">60.0</span>
+    <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;Inventory Time: </span><span class="si">%.2f</span><span class="s1"> minutes&#39;</span> <span class="o">%</span> <span class="n">total_time</span><span class="p">)</span>
+
+    <span class="k">return</span> <span class="n">df</span></div>
 
 <div class="viewcode-block" id="kgs_download"><a class="viewcode-back" href="../../function/download.html#petropy.kgs_download">[docs]</a><span class="k">def</span> <span class="nf">kgs_download</span><span class="p">(</span><span class="n">save_dir</span> <span class="o">=</span> <span class="kc">None</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot;</span>
@@ -141,8 +189,10 @@
 
 <span class="sd">    This function downloads files from the Kansas Geologic Society.</span>
 <span class="sd">    These are zip files inside zip files, so the function parses out</span>
-<span class="sd">    all las files and saves them in the folder data/kgs.</span>
-
+<span class="sd">    all las files and saves them in the folder input save_dir or with</span>
+<span class="sd">    package data in the folder data/kgs. It inventories readable logs</span>
+<span class="sd">    into a csv file containing header data in the save_dir. This</span>
+<span class="sd">    inventory data is also returned as a DataFrame.</span>
 
 <span class="sd">    Parameters</span>
 <span class="sd">    ----------</span>
@@ -152,8 +202,8 @@
 
 <span class="sd">    Returns</span>
 <span class="sd">    -------</span>
-<span class="sd">    bool</span>
-<span class="sd">        True if successful</span>
+<span class="sd">    DataFrame</span>
+<span class="sd">        DataFrame of header data for all logs downloaded and read.</span>
 
 <span class="sd">    Examples</span>
 <span class="sd">    --------</span>
@@ -161,8 +211,14 @@
 <span class="sd">    &gt;&gt;&gt; ptr.kgs_download()</span>
 
 <span class="sd">    &gt;&gt;&gt; import petropy as ptr</span>
-<span class="sd">    &gt;&gt;&gt; p = &#39;path/to/my/folder/&#39;</span>
+<span class="sd">    &gt;&gt;&gt; p = r&#39;path/to/my/folder/&#39;</span>
 <span class="sd">    &gt;&gt;&gt; ptr.kgs_download(p)</span>
+
+<span class="sd">    Note</span>
+<span class="sd">    ----</span>
+<span class="sd">    Function takes approximately one hour to download, unzip, and</span>
+<span class="sd">    inventory 20GB of log data. YMMV depending on internet  and</span>
+<span class="sd">    processor speed.</span>
 
 <span class="sd">    &quot;&quot;&quot;</span>
 
@@ -182,7 +238,6 @@
                                 <span class="s1">&#39;kgs&#39;</span><span class="p">)</span>
 
     <span class="k">for</span> <span class="n">url</span> <span class="ow">in</span> <span class="n">urls</span><span class="p">:</span>
-
         <span class="n">year_dir</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">save_dir</span><span class="p">,</span>
                                 <span class="n">url</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s1">&#39;/&#39;</span><span class="p">)[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s1">&#39;.&#39;</span><span class="p">)[</span><span class="mi">0</span><span class="p">])</span>
         <span class="k">if</span> <span class="ow">not</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">isdir</span><span class="p">(</span><span class="n">year_dir</span><span class="p">):</span>
@@ -199,7 +254,94 @@
             <span class="n">las_zip</span><span class="o">.</span><span class="n">close</span><span class="p">()</span>
             <span class="n">os</span><span class="o">.</span><span class="n">remove</span><span class="p">(</span><span class="n">zip_path</span><span class="p">)</span>
 
-    <span class="k">return</span> <span class="kc">True</span></div>
+    <span class="n">df</span> <span class="o">=</span> <span class="n">create_log_inventory_table</span><span class="p">(</span><span class="n">save_dir</span><span class="p">)</span>
+
+    <span class="k">return</span> <span class="n">df</span></div>
+
+<div class="viewcode-block" id="create_log_inventory_table"><a class="viewcode-back" href="../../function/download.html#petropy.create_log_inventory_table">[docs]</a><span class="k">def</span> <span class="nf">create_log_inventory_table</span><span class="p">(</span><span class="n">save_dir</span><span class="p">,</span> <span class="n">folder_copy</span> <span class="o">=</span> <span class="kc">None</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Scans all folders and subfolders (recursive scan) for las files,</span>
+<span class="sd">    and opens them as a :class:`petropy.Log` object. Extracts header</span>
+<span class="sd">    data and curve names. Returns DataFrame of data after saving to a</span>
+<span class="sd">    csv file in the save_dir folder.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    save_dir : str</span>
+<span class="sd">        path to folder for recusive scan</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    DataFrame</span>
+<span class="sd">        DataFrame of header data for all logs downloaded and read.</span>
+
+<span class="sd">    Example</span>
+<span class="sd">    -------</span>
+<span class="sd">    &gt;&gt;&gt; import petropy as ptr</span>
+<span class="sd">    &gt;&gt;&gt; p = r&#39;path/to/folder/&#39;</span>
+<span class="sd">    &gt;&gt;&gt; df = ptr.create_log_inventory_table(p)</span>
+<span class="sd">    &gt;&gt;&gt; # filter logs with triple-combo for processing</span>
+<span class="sd">    &gt;&gt;&gt; tc_df = df[df.GR_N == &#39;Y&#39; &amp; df.RESDEEP_N == &#39;Y&#39; &amp;</span>
+<span class="sd">    ...            df.NPHI_N == &#39;Y&#39; &amp; df.RHOB_N == &#39;Y&#39;]</span>
+<span class="sd">    &gt;&gt;&gt; # print count of useable logs</span>
+<span class="sd">    &gt;&gt;&gt; print(len(tc_df))</span>
+
+
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="k">if</span> <span class="n">folder_copy</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">isdir</span><span class="p">(</span><span class="n">folder_copy</span><span class="p">):</span>
+            <span class="n">os</span><span class="o">.</span><span class="n">makedirs</span><span class="p">(</span><span class="n">folder_copy</span><span class="p">)</span>
+
+    <span class="n">error_log</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">save_dir</span><span class="p">,</span> <span class="s1">&#39;error_log.txt&#39;</span><span class="p">)</span>
+    <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">error_log</span><span class="p">,</span> <span class="s1">&#39;w&#39;</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
+        <span class="n">f</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="s1">&#39;LAS INVENTORY ERROR LOG</span><span class="se">\n</span><span class="s1">&#39;</span><span class="p">)</span>
+        <span class="n">f</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="s1">&#39;-----------------------</span><span class="se">\n</span><span class="s1">&#39;</span><span class="p">)</span>
+
+    <span class="n">log_data</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="k">for</span> <span class="n">root</span><span class="p">,</span> <span class="n">dirnames</span><span class="p">,</span> <span class="n">filenames</span> <span class="ow">in</span> <span class="n">os</span><span class="o">.</span><span class="n">walk</span><span class="p">(</span><span class="n">save_dir</span><span class="p">):</span>
+        <span class="k">for</span> <span class="n">filename</span> <span class="ow">in</span> <span class="n">fnmatch</span><span class="o">.</span><span class="n">filter</span><span class="p">(</span><span class="n">filenames</span><span class="p">,</span> <span class="s1">&#39;*.las&#39;</span><span class="p">):</span>
+            <span class="k">try</span><span class="p">:</span>
+                <span class="n">las_path</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">root</span><span class="p">,</span> <span class="n">filename</span><span class="p">)</span>
+                <span class="n">log</span> <span class="o">=</span> <span class="n">Log</span><span class="p">(</span><span class="n">las_path</span><span class="p">)</span>
+
+                <span class="k">if</span> <span class="n">folder_copy</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+
+                    <span class="n">keys</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;WELL&#39;</span><span class="p">,</span> <span class="s1">&#39;UWI&#39;</span><span class="p">,</span> <span class="s1">&#39;API&#39;</span><span class="p">]</span>
+                    <span class="n">new_name</span> <span class="o">=</span> <span class="s1">&#39;&#39;</span>
+                    <span class="k">for</span> <span class="n">k</span> <span class="ow">in</span> <span class="n">keys</span><span class="p">:</span>
+                        <span class="k">if</span> <span class="n">k</span> <span class="ow">in</span> <span class="n">log</span><span class="o">.</span><span class="n">well</span><span class="p">:</span>
+                            <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">log</span><span class="o">.</span><span class="n">well</span><span class="p">[</span><span class="n">k</span><span class="p">]</span><span class="o">.</span><span class="n">value</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
+                                <span class="n">new_name</span> <span class="o">=</span> <span class="n">log</span><span class="o">.</span><span class="n">well</span><span class="p">[</span><span class="n">k</span><span class="p">]</span><span class="o">.</span><span class="n">value</span> <span class="o">+</span> <span class="s1">&#39;.las&#39;</span>
+                                <span class="k">break</span>
+
+                    <span class="k">if</span> <span class="n">new_name</span> <span class="o">==</span> <span class="s1">&#39;&#39;</span><span class="p">:</span>
+                        <span class="n">new_name</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">basename</span><span class="p">(</span><span class="n">path</span><span class="p">)</span>
+
+                    <span class="n">new_name</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">folder_copy</span><span class="p">,</span> <span class="n">new_name</span><span class="p">)</span>
+                    <span class="n">log</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">new_name</span><span class="p">)</span>
+
+            <span class="k">except</span><span class="p">:</span>
+                <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">error_log</span><span class="p">,</span> <span class="s1">&#39;a&#39;</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
+                    <span class="n">f</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">las_path</span><span class="p">)</span>
+                    <span class="n">f</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="s1">&#39;</span><span class="se">\n</span><span class="s1">&#39;</span><span class="p">)</span>
+                <span class="k">continue</span>
+
+            <span class="n">data</span> <span class="o">=</span> <span class="p">{</span><span class="s1">&#39;PATH&#39;</span><span class="p">:</span> <span class="n">las_path</span><span class="p">}</span>
+
+            <span class="k">for</span> <span class="n">w</span> <span class="ow">in</span> <span class="n">log</span><span class="o">.</span><span class="n">well</span><span class="p">:</span>
+                <span class="n">data</span><span class="p">[</span><span class="n">w</span><span class="o">.</span><span class="n">mnemonic</span><span class="p">]</span> <span class="o">=</span> <span class="n">w</span><span class="o">.</span><span class="n">value</span>
+
+            <span class="k">for</span> <span class="n">c</span> <span class="ow">in</span> <span class="n">log</span><span class="o">.</span><span class="n">curves</span><span class="p">:</span>
+                <span class="n">data</span><span class="p">[</span><span class="n">c</span><span class="o">.</span><span class="n">mnemonic</span><span class="p">]</span> <span class="o">=</span> <span class="s1">&#39;Y&#39;</span>
+
+            <span class="n">log_data</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">data</span><span class="p">)</span>
+
+    <span class="n">df</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">(</span><span class="n">log_data</span><span class="p">)</span>
+    <span class="n">log_inventory_path</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">save_dir</span><span class="p">,</span> <span class="s1">&#39;log_inventory.csv&#39;</span><span class="p">)</span>
+    <span class="n">df</span><span class="o">.</span><span class="n">to_csv</span><span class="p">(</span><span class="n">log_inventory_path</span><span class="p">,</span> <span class="n">index</span> <span class="o">=</span> <span class="kc">False</span><span class="p">)</span>
+
+    <span class="k">return</span> <span class="n">df</span></div>
 </pre></div>
 
           </div>
@@ -223,6 +365,7 @@
 <li class="toctree-l1"><a class="reference internal" href="../../function/electrofacies.html">Electrofacies</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../function/dataset.html">Dataset</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../function/download.html">Downloads</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../auto_examples/index.html">Examples</a></li>
 </ul>
 
 

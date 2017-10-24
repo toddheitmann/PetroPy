@@ -15,6 +15,7 @@
     
     <link rel="stylesheet" href="../_static/alabaster.css" type="text/css" />
     <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+    <link rel="stylesheet" href="../_static/gallery.css" type="text/css" />
     
     <script type="text/javascript">
       var DOCUMENTATION_OPTIONS = {
@@ -33,6 +34,7 @@
     <link rel="shortcut icon" href="../_static/petropy_logo_icon.ico"/>
     <link rel="index" title="Index" href="../genindex.html" />
     <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="Examples" href="../auto_examples/index.html" />
     <link rel="prev" title="Dataset" href="dataset.html" />
    
   <link rel="stylesheet" href="../_static/custom.css" type="text/css" />
@@ -56,7 +58,9 @@
 <code class="descclassname">petropy.</code><code class="descname">ul_lands_download</code><span class="sig-paren">(</span><em>save_dir=None</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/petropy/download.html#ul_lands_download"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#petropy.ul_lands_download" title="Permalink to this definition">¶</a></dt>
 <dd><p>Downloads las files from University Lands Texas</p>
 <p>This function downloads files from the university lands ftp
-website located at publiftp.utlands.utsystem.edu.</p>
+website located at publiftp.utlands.utsystem.edu.  It inventories
+readable logs into a csv file containing header data in the
+save_dir. This inventory data is also returned as a DataFrame.</p>
 <p>The bulk of this script is provided courtesy of Jon Reynolds,
 with Glacier Geosciences at:</p>
 <p><a class="reference external" href="http://www.glaciergeosciences.com/">http://www.glaciergeosciences.com/</a></p>
@@ -67,9 +71,9 @@ with Glacier Geosciences at:</p>
 <tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>save_dir</strong> (<a class="reference external" href="https://docs.python.org/2/library/functions.html#str" title="(in Python v2.7)"><em>str</em></a><em> (</em><em>default None</em><em>)</em>) &#8211; path to directory to save data. defaults to data folder
 within petropy</td>
 </tr>
-<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body">True if successful</td>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body">DataFrame of header data for all logs downloaded and read.</td>
 </tr>
-<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><a class="reference external" href="https://docs.python.org/2/library/functions.html#bool" title="(in Python v2.7)">bool</a></td>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body">DataFrame</td>
 </tr>
 </tbody>
 </table>
@@ -79,9 +83,15 @@ within petropy</td>
 </pre></div>
 </div>
 <div class="highlight-default"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">import</span> <span class="nn">petropy</span> <span class="k">as</span> <span class="nn">ptr</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">p</span> <span class="o">=</span> <span class="s1">&#39;path/to/my/folder/&#39;</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">p</span> <span class="o">=</span> <span class="sa">r</span><span class="s1">&#39;path/to/my/folder/&#39;</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">ptr</span><span class="o">.</span><span class="n">ul_lands_download</span><span class="p">(</span><span class="n">p</span><span class="p">)</span>
 </pre></div>
+</div>
+<div class="admonition note">
+<p class="first admonition-title">Note</p>
+<p class="last">Function takes approximately twelve hours to scan ftp site,
+download, and inventory 30 GB of log data. YMMV depending on
+internet and processor speed.</p>
 </div>
 </dd></dl>
 
@@ -91,7 +101,10 @@ within petropy</td>
 <dd><p>Downloads las files from Kansas Geologic Society</p>
 <p>This function downloads files from the Kansas Geologic Society.
 These are zip files inside zip files, so the function parses out
-all las files and saves them in the folder data/kgs.</p>
+all las files and saves them in the folder input save_dir or with
+package data in the folder data/kgs. It inventories readable logs
+into a csv file containing header data in the save_dir. This
+inventory data is also returned as a DataFrame.</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
 <col class="field-body" />
@@ -99,9 +112,9 @@ all las files and saves them in the folder data/kgs.</p>
 <tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>save_dir</strong> (<a class="reference external" href="https://docs.python.org/2/library/functions.html#str" title="(in Python v2.7)"><em>str</em></a><em> (</em><em>default None</em><em>)</em>) &#8211; path to directory to save data. defaults to data folder within
 petropy</td>
 </tr>
-<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body">True if successful</td>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body">DataFrame of header data for all logs downloaded and read.</td>
 </tr>
-<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><a class="reference external" href="https://docs.python.org/2/library/functions.html#bool" title="(in Python v2.7)">bool</a></td>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body">DataFrame</td>
 </tr>
 </tbody>
 </table>
@@ -111,8 +124,46 @@ petropy</td>
 </pre></div>
 </div>
 <div class="highlight-default"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">import</span> <span class="nn">petropy</span> <span class="k">as</span> <span class="nn">ptr</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">p</span> <span class="o">=</span> <span class="s1">&#39;path/to/my/folder/&#39;</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">p</span> <span class="o">=</span> <span class="sa">r</span><span class="s1">&#39;path/to/my/folder/&#39;</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">ptr</span><span class="o">.</span><span class="n">kgs_download</span><span class="p">(</span><span class="n">p</span><span class="p">)</span>
+</pre></div>
+</div>
+<div class="admonition note">
+<p class="first admonition-title">Note</p>
+<p class="last">Function takes approximately one hour to download, unzip, and
+inventory 20GB of log data. YMMV depending on internet  and
+processor speed.</p>
+</div>
+</dd></dl>
+
+<dl class="function">
+<dt id="petropy.create_log_inventory_table">
+<code class="descclassname">petropy.</code><code class="descname">create_log_inventory_table</code><span class="sig-paren">(</span><em>save_dir</em>, <em>folder_copy=None</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/petropy/download.html#create_log_inventory_table"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#petropy.create_log_inventory_table" title="Permalink to this definition">¶</a></dt>
+<dd><p>Scans all folders and subfolders (recursive scan) for las files,
+and opens them as a <a class="reference internal" href="../class/Log.html#petropy.Log" title="petropy.Log"><code class="xref py py-class docutils literal"><span class="pre">petropy.Log</span></code></a> object. Extracts header
+data and curve names. Returns DataFrame of data after saving to a
+csv file in the save_dir folder.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>save_dir</strong> (<a class="reference external" href="https://docs.python.org/2/library/functions.html#str" title="(in Python v2.7)"><em>str</em></a>) &#8211; path to folder for recusive scan</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body">DataFrame of header data for all logs downloaded and read.</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body">DataFrame</td>
+</tr>
+</tbody>
+</table>
+<p class="rubric">Example</p>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">import</span> <span class="nn">petropy</span> <span class="k">as</span> <span class="nn">ptr</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">p</span> <span class="o">=</span> <span class="sa">r</span><span class="s1">&#39;path/to/folder/&#39;</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">df</span> <span class="o">=</span> <span class="n">ptr</span><span class="o">.</span><span class="n">create_log_inventory_table</span><span class="p">(</span><span class="n">p</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="c1"># filter logs with triple-combo for processing</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">tc_df</span> <span class="o">=</span> <span class="n">df</span><span class="p">[</span><span class="n">df</span><span class="o">.</span><span class="n">GR_N</span> <span class="o">==</span> <span class="s1">&#39;Y&#39;</span> <span class="o">&amp;</span> <span class="n">df</span><span class="o">.</span><span class="n">RESDEEP_N</span> <span class="o">==</span> <span class="s1">&#39;Y&#39;</span> <span class="o">&amp;</span>
+<span class="gp">... </span>           <span class="n">df</span><span class="o">.</span><span class="n">NPHI_N</span> <span class="o">==</span> <span class="s1">&#39;Y&#39;</span> <span class="o">&amp;</span> <span class="n">df</span><span class="o">.</span><span class="n">RHOB_N</span> <span class="o">==</span> <span class="s1">&#39;Y&#39;</span><span class="p">]</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="c1"># print count of useable logs</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="nb">print</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">tc_df</span><span class="p">))</span>
 </pre></div>
 </div>
 </dd></dl>
@@ -141,6 +192,7 @@ petropy</td>
 <li class="toctree-l1"><a class="reference internal" href="electrofacies.html">Electrofacies</a></li>
 <li class="toctree-l1"><a class="reference internal" href="dataset.html">Dataset</a></li>
 <li class="toctree-l1 current"><a class="current reference internal" href="#">Downloads</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../auto_examples/index.html">Examples</a></li>
 </ul>
 
 
