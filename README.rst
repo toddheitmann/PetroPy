@@ -42,7 +42,7 @@ Documentation
 
 View the `online documentation`_ for classes and methods.
 
-.. online documentation: https://toddheitmann.github.io/PetroPy/
+.. _online documentation: https://toddheitmann.github.io/PetroPy/
 
 Las File Processing
 -------------------
