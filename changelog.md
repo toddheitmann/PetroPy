@@ -5,6 +5,18 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](http://keepachangelog.com/en/1.0.0/)
 and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.html).
 
+## [0.1.5] - 2017-10-24
+
+### Added
+- Gradients for filled curves
+- Inventory las files from given folders
+- Wolfcamp examples
+- autodetect_encoding to LASFile requiring cchardet on install
+
+### Fixed
+- Downloading las data from KGS and University Lands
+- Electrofacies calculations
+
 ## [0.1.4] - 2017-10-04
 
 ### Fixed

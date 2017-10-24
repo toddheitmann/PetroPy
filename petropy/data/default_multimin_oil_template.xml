@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <graph>
   <track display_name="GAMMA RAY" width="1.5" major_lines="3">
-    <curve display_name="GR" curve_name="GR_N" color="#006400" left="0" right="150" fill="left" fill_color="#CCE0CC"/>
     <curve display_name="CAL" curve_name="CAL_N" color="#FF0000" left="0" right="16"/>
+    <curve display_name="GR" curve_name="GR_N" color="#006400" left="0" right="150" fill="left" fill_color_map="Greens" left_color_value="20"/>
   </track>
   <track display_name="DEPTH" number_spacing="50" tick_spacing="10" line_spacing="50" width="0.75">
   </track>

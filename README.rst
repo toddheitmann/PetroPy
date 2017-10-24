@@ -1,14 +1,14 @@
-.. image:: https://www.toddheitmann.com/images/petropy_logo.png
+.. image:: https://toddheitmann.github.io/PetroPy/_images/petropy_logo.png
 
 PetroPy
 =======
 
-A petrophysics with python package allowing scientific python computing
-of conventional and unconventional formation evaluation. Reads las files
-using `lasio <https://github.com/kinverarity1/lasio>`__. Includes a
-petrophysical workflow and a log viewer based on XML templates.
+A python petrophysics package allowing scientific python computing
+of conventional and unconventional formation evaluation. Reads las
+files using `lasio <https://github.com/kinverarity1/lasio>`__. Includes
+a petrophysical workflow and a log viewer based on XML templates.
 
-.. image:: https://www.toddheitmann.com/images/university_6-17_no1.png
+.. image:: https://toddheitmann.github.io/PetroPy/_images/university_6-18W_no1.png
 
 Requirements
 ------------
@@ -20,52 +20,21 @@ Requirements
 -  `matplotlib <http://matplotlib.org>`__
 -  `scikit-learn <http://scikit-learn.org/stable/>`__
 
-Currently Version 0.1.x
------------------------
-
-The basic workflow in the module is functional, but requires downloading source code and importing .py files.
-
-TO DO version 0.1.5
--------------------
-
-Features
-~~~~~~~~
-
--  [x] Read las files
--  [x] Calculate fluid properties
--  [x] Calculate multimineral, posority, saturation model
--  [x] Calculate and export statistics
--  [x] Curve edit manual redrawing
--  [x] Curve edit bulk shift data
--  [x] Electrofacies module
--  [x] Replace log object by subclassing `lasio <https://github.com/kinverarity1/lasio>`__ object
--  [x] Add to pypi package registry
-
-Examples
-~~~~~~~~
-
--  [x] Sphinx Documentation
--  [ ] Wolfcamp example from University Lands
--  [ ] Mississippi Limestone Example from KGS
--  [ ] Dataframe manipulation for different petrophysical crossplots
--  [ ] Template creation for log viewer
-
 Installation
 ------------
 
-Install PetroPy through pip via the command
+Install PetroPy through pip via the command line
 
 .. code-block:: bash
 
   pip install petropy
-
 
 To read in an las file, pass the file reference:
 
 .. code-block:: python
 
   import petropy as ptr
-  file_path = 'path/to/well.las'
+  file_path = r'path/to/well.las'
   log = ptr.Log(file_path)
 
 Petrophysical Model Default Example
@@ -73,6 +42,7 @@ Petrophysical Model Default Example
 
 .. code-block:: python
 
+  >>> # import petropy and print raw curves
   >>> import petropy as ptr
   >>> log = ptr.log_data('WFMP')
   >>> print(log.curves)
@@ -112,6 +82,7 @@ Petrophysical Model Default Example
 
 .. code-block:: python
 
+  >>> # read tops into Log object and print
   >>> log.tops_from_csv()
   >>> print(log.tops)
 
@@ -121,6 +92,7 @@ Petrophysical Model Default Example
 
 .. code-block:: python
 
+  >>> # load default parameters and print values
   >>> log.fluid_properties_parameters_from_csv()
   >>> print(log.fluid_properties_parameters.keys())
 
@@ -130,8 +102,11 @@ Petrophysical Model Default Example
 
 .. code-block:: python
 
+  >>> # specificy formation intervals
   >>> f = ['WFMPA', 'WFMPB', 'WFMPC']
+  >>> # calculate fluid properties for defined formations
   >>> log.formation_fluid_properties(f, parameter = 'WFMP')
+  >>> # print curves for description of calculated curves
   >>> print(log.curves)
 
 .. code-block:: bash
@@ -183,7 +158,9 @@ Petrophysical Model Default Example
 
 .. code-block:: python
 
+  >>> # load default multimineral parameters
   >>> log.multimineral_parameters_from_csv()
+  >>> # print available default formation parameters
   >>> print(log.multimineral_parameters.keys())
 
 .. code-block:: bash
@@ -192,7 +169,11 @@ Petrophysical Model Default Example
 
 .. code-block:: python
 
+  >>> # calculate mulitmineral model over defined formations
+  >>> # with parameter 'WFMP'
   >>> log.formation_multimineral_model(f, parameter = 'WFMP')
+  >>> log.write('processed_log.las')
+  >>> # print curves for description of calculated curves
   >>> print(log.curves)
 
 .. code-block:: bash

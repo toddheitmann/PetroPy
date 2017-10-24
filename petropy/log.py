@@ -38,7 +38,7 @@ class Log(LASFile):
     -------
     >>> import petropy as ptr
     # define path to las file
-    p = 'path/to/well.las'
+    >>> p = 'path/to/well.las'
     # loads specified las file
     >>> log = ptr.Log(p)
 
@@ -47,7 +47,8 @@ class Log(LASFile):
     def __init__(self, file_ref = None, drho_matrix = 2.71, **kwargs):
 
         if file_ref is not None:
-            LASFile.__init__(self, file_ref = file_ref, **kwargs)
+            LASFile.__init__(self, file_ref = file_ref,
+                             autodetect_encoding = True, **kwargs)
 
         self.precondition(drho_matrix = drho_matrix)
 
@@ -101,7 +102,11 @@ class Log(LASFile):
                     break
 
         if 'RHOB_N' not in self.keys() and 'DPHI_N' in self.keys():
-            calculated_rho= drho_matrix-(drho_matrix - 1)*self['DHI_N']
+            calculated_rho = np.empty(len(self[0]))
+            non_null_depth_index=np.where(~np.isnan(self['DPHI_N']))[0]
+            non_null_depths = self['DPHI_N'][non_null_depth_index]
+            calculated_rho[non_null_depth_index] = \
+                      drho_matrix - (drho_matrix - 1) * non_null_depths
 
             self.add_curve('RHOB_N', calculated_rho, unit = 'g/cc',
                        value = '',
@@ -164,8 +169,8 @@ class Log(LASFile):
         top_df = pd.read_csv(csv_path, dtype = {'uwi': str,'form': str,
                                                 'depth': float})
 
-        for r, row in top_df[top_df.uwi == self.well['UWI'].value].\
-        iterrows():
+        well_tops_df =top_df[top_df.uwi == str(self.well['UWI'].value)]
+        for r, row in well_tops_df.iterrows():
             self.tops[row.form] = row.depth
 
 

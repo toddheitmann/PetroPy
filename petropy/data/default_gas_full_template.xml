@@ -1,0 +1,44 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<graph>
+  <track display_name="GAMMA RAY" width="1.5" major_lines="3">
+    <curve display_name="CAL" curve_name="CAL_N" color="#FF0000" left="0" right="16"/>
+    <curve display_name="GR" curve_name="GR_N" color="#006400" left="0" right="150" fill="left" fill_color_map="Greens" left_color_value="20"/>
+  </track>
+  <track display_name="DEPTH" number_spacing="50" tick_spacing="10" line_spacing="100" width="0.75">
+  </track>
+  <track display_name="RESISTIVITY" scale="log" width="2">
+    <curve display_name="RESMED" curve_name="RESMED_N" color="#cc0000" left="2" right="2000"/>
+    <curve display_name="RESDEEP" curve_name="RESDEEP_N" color="#330000" left="2" right="2000" right_cutoff_fill="20" right_cutoff_fill_color="#ff9994"/>
+  </track>
+  <track display_name="NEUTRON DENSITY" width="2" major_lines="9">
+    <curve display_name="PE" curve_name="PE_N" color="#000000" left="0" right="10" right_cutoff_fill="3" right_cutoff_fill_color="#cde7f0" left_cutoff_fill="3" left_cutoff_fill_color="#ffff99"/>
+    <curve display_name="RHOB" curve_name="RHOB_N" color="#FF0000" left="1.95" right="2.95"/>
+    <curve display_name="NPHI" curve_name="NPHI_N" color="#0099CC" left="0.45" right="-0.15" line_style="--"/>
+  </track>
+  <track display_name="" width="1" major_lines="4">
+    <curve display_name="TOC" curve_name="TOC" color="#000000" left="0.1" right="0" fill="right" fill_color="#aa0000"/>
+  </track>
+  <track display_name="MINERALOGOY" width="2" left="0" right="1" major_lines="9" cumulative="True">
+    <curve display_name="VCLAY" curve_name="VCLAY" fill_color="#808080"/>
+    <curve display_name="VQTZ" curve_name="VQTZ" fill_color="#ffff8c"/>
+    <curve display_name="VDOL" curve_name="VDOL" fill_color="#ffc0cb"/>
+    <curve display_name="VCLC" curve_name="VCLC" fill_color="#0000ff"/>
+    <curve display_name="VPYR" curve_name="VPYR" fill_color="#ffa500"/>
+    <curve display_name="VOM" curve_name="VOM" fill_color="#000000"/>
+  </track>
+  <track display_name="POROSITY" width="1" major_lines="9" left="0.2" right="0" cumulative="True">
+    <curve display_name="BVWI" curve_name="BVWI" fill_color="#bfefff"/>
+    <curve display_name="BVWF" curve_name="BVWF" fill_color="#0000ff"/>
+    <curve display_name="BVH" curve_name="BVH" fill_color="#B20000"/>
+  </track>
+  <track display_name="SATURATION" width="1" major_lines="9">
+    <curve display_name="Sw" curve_name="SW" color="#0000ff" left="1" right="0" fill="right" fill_color="#bfefff"/>
+  </track>
+  <track display_name="GAS IN PLACE" width="1.5" major_lines="9">
+    <curve display_name="SUM GIP" curve_name="GIP_SUM" color="#000000" left="50" right="0" fill="right" fill_color="#B20000"/>
+    <curve display_name="GIP" curve_name="GIP" color="#7C0000" left="0" right="0.25" fill="left" fill_color="#B20000"/>
+  </track>
+  <track display_name="ELECTROFACIES" width="1.5" major_lines="1">
+    <curve display_name="" curve_name="FACIES" color="#000000" left="0" right="1" fill="left" fill_color_map="Paired" left_color_value="1" right_color_value="8"/>
+  </track>
+</graph>
