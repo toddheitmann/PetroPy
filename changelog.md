@@ -5,6 +5,11 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](http://keepachangelog.com/en/1.0.0/)
 and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.html).
 
+## [0.1.6] - 2018-02-15
+
+## Fixed
+- Issue with show method for LogViewer class using different back ends of matplotlib
+
 ## [0.1.5] - 2017-10-24
 
 ### Added
@@ -48,6 +53,6 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 - Electrofacies function for digital rock types
 - Dataset function to read packaged data
 - Download functions to download public data
-  - ul_lands_download() from Texas Unversity Lands
+  - ul_lands_download() from Texas University Lands
   - kgs_download() from Kansas Geologic Society
 - package added to PyPI registry

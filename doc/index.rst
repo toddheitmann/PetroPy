@@ -1,12 +1,21 @@
 
 .. image:: static/petropy_logo.png
 
+A python petrophysics package allowing scientific python computing of conventional and unconventional formation evaluation. Reads las files using `lasio <https://github.com/kinverarity1/lasio>`__. Includes a petrophysical workflow and a log viewer based on XML templates.
 
-A petrophysics with python package allowing scientific python computing of conventional and unconventional formation evaluation. Reads las files using lasio_. Includes a petrophysical workflow and a log viewer based on XML templates.
+.. image:: https://toddheitmann.github.io/PetroPy/_images/university_6-18W_no1.png
 
-.. _lasio: https://github.com/kinverarity1/lasio
+************
+Requirements
+************
 
-.. image:: static/university_6-18W_no1.png
+-  `cchardet <https://github.com/PyYoshi/uchardet`__
+-  `lasio <https://github.com/kinverarity1/lasio>`__
+-  `numpy <http://www.numpy.org>`__
+-  `scipy <https://www.scipy.org>`__
+-  `pandas <http://pandas.pydata.org>`__
+-  `matplotlib <http://matplotlib.org>`__
+-  `scikit-learn <http://scikit-learn.org/stable/>`__
 
 ************
 Installation
@@ -32,7 +41,7 @@ Las File Processing
 *******************
 
 To understanding using petropy in a petrophysical workflow for las file
-processings, see the `example page`_.
+processing, see the `example page`_.
 
 .. _example page: auto_examples/index.html
 

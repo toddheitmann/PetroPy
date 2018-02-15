@@ -8,6 +8,7 @@ bulk shifting.
 
 import os
 import numpy as np
+import matplotlib as mpl
 import matplotlib.pyplot as plt
 from matplotlib.text import Text
 from matplotlib.widgets import RadioButtons
@@ -816,16 +817,19 @@ class LogViewer(object):
 
         """
 
-        mngr = self.fig.canvas.manager
-        geom = mngr.window.geometry()
-        x, y, dx, dy = geom.getRect()
-        x = window_location[0]
-        y = window_location[1]
-        mngr.window.setGeometry(x, y, dx, dy)
+        if len(str(self.log.well['UWI'].value)) > 0:
+            log_window_title = 'UWI: ' + str(self.log.well['UWI'].value)
+        elif len(self.log.well['API'].value) > 0:
+            log_window_title = 'API: ' + str(self.log.well['API'].value)
+        else:
+            log_window_title = 'Log Viewer'
+        self.fig.canvas.set_window_title(log_window_title)
 
         if edit_mode:
 
+            mpl.rcParams['toolbar'] = 'None'
             self.edit_fig, self.edit_axes = plt.subplots(1)
+            mpl.rcParams['toolbar'] = 'toolmanager'
 
             rax = plt.axes([0, 0, 1, 1])
             self._radio_button = RadioButtons(rax, ('No Edit',
@@ -841,12 +845,8 @@ class LogViewer(object):
             self.fig.canvas.mpl_connect('motion_notify_event',
                                         self._draw_curve)
 
-            edit_x = x + dx + 17
-            edit_y = y
-            mngr = self.edit_fig.canvas.manager
-            geom = mngr.window.geometry()
-            x, y, dx, dy = geom.getRect()
-            mngr.window.setGeometry(edit_x, edit_y, 225, 225)
+            self.edit_fig.set_size_inches(2, 1)
+            self.edit_fig.canvas.set_window_title('Curve Edit Options')
 
         plt.show()
 

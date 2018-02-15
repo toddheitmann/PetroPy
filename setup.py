@@ -19,7 +19,7 @@ setup(
     author = 'Todd Heitmann',
     author_email = 'toddheitmann@protonmail.com',
     url = 'https://github.com/toddheitmann/petropy',
-    keywords = ['petrophysics', 'formation evaluation', 'reservoir characterization'],
+    keywords = ['petrophysics', 'formation evaluation', 'reservoir characterization', 'Oil and Gas'],
     classifiers=[
         "Intended Audience :: Customer Service",
         "Intended Audience :: Developers",
