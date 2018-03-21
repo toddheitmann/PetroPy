@@ -9,6 +9,7 @@ bulk shifting.
 import os
 import numpy as np
 import matplotlib as mpl
+mpl.rcParams['backend'] = 'TkAgg'
 import matplotlib.pyplot as plt
 from matplotlib.text import Text
 from matplotlib.widgets import RadioButtons
@@ -23,18 +24,18 @@ class LogViewer(object):
 
     Attributes
     ----------
-    log : Log
+    log : :class:`petropy.Log`
         The Log class with data updated from any edits performed
         within LogViewer
-    fig : Figure
+    fig : :class:`matplotlib.figure.Figure`
         The matplotlib Figure object
-    axes : ndarray
+    axes : :class:`numpy.ndarray`
         numpy ndarray of AxesSubplot objects where each axes is a
         curve track
 
     Parameters
     ----------
-    log : Log
+    log : :class:`petropy.Log`
         A `Log` object with curve data to display in the LogViewer
     template_xml_path : str (default None)
         Path to xml template.
@@ -61,57 +62,57 @@ class LogViewer(object):
 
     Examples
     --------
+    >>> # create LogViewer with default triple-combo template and show
+    >>> #
+    >>> # Load sample wolfcamp log
     >>> import petropy as ptr
-    # create LogViewer with default triple-combo template and display
-    #
-    # Load sample wolfcamp log
     >>> log = ptr.log_data('WFMP')
-    # create LogViewer with 'raw' template
+    >>> # create LogViewer with 'raw' template
     >>> viewer = ptr.LogViewer(log, template_defaults = 'raw')
     >>> viewer.show() # diplay log data
 
+    >>> # create LogViewer for 11 x 17 paper
+    >>> # with default triple-combo template and save
+    >>> #
+    >>> # Load sample wolfcamp log
     >>> import petropy as ptr
-    # create LogViewer for 11 x 17 paper
-    # with default triple-combo template and save
-    #
-    # Load sample wolfcamp log
     >>> log = ptr.log_data('WFMP')
-    # create LogViewer with 'raw' template (default)
+    >>> # create LogViewer with 'raw' template (default)
     >>> viewer = ptr.LogViewer(log)
-    # use fig attribute to change size to 17 x 11
+    >>> # use fig attribute to change size to 17 x 11
     >>> viewer.fig.set_size_inches(17, 11)
-    # file path for image file
+    >>> # file path for image file
     >>> s = 'path/to/save/wfmp_log.png'
-    # saves matplotlib figure
+    >>> # saves matplotlib figure
     >>> viewer.fig.savefig(s)
 
+    >>> # create LogViewer with custom template and save
+    >>> #
+    >>> # Load sample wolfcamp log
     >>> import petropy as ptr
-    # create LogViewer with custom template and save
-    #
-    # Load sample wolfcamp log
     >>> log = ptr.log_data('WFMP')
-    # specify path to template file
+    >>> # specify path to template file
     >>> t = 'path/to/my/custom/template.xml'
-    # create log view with template
+    >>> # create log view with template
     >>> viewer = ptr.LogViewer(log, template_xml_path = t)
-    # define path to save the log picture
+    >>> # define path to save the log picture
     >>> s = 'path/to/save/figure.png'
-    # save figure using matplotlib savefig method
+    >>> # save figure using matplotlib savefig method
     >>> viewer.fig.savefig(s)
 
+    >>> # create LogViewer with default triple-combo template,
+    >>> # make graphical edits, then save log changes
+    >>> #
+    >>> # Load sample wolfcamp log
     >>> import petropy as ptr
-    # create LogViewer with default triple-combo template,
-    # make graphical edits, then save log changes
-    #
-    # Load sample wolfcamp log
     >>> log = ptr.log_data('WFMP')
     >>> viewer = ptr.LogViewer(log)
-    # diplay log data and graphically edit
+    >>> # diplay log data and graphically edit
     >>> viewer.show(edit_mode = True)
-    # define path to save the updated log data
+    >>> # define path to save the updated log data
     >>> file_path = 'path/to/save/wfmp_edits.las'
-    # write updated log to new las file.
-    # Executed after figures are closed.
+    >>> # write updated log to new las file.
+    >>> # Executed after figures are closed.
     >>> viewer.log.write(file_path)
 
     Raises
@@ -149,6 +150,8 @@ class LogViewer(object):
 
     def __init__(self, log, template_xml_path = None,
                  template_defaults = None, top = None, height = None):
+
+        plt.rcParams['backend'] = 'TkAgg'
 
         self.log = log
 
@@ -799,8 +802,8 @@ class LogViewer(object):
             First value is pixels from the left of the screen.
             Second value is pixels from the top of the screen.
 
-        Example
-        -------
+        Examples
+        --------
         >>> import petropy as ptr
         >>> log = ptr.log_data('WFMP') # sample Wolfcamp log
         >>> viewer = ptr.LogViewer(log) # default triple-combo template
@@ -857,14 +860,14 @@ class LogViewer(object):
         on line 765 with 'pick_event'.
         """
         if self._edit_curve is not None:
-            self._edit_curve.set_bbox({'facecolor':'white',
+            self._edit_curve.set_bbox({'facecolor': 'white',
                                        'edgecolor': 'white',
                                        'alpha': 0})
 
         self._edit_curve = event.artist
 
         if self._radio_button.value_selected != 'No Edit':
-            self._edit_curve.set_bbox({'facecolor':'khaki',
+            self._edit_curve.set_bbox({'facecolor': 'khaki',
                                        'edgecolor': 'khaki',
                                        'alpha': 1})
 
@@ -878,17 +881,17 @@ class LogViewer(object):
         """
         if label == 'No Edit':
             if self._edit_curve is not None:
-                self._edit_curve.set_bbox({'facecolor':'white',
+                self._edit_curve.set_bbox({'facecolor': 'white',
                                            'edgecolor': 'white',
                                            'alpha': 0})
         elif label == 'Manual Edit':
             if self._edit_curve is not None:
-                self._edit_curve.set_bbox({'facecolor':'khaki',
+                self._edit_curve.set_bbox({'facecolor': 'khaki',
                                            'edgecolor': 'khaki',
                                            'alpha': 1})
         elif label == 'Bulk Shift':
             if self._edit_curve is not None:
-                self._edit_curve.set_bbox({'facecolor':'khaki',
+                self._edit_curve.set_bbox({'facecolor': 'khaki',
                                            'edgecolor': 'khaki',
                                            'alpha': 1})
 

@@ -104,7 +104,13 @@ html_theme = 'alabaster'
 # further.  For a list of options available for each theme, see the
 # documentation.
 #
-# html_theme_options = {}
+html_theme_options = {
+    'logo': 'petropy_logo.png',
+    'github_user': 'toddheitmann',
+    'github_repo': 'PetroPy',
+    'github_banner': 'true',
+    'github_button': 'false'
+}
 
 # Add any paths that contain custom static files (such as style sheets) here,
 # relative to this directory. They are copied after the builtin static files,
@@ -170,10 +176,11 @@ texinfo_documents = [
 ]
 
 # Example configuration for intersphinx: refer to the Python standard library.
-intersphinx_mapping = {'python':('https://docs.python.org/', None),
-                       'numpy': ('http://docs.scipy.org/doc/numpy/', None),
-                       'scipy': ('http://docs.scipy.org/doc/scipy/reference/', None),
-                       'matplotlib': ('http://matplotlib.sourceforge.net/', None)}
+intersphinx_mapping = {'python':('https://docs.python.org/3/', None),
+                       'numpy': ('https://docs.scipy.org/doc/numpy/', None),
+                       'pandas': ('https://pandas.pydata.org/pandas-docs/stable/', None),
+                       'scipy': ('https://docs.scipy.org/doc/scipy/reference/', None),
+                       'matplotlib': ('https://matplotlib.org/', None)}
 
 # Alabaster Sidebar #
 html_sidebars = {

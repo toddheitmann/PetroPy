@@ -37,9 +37,9 @@ class Log(LASFile):
     Example
     -------
     >>> import petropy as ptr
-    # define path to las file
+    >>> # define path to las file
     >>> p = 'path/to/well.las'
-    # loads specified las file
+    >>> # loads specified las file
     >>> log = ptr.Log(p)
 
     """
@@ -192,18 +192,18 @@ class Log(LASFile):
         Example
         --------
         >>> import petropy as ptr
-        # reads sample Wolfcamp Log from las file
+        >>> # reads sample Wolfcamp Log from las file
         >>> log = ptr.log_data('WFMP')
-        # get top of formation WFMPA
+        >>> # get top of formation WFMPA
         >>> wfmpa_top = log.tops['WFMPA']
         >>> print(wfmpa_top)
         6993.5
-        # got bottom of formation WFMPA
+        >>> # got bottom of formation WFMPA
         >>> wfmpa_bottom = log.next_formation_depth('WFMPB')
         >>> print(wfmpa_bottom)
         7294.0
-        # Compare depths for bottom of WFMPA
-        # to top of WFMPB
+        >>> # Compare depths for bottom of WFMPA
+        >>> # to top of WFMPB
         >>> wfmpb_top = log.tops['WFMPB']
         >>> print(wfmpb_top)
         7294.0
@@ -300,17 +300,17 @@ class Log(LASFile):
         Examples
         --------
         >>> import petropy as ptr
-        # reads sample Wolfcamp Log from las file
+        >>> # reads sample Wolfcamp Log from las file
         >>> log = ptr.log_data('WFMP')
-        # loads sample parameters provided
+        >>> # loads sample parameters provided
         >>> log.fluid_properties_parameters_from_csv()
 
         >>> import petropy as ptr
-        # reads sample Wolfcamp Log from las file
+        >>> # reads sample Wolfcamp Log from las file
         >>> log = ptr.log_data('WFMP')
-        # define path to csv file with parameters
+        >>> # define path to csv file with parameters
         >>> my_csv_paramters = 'path/to/csv/file.csv'
-        # loads specified parameters
+        >>> # loads specified parameters
         >>> log.fluid_properties_parameters_from_csv(my_csv_paramters)
 
         See Also
@@ -463,9 +463,9 @@ class Log(LASFile):
         -------
         >>> import petropy as ptr
         >>> from petropy import datasets
-        # reads sample Wolfcamp Log from las file
+        >>> # reads sample Wolfcamp Log from las file
         >>> log = ptr.log_data('WFMP')
-        # calculates fluid properties with default settings
+        >>> # calculates fluid properties with default settings
         >>> log.fluid_properties()
 
         See Also
@@ -836,13 +836,13 @@ class Log(LASFile):
         Example
         -------
         >>> import petropy as ptr
-        # reads sample Wolfcamp Log from las file
+        >>> # reads sample Wolfcamp Log from las file
         >>> log = ptr.log_data('WFMP')
-        # loads sample parameters provided
+        >>> # loads sample parameters provided
         >>> log.fluid_properties_parameters_from_csv()
-        # define formations to run
+        >>> # define formations to run
         >>> f = ['WFMPA', 'WFMPB', 'WFMPC']
-        # use WFMP parameters for formations from f
+        >>> # use WFMP parameters for formations from f
         >>> log.formation_fluid_properties(f, parameter = 'WFMP')
 
 
@@ -1025,17 +1025,17 @@ class Log(LASFile):
         Examples
         --------
         >>> import petropy as ptr
-        # reads sample Wolfcamp Log from las file
+        >>> # reads sample Wolfcamp Log from las file
         >>> log = ptr.log_data('WFMP')
-        # loads base parameters
+        >>> # loads base parameters
         >>> log.multimineral_parameters_from_csv()
 
         >>> import petropy as ptr
-        # reads sample Wolfcamp Log from las file
+        >>> # reads sample Wolfcamp Log from las file
         >>> log = ptr.log_data('WFMP')
-        # define path to csv file
+        >>> # define path to csv file
         >>> my_csv_paramters = 'path/to/csv/file.csv'
-        # loads specified parameters
+        >>> # loads specified parameters
         >>> log.multimineral_parameters_from_csv(my_csv_paramters)
 
         See Also
@@ -1531,11 +1531,11 @@ class Log(LASFile):
         -------
         >>> import petropy as ptr
         >>> from petropy import datasets
-        # reads sample Wolfcamp Log from las file
+        >>> # reads sample Wolfcamp Log from las file
         >>> log = ptr.log_data('WFMP')
-        # calculates fluid properties with default settings
+        >>> # calculates fluid properties with default settings
         >>> log.fluid_properties()
-        # calculates multimeral model with default settings
+        >>> # calculates multimeral model with default settings
         >>> log.multimineral_model()
 
         See Also
@@ -2292,14 +2292,14 @@ class Log(LASFile):
         Example
         -------
         >>> import petropy as ptr
-        # reads sample Wolfcamp Log from las file
+        >>> # reads sample Wolfcamp Log from las file
         >>> log = ptr.log_data('WFMP')
         >>> f = ['WFMPA', 'WFMPB', 'WFMPC']
-        # calculates fluid properties for formations
-        # WFMPA, WFMPB, and WFMPC with default settings
+        >>> # calculates fluid properties for formations
+        >>> # WFMPA, WFMPB, and WFMPC with default settings
         >>> log.formation_fluid_properties(f)
-        # calculates multimineral model for formations
-        # WFMPA, WFMPB, and WFMPC with default settings
+        >>> # calculates multimineral model for formations
+        >>> # WFMPA, WFMPB, and WFMPC with default settings
         >>> log.formation_multimineral_model(f)
 
         See Also
@@ -2349,18 +2349,18 @@ class Log(LASFile):
 
         Example
         -------
+        >>> # loads Wolfcamp and adds pay flag
+        >>> # based on resistivity
+        >>> #
+        >>> # reads sample Wolfcamp Log from las file
         >>> import petropy as ptr
-        # loads Wolfcamp and adds pay flag
-        # based on resistivity
-        #
-        # reads sample Wolfcamp Log from las file
         >>> log = ptr.log_data('WFMP')
-        # specify play flag if RESDEEP_N is
-        # greather than or equal to 20
+        >>> # specify play flag if RESDEEP_N is
+        >>> # greather than or equal to 20
         >>> gtoe = [('RESDEEP_N', 20)]
-        # define formations to calculate pay flag
+        >>> # define formations to calculate pay flag
         >>> f = ['WFMPA', 'WFMPB', 'WFMPC']
-        # add pay flag over formations
+        >>> # add pay flag over formations
         >>> log.add_pay_flag(f, greater_than_or_equal=gtoe,name ='RES')
 
         """
@@ -2413,18 +2413,18 @@ class Log(LASFile):
 
         Example
         -------
+        >>> # Sum Oil in Place for Wolfcamp A
+        >>> #
+        >>> # reads sample Wolfcamp Log from las file
         >>> import petropy as ptr
-        # Sum Oil in Place for Wolfcamp A
-        #
-        # reads sample Wolfcamp Log from las file
         >>> log = ptr.log_data('WFMP')
-        # define formations
+        >>> # define formations
         >>> f = ['WFMPA', 'WFMPB', 'WFMPC']
-        # calculate fluid properties for formations
+        >>> # calculate fluid properties for formations
         >>> log.formation_fluid_properties(formations = f)
-        # calculate minerals and saturations for formations
+        >>> # calculate minerals and saturations for formations
         >>> log.formation_multimineral_model(formation = f)
-        # run summations for Oil in Place over formations
+        >>> # run summations for Oil in Place over formations
         >>> log.summations(formations = f, curves = ['OIP'])
 
         See Also
@@ -2483,7 +2483,7 @@ class Log(LASFile):
 
         Returns
         -------
-        df : DataFrame
+        df : :class:`pandas.DataFrame`
             Returns Mean, Sum, and Standard Deviation for each curve
             over every formation
 
@@ -2603,7 +2603,7 @@ class Log(LASFile):
         ----------
         file_path : str
             path to csv file
-        replace : boolean (default False)
+        replace : bool (default False)
             option to replace uwi, formation statistics if already in
             csv file
         formations : list (default [])
@@ -2616,16 +2616,16 @@ class Log(LASFile):
         Example
         -------
         >>> import petropy as ptr
-        # reads sample Wolfcamp Log from las file
+        >>> # reads sample Wolfcamp Log from las file
         >>> log = ptr.log_data('WFMP')
-        # define formations to calculate
-        # define formations to calculate statistics
+        >>> # define formations to calculate
+        >>> # define formations to calculate statistics
         >>> f = ['WFMPA', 'WFMPB', 'WFMPC']
-        # define curves to calculate statistics
+        >>> # define curves to calculate statistics
         >>> c = ['GR_N', 'RHOB_N', NPHI_N']
-        # define path to csv
+        >>> # define path to csv
         >>> p = 'path/to/my/file.csv'
-        # calculate and save statistcs to csv
+        >>> # calculate and save statistcs to csv
         >>> log.statistics_to_csv(p, formations = f, curves = c)
 
 
@@ -2642,8 +2642,8 @@ class Log(LASFile):
                                  curves = curves)
 
         try:
-            prev_df = pd.read_csv(file_path)
-            prev_df['UWI'] = prev_df['UWI'].apply(str)
+            prev_df = pd.read_csv(file_path, dtypes = {'API': str,
+                                                       'UWI': str})
         except:
             prev_df = pd.DataFrame([])
 
@@ -2663,9 +2663,11 @@ class Log(LASFile):
 
     def to_csv(self, *args, **kwargs):
         """
-        Write the log DataFrame to a comma-separated values (csv) file.
+        Write the log :class:`pandas.DataFrame` to a comma-separated
+        values (csv) file.
 
-        Calls pandas.DataFrame.to_csv which includes these parameters.
+        Calls :meth:`pandas.DataFrame.to_csv` which includes these
+        parameters.
 
         Parameters
         ----------
@@ -2727,14 +2729,14 @@ class Log(LASFile):
 
         Example
         -------
+        >>> # Read las file, then write to csv for use in excel
+        >>> #
+        >>> # reads sample Wolfcamp Log from las file
         >>> import petropy as ptr
-        # Read las file, then write to csv for use in excel
-        #
-        # reads sample Wolfcamp Log from las file
         >>> log = ptr.log_data('WFMP')
-        # define path to save csv
+        >>> # define path to save csv
         >>> file_name = 'path/to/save/name_of_file.csv'
-        # save log to csv
+        >>> # save log to csv
         >>> log.to_csv(path_or_buf = file_name, index = False)
 
         """
@@ -2755,7 +2757,7 @@ class Log(LASFile):
             path to new las file.
         version : {1.2 or 2} (default 2)
             Version for las file
-        wrap : {True, Flase, None} (default False)
+        wrap : {True, False, None} (default False)
             Specify to wrap data. If None, uses setting from when
             file was read.
         STRT : float (default None)
@@ -2774,9 +2776,9 @@ class Log(LASFile):
         Example
         -------
         >>> import petropy as ptr
-        # reads sample Wolfcamp Log from las file
+        >>> # reads sample Wolfcamp Log from las file
         >>> log = ptr.log_data('WFMP')
-        # define file path to save log
+        >>> # define file path to save log
         >>> p = 'path/to/new_file.las'
         >>> log.write(p)
 

@@ -47,7 +47,7 @@ def ul_lands_download(save_dir = None):
 
     Returns
     -------
-    DataFrame
+    df : :class:`pandas.DataFrame`
         DataFrame of header data for all logs downloaded and read.
 
     Examples
@@ -150,7 +150,7 @@ def kgs_download(save_dir = None):
 
     Returns
     -------
-    DataFrame
+    df : :class:`pandas.DataFrame`
         DataFrame of header data for all logs downloaded and read.
 
     Examples
@@ -165,12 +165,13 @@ def kgs_download(save_dir = None):
     Note
     ----
     Function takes approximately one hour to download, unzip, and
-    inventory 20GB of log data. YMMV depending on internet  and
+    inventory 20GB of log data. YMMV depending on internet and
     processor speed.
 
     """
 
     urls = [
+        'http://www.kgs.ku.edu/PRS/Scans/Log_Summary/2017.zip',
         'http://www.kgs.ku.edu/PRS/Scans/Log_Summary/2016.zip',
         'http://www.kgs.ku.edu/PRS/Scans/Log_Summary/2015.zip',
         'http://www.kgs.ku.edu/PRS/Scans/Log_Summary/2014.zip',
@@ -220,7 +221,7 @@ def create_log_inventory_table(save_dir, folder_copy = None):
 
     Returns
     -------
-    DataFrame
+    df : :class:`pandas.DataFrame`
         DataFrame of header data for all logs downloaded and read.
 
     Example

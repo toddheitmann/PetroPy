@@ -18,10 +18,10 @@ def electrofacies(logs, formations, curves, n_clusters, log_scale = [],
 
     Parameters
     ----------
-    logs : list of :class:`ptr.Log` objects
+    logs : list of :class:`petropy.Log` objects
         List of Log objects
     formations: list of formation names
-        List of strings containg formation names which should be
+        List of str containing formation names which should be
         previously loaded into Log objects
     curves : list of curve names
         List of strings containing curve names as inputs in the
@@ -31,12 +31,12 @@ def electrofacies(logs, formations, curves, n_clusters, log_scale = [],
     log_scale : list of curve names
         List of string containing curve names which are preprocessed
         on a log scale. For example, deep resistivity separates better
-        on a log scale, and is graph logarithmically when viewing data
-        in a log viewer.
+        on a log scale, and is graphed logarithmically when viewing
+        data in a log viewer.
     n_components : int, float, None or string (default 0.85)
         Number of principal components to keep. If value is less than
-        one, the number of principal components be the number required
-        to exceed the explained variance.
+        one, the number of principal components will be the number
+        required to exceed the explained variance.
     curve_name : str (default 'FACIES')
         Name of the new electrofacies curve.
 
@@ -57,28 +57,29 @@ def electrofacies(logs, formations, curves, n_clusters, log_scale = [],
     >>> scale = ['RESDEEP_N']
     >>> logs = ptr.electrofacies(logs, f, c, 8, log_scale = scale)
 
+    >>> # loads logs from a list of paths and
+    >>> # calculates electrofacies across the wells
+    >>> #
+    >>> # define file_paths for las files to analyze
     >>> import petropy as ptr
-    # loads logs from a list of paths and
-    # calculates electrofacies across the wells
-    #
-    # defin file_paths for las files to analyze
     >>> file_paths = ['path/to/log1.las', 'path/to/log2.las',
     ... 'path/to/log3.las', 'path/to/log4.las']
-    # create list of Log objects
+    >>> # create list of Log objects
     >>> logs = [ptr.Log(x) for x in file_paths]
-    # define csv with tops for all wells
+    >>> # define csv with tops for all wells
     >>> tops_csv = 'path/to/tops.csv'
-    # add formation tops to wells
+    >>> # add formation tops to wells
     >>> for log in logs:
     ...     log.tops_from_csv(tops_csv)
-    # define list of formation tops. If single formation, f = ['FORM']
+    >>> # define list of formation tops.
+    >>> # If single formation, f = ['FORM']
     >>> f = ['FORM1', 'FORM2']
-    # list of curves to use for classification
+    >>> # list of curves to use for classification
     >>> c = ['GR_N', 'RESDEEP_N', 'RHOB_N', 'NPHI_N', 'PE_N']
     >>> scale = ['RESDEEP_N']
-    # run electrofacies across logs in list
+    >>> # run electrofacies across logs in list
     >>> logs = electrofacies(logs, f, c, 8, log_scale = scale)
-    # save las in renamed file
+    >>> # save las in renamed file
     >>> for i, log in enumerate(logs):
     ...     new_file_name = file_paths[i].split('.')[0]+'_with_HRA.las'
     ...     log.write(new_file_name)

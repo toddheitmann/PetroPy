@@ -43,6 +43,10 @@ The Third Iteration
 1. Exporting log statistics via :meth:`petropy.Log.statistics`
 2. Saving LogViewer to png and Log to las
 
+Downloading the script at the bottom of this webpage will not download the required las
+files or PetroPy logo. To download all files, view the `examples folder`_ on GitHub.
+
+.. _examples folder: https://github.com/toddheitmann/PetroPy/tree/master/examples
 
 
 

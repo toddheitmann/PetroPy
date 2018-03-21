@@ -30,7 +30,11 @@ The workflow progresses in these 11 steps
 
 To bulk process a folder of las files at once, use the `bulk example`_ .
 
+Downloading the script at the bottom of this webpage will not download the required las
+file or PetroPy logo. To download all files, view the `examples folder`_ on GitHub.
+
 .. _bulk example: wolfcamp_bulk.html
+.. _examples folder: https://github.com/toddheitmann/PetroPy/tree/master/examples
 
 
 

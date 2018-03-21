@@ -1,7 +1,7 @@
-cchardet
-lasio
-numpy
-scipy
-pandas
-matplotlib
-scikit-learn
+cchardet>=2.1.1
+lasio>=0.19
+numpy>=0.14.2
+scipy>=1.0.0
+pandas>=0.22.0
+matplotlib>=2.2.0
+scikit-learn>=0.19.1

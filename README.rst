@@ -13,7 +13,7 @@ a petrophysical workflow and a log viewer based on XML templates.
 Requirements
 ------------
 
--  `cchardet <https://github.com/PyYoshi/uchardet>`__
+-  `cchardet <https://github.com/PyYoshi/cChardet>`__
 -  `lasio <https://github.com/kinverarity1/lasio>`__
 -  `numpy <http://www.numpy.org>`__
 -  `scipy <https://www.scipy.org>`__

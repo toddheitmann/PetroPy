@@ -30,7 +30,7 @@ def log_data(source):
     Example
     -------
     >>> import petropy as ptr
-    # reads sample Wolfcamp Log from las file
+    >>> # reads sample Wolfcamp Log from las file
     >>> log = ptr.log_data('WFMP')
 
     """
