@@ -213,8 +213,8 @@ class Log(LASFile):
         """
 
         top = self.tops[formation]
+        bottom = self.df().index.max()
 
-        bottom = np.max(self[0])
         closest_formation = bottom - top
         for form in self.tops:
             form_depth = self.tops[form]

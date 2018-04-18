@@ -13,6 +13,7 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 
 ### Fixed
 - [Issue 1](https://github.com/toddheitmann/PetroPy/issues/1) calling newer methods from old versions of required packages. Versions added to requirements.txt.
+- Issue returning empty depth array when trying to find next_formation_depth
 
 ## [0.1.6] - 2018-02-15
 
