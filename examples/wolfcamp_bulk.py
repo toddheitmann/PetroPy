@@ -199,14 +199,16 @@ final_logs = ptr.electrofacies(processed_logs, f,
 
 
 ### Third Iteration ###
-
+pay_flags = ['PAY_FLAG_1', 'PAY_FLAG_2', 'PAY_FLAG_3']
+facies_curves = ['FACIES']
 for log in final_logs:
 
     ### 1. export statistics ###
 
     log.statistics_to_csv('wfmp_processed_las/wfmp_statistics.csv',
                           replace = True, formations = f,
-                          curves = stats_curves)
+                          curves = stats_curves, pay_flags = pay_flags,
+                          facies = facies_curves)
 
     ### 2. export data ###
 

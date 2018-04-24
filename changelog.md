@@ -10,6 +10,7 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 ### Added
 - Use TkAgg backend in matplotlib for consistent performance
 - Download 2017 logs in [kgs_download](https://toddheitmann.github.io/PetroPy/function/download.html#petropy.kgs_download) function
+- Facies and pay flag input for statistics export.
 
 ### Fixed
 - [Issue 1](https://github.com/toddheitmann/PetroPy/issues/1) calling newer methods from old versions of required packages. Versions added to requirements.txt.

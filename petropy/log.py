@@ -2371,8 +2371,6 @@ class Log(LASFile):
                 if 'PAY_FLAG' in curve:
                     c += 1
             name = 'PAY_FLAG_' + str(c)
-        else:
-            name = 'PAY_FLAG_' + name
 
         if name not in self.keys():
             nulls = np.empty(len(self[0]))
@@ -2468,9 +2466,11 @@ class Log(LASFile):
                                             series[::-1].cumsum()[::-1]
 
 
-    def statistics(self, formations, curves = ['PHIE']):
+    def statistics(self, formations, curves = ['PHIE'], pay_flags = [],
+                   facies = []):
         """
-        Curve statistcs for given formations and curves
+        Statistics for curves and facies over every formation with
+        for every pay flag in each formation.
 
         Parameters
         ----------
@@ -2478,8 +2478,15 @@ class Log(LASFile):
             list of formations to calculate statistics over. Must be
             included in preloaded tops
         curves : list (default ['PHIE'])
-            list of curve to calculate statistics for. Must be
-            included in Log object.
+            list of curve to calculate statistics. Must be
+            included in Log object. Calculates mean, sum, and standard
+            deviation for each curve in list.
+        pay_flags : list (default [])
+            list of curves that indicate pay zone. Pay flag must be an
+            integer or float greater than 0.
+        facies : list (default [])
+            list of facies curves. For every different facie in each
+            facie curve, calculates a summation and fraction.
 
         Returns
         -------
@@ -2529,11 +2536,6 @@ class Log(LASFile):
                                 np.diff(self[0])
                                 ))
 
-        pay_flags = []
-        for curve in self.keys():
-            if 'PAY_FLAG' in curve:
-                pay_flags.append(curve)
-
         stats_data = {}
         for f in formations:
 
@@ -2542,15 +2544,17 @@ class Log(LASFile):
             formation_data = {'DATETIME': dt.datetime.now(),
                               'GROSS_H': bottom - top}
 
-            depth_index = np.intersect1d(np.where(self[0] >= top)[0],
-                                         np.where(self[0] < bottom)[0])
+            depth_index = (self[0] >= top) & (self[0] < bottom)
 
             for curve in curves:
                 if curve not in self.keys():
                     raise ValueError('Curve %s not in log curves.' \
                                      % curve)
 
-                series = self[curve][depth_index]
+                curve_rows = depth_index & ~np.isnan(self[curve]) & \
+                                            np.isfinite(self[curve])
+
+                series = self[curve][curve_rows]
                 formation_data[curve + '_MEAN'] = series.mean()
                 formation_data[curve + '_STD'] = series.std()
 
@@ -2559,13 +2563,12 @@ class Log(LASFile):
                 else:
                     ### multiply by step rate for summations ###
                     series_sum = \
-                              (series * sample_rate[depth_index]).sum()
+                              (series * sample_rate[curve_rows]).sum()
 
                 formation_data[curve + '_SUM'] = series_sum
 
                 for p in pay_flags:
-                    pay_depth_index = np.intersect1d(depth_index,
-                                              np.where(self[p] > 0)[0])
+                    pay_depth_index = curve_rows & (self[p] > 0)
 
                     pay_series = self[curve][pay_depth_index]
 
@@ -2584,6 +2587,21 @@ class Log(LASFile):
 
                     formation_data[curve + '_' + p + '_SUM'] = \
                                                          pay_series_sum
+            for facie in facies:
+                if facie not in self.keys():
+                    raise ValueError('Curve %s not in log curves.' \
+                                     % facie)
+                facie_rows = depth_index & ~np.isnan(self[curve]) & \
+                                            np.isfinite(self[curve])
+                series = self[facie][facie_rows]
+                for label in np.unique(series):
+                    name = facie + '_' + str(label)
+                    formation_data[name + '_SUM'] = \
+                    np.sum(sample_rate[facie_rows] * (series == label))
+                    formation_data[name + '_FRACTION'] = \
+                                     formation_data[name + '_SUM'] /  \
+                                     np.sum(sample_rate[depth_index])
+
 
             stats_data[f] = formation_data
 
@@ -2595,7 +2613,8 @@ class Log(LASFile):
         return df
 
     def statistics_to_csv(self, file_path, replace = False,
-                          formations = [], curves = ['PHIE']):
+                          formations = [], curves = ['PHIE'],
+                          pay_flags = [], facies = []):
         """
         Saves curve statistcs for given formations and curves to a csv
 
@@ -2611,6 +2630,12 @@ class Log(LASFile):
             included in preloaded tops
         curves : list (default ['PHIE'])
             list of curve to calculate statistics.
+        pay_flags : list (default [])
+            list of curves that indicate pay zone. Pay flag must be an
+            integer or float greater than 0.
+        facies : list (default [])
+            list of curves describing facies. Data type of curve can be
+            str or float.
 
 
         Example
@@ -2639,7 +2664,9 @@ class Log(LASFile):
         """
 
         new_df = self.statistics(formations = formations,
-                                 curves = curves)
+                                 curves = curves,
+                                 pay_flags = pay_flags,
+                                 facies = facies)
 
         try:
             prev_df = pd.read_csv(file_path, dtypes = {'API': str,
