@@ -131,6 +131,7 @@ def ul_lands_download(save_dir = None):
 
     return df
 
+
 def kgs_download(save_dir = None):
     """
     Downloads las files from Kansas Geologic Society
@@ -171,6 +172,7 @@ def kgs_download(save_dir = None):
     """
 
     urls = [
+        'http://www.kgs.ku.edu/PRS/Scans/Log_Summary/2018.zip',
         'http://www.kgs.ku.edu/PRS/Scans/Log_Summary/2017.zip',
         'http://www.kgs.ku.edu/PRS/Scans/Log_Summary/2016.zip',
         'http://www.kgs.ku.edu/PRS/Scans/Log_Summary/2015.zip',

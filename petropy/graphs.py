@@ -6,14 +6,19 @@ bulk shifting.
 
 """
 
+
 import os
+import gc
 import numpy as np
 import matplotlib as mpl
-mpl.rcParams['backend'] = 'TkAgg'
 import matplotlib.pyplot as plt
-from matplotlib.text import Text
-from matplotlib.widgets import RadioButtons
 import xml.etree.ElementTree as ET
+from matplotlib.backend_tools import ToolBase, ToolToggleBase
+
+
+mpl.rcParams['backend'] = 'TkAgg'
+plt.rcParams['toolbar'] = 'toolmanager'
+
 
 class LogViewer(object):
     """LogViewer
@@ -148,11 +153,9 @@ class LogViewer(object):
 
     """
 
+
     def __init__(self, log, template_xml_path = None,
                  template_defaults = None, top = None, height = None):
-
-        plt.rcParams['backend'] = 'TkAgg'
-
         self.log = log
 
         self.template_xml_path = template_xml_path
@@ -170,9 +173,6 @@ class LogViewer(object):
 
         # stores bool to show downclick to edit curve
         self._edit_lock = False
-
-        # radio button for editing modes
-        self._radio_button = None
 
         # display name to log column name dictionary
         self._display_name_to_curve_name = {}
@@ -233,7 +233,8 @@ class LogViewer(object):
         num_tracks = len(tracks)
 
         self.fig, self.axes = plt.subplots(1, num_tracks + 2,
-                                           sharey = True)
+                            sharey = True,
+                            subplot_kw={'projection': 'PetroPyAxes'})
 
         ### add formation background color ###
         for formation in formations:
@@ -271,7 +272,6 @@ class LogViewer(object):
         numbers = None
         ticks = None
         track_widths = [0.5]
-        track_height = 0.78
 
         depth_track_numbers = []
         track_names = []
@@ -359,8 +359,6 @@ class LogViewer(object):
                     left, right = right, left
                     invert_axis = True
 
-                curve_sums = []
-                colors = []
                 summation = np.asarray(self.log[0] * 0)
                 for c, curve in enumerate(track):
                     ### names ###
@@ -474,7 +472,6 @@ class LogViewer(object):
                     if 'marker_size' in curve.attrib:
                         marker_size =float(curve.attrib['marker_size'])
 
-
                     if scale == 'log':
                         ax.set_xlim(left, right)
                         x = self.log[curve_name]
@@ -570,7 +567,7 @@ class LogViewer(object):
                             cmap = plt.get_cmap(cmap_name)
 
                             if len(np.unique(x)) < 50:
-                                colored_index = np.unique(x)
+                                color_index = np.unique(x)
                             else:
                                 color_index=np.arange(left_color_value,\
                                                      right_color_value,\
@@ -753,7 +750,7 @@ class LogViewer(object):
         track_locations = [0]
         for t in range(1, len(track_widths)):
             track_locations.append(track_locations[t - 1] + \
-                                                   track_widths[t - 1])
+                                                    track_widths[t - 1])
 
         for a, ax in enumerate(self.axes):
             post = ax.get_position()
@@ -775,8 +772,7 @@ class LogViewer(object):
             if a > 0 and a < len(self.axes) - 1:
                 track_title = track_names[a - 1]
                 if track_title is not None:
-                    for i in range(max_track_curves):
-                        track_title += '\n'
+                    track_title += '\n' * max_track_curves
                     ax.set_title(track_title, fontweight = 'bold')
 
         if top is not None and bottom is not None:
@@ -785,22 +781,14 @@ class LogViewer(object):
         plt.gca().invert_yaxis()
         self.fig.set_size_inches(11, 8.5)
 
-    def show(self, edit_mode = False, window_location = (10, 30)):
+
+    def show(self):
         """
-        Calls matplotlib.pyplot.show() to display log viewer. If
-        edit_mode == True, it includes options to graphically edit
+        Calls matplotlib.pyplot.show() to display log viewer. It
+        includes options in the toolbar to graphically edit
         curve data, and stores these changes within the LogViewer
         object. After editing is finished, access the updated
         :class:`petropy.Log` data with the .log property.
-
-        Parameters
-        -----------
-        edit_mode : bool (default False)
-            Setting to allow editing of curve data
-        window_location : float, float tuple (default 10, 30)
-            Tuple of floats to specify top left location of LogViewer
-            First value is pixels from the left of the screen.
-            Second value is pixels from the top of the screen.
 
         Examples
         --------
@@ -812,10 +800,10 @@ class LogViewer(object):
         >>> import petropy as ptr
         >>> log = ptr.log_data('WFMP') # sample Wolfcamp log
         >>> viewer = ptr.LogViewer(log)
-        # display graphs with editing option
-        >>> viewer.show(edit_mode = True)
+        >>> # display graphs with editing option
+        >>> viewer.show()
         >>> file_path = 'path/to/new_file.las'
-        # writes changed data to new las file
+        >>> # writes changed log data to new las file
         >>> viewer.log.write(file_path)
 
         """
@@ -827,82 +815,62 @@ class LogViewer(object):
         else:
             log_window_title = 'Log Viewer'
         self.fig.canvas.set_window_title(log_window_title)
+        # add edit tools
+        tm = self.fig.canvas.manager.toolmanager
+        tm.add_tool('Curve Edit', _CurveEditToggle)
+        t = tm.get_tool('Curve Edit')
+        self.fig.canvas.manager.toolbar.add_tool(t, 'PetroPy')
 
-        if edit_mode:
+        tm = self.fig.canvas.manager.toolmanager
+        tm.add_tool('Bulk Shift', _BulkShiftToggle)
+        t = tm.get_tool('Bulk Shift')
+        self.fig.canvas.manager.toolbar.add_tool(t, 'PetroPy')
 
-            mpl.rcParams['toolbar'] = 'None'
-            self.edit_fig, self.edit_axes = plt.subplots(1)
-            mpl.rcParams['toolbar'] = 'toolmanager'
+        # remove non-useful tools
+        self.fig.canvas.manager.toolmanager.remove_tool('forward')
+        self.fig.canvas.manager.toolmanager.remove_tool('back')
+        self.fig.canvas.manager.toolmanager.remove_tool('help')
 
-            rax = plt.axes([0, 0, 1, 1])
-            self._radio_button = RadioButtons(rax, ('No Edit',
-                                          'Manual Edit', 'Bulk Shift'))
-            self._radio_button.on_clicked(self._radio_click)
-
-            self.fig.canvas.mpl_connect('pick_event',
-                                        self._curve_pick)
-            self.fig.canvas.mpl_connect('button_press_event',
-                                        self._edit_lock_toggle)
-            self.fig.canvas.mpl_connect('button_release_event',
-                                        self._edit_lock_toggle)
-            self.fig.canvas.mpl_connect('motion_notify_event',
-                                        self._draw_curve)
-
-            self.edit_fig.set_size_inches(2, 1)
-            self.edit_fig.canvas.set_window_title('Curve Edit Options')
-
+        self.fig.canvas.mpl_connect('pick_event', self._curve_pick)
+        self.fig.canvas.mpl_connect('button_press_event',
+                                    self._edit_lock_toggle)
+        self.fig.canvas.mpl_connect('button_release_event',
+                                    self._edit_lock_toggle)
+        self.fig.canvas.mpl_connect('motion_notify_event',
+                                    self._draw_curve)
         plt.show()
+
 
     def _curve_pick(self, event):
         """
         Event handler for selecting a curve to edit. Results in
         self._edit_curve being set to matplotlib text object. Connected
-        on line 765 with 'pick_event'.
+        on line 852 with 'pick_event'.
         """
+ 
         if self._edit_curve is not None:
             self._edit_curve.set_bbox({'facecolor': 'white',
                                        'edgecolor': 'white',
                                        'alpha': 0})
 
         self._edit_curve = event.artist
+        draw= self.fig.canvas.manager.toolmanager.get_tool('Curve Edit')
+        bulk= self.fig.canvas.manager.toolmanager.get_tool('Bulk Shift')
 
-        if self._radio_button.value_selected != 'No Edit':
+        if draw.toggled or bulk.toggled:
             self._edit_curve.set_bbox({'facecolor': 'khaki',
                                        'edgecolor': 'khaki',
                                        'alpha': 1})
 
         self.fig.canvas.draw()
 
-    def _radio_click(self, label):
-        """
-        Event handler for selecting which editing type to use.
-        Connected on line 763 with on_click method for RadioButtons
-        object.
-        """
-        if label == 'No Edit':
-            if self._edit_curve is not None:
-                self._edit_curve.set_bbox({'facecolor': 'white',
-                                           'edgecolor': 'white',
-                                           'alpha': 0})
-        elif label == 'Manual Edit':
-            if self._edit_curve is not None:
-                self._edit_curve.set_bbox({'facecolor': 'khaki',
-                                           'edgecolor': 'khaki',
-                                           'alpha': 1})
-        elif label == 'Bulk Shift':
-            if self._edit_curve is not None:
-                self._edit_curve.set_bbox({'facecolor': 'khaki',
-                                           'edgecolor': 'khaki',
-                                           'alpha': 1})
-
-        self.fig.canvas.draw()
 
     def _edit_lock_toggle(self, event):
         """
         Event handler to check for correct axis associated with
         selected curve. Will allow _draw_curve to function if click is
         in proper axis based on the self._edit_curve property set with
-        _curve_pick. Connected on lines 767 and 769 to
+        _curve_pick. Connected on lines 853 and 855 to
         :code:`button_press_event` and :code:`button_release_event`.
         """
 
@@ -911,25 +879,27 @@ class LogViewer(object):
                 ax_num = np.where(self.axes == event.inaxes)[0]
                 if len(ax_num) > 0:
                     curve_num = \
-                        self.axes.tolist().index(self._edit_curve.axes)
+                         np.where(self.axes == self._edit_curve.axes)[0]
                     if ax_num == curve_num:
                         self._edit_lock = not self._edit_lock
+
 
     def _draw_curve(self, event):
         """
         Event handler for changing data in the figure and in the log
-        object. Connected on line 771 with :code:`motion_notify_event`.
+        object. Connected on line 857 with :code:`motion_notify_event`.
         """
 
-        if self._radio_button.value_selected == 'Manual Edit' and \
-        self._edit_lock:
+        draw= self.fig.canvas.manager.toolmanager.get_tool('Curve Edit')
+        bulk= self.fig.canvas.manager.toolmanager.get_tool('Bulk Shift')
+
+        if draw.toggled and self._edit_lock:
             x, y = event.xdata, event.ydata
 
             curve_name = \
-          self._display_name_to_curve_name[self._edit_curve.get_text()]
+           self._display_name_to_curve_name[self._edit_curve.get_text()]
 
             cursor_depth_index = np.argmin(np.abs(self.log[0] - y))
-            depth = self.log[0][cursor_depth_index]
             line, m, b = self._edit_curve_lines[curve_name]
 
             x_data = line.get_xdata()
@@ -943,16 +913,13 @@ class LogViewer(object):
 
             self.fig.canvas.draw()
 
-        elif self._radio_button.value_selected == 'Bulk Shift' and \
-        self._edit_lock:
-
+        elif bulk.toggled and self._edit_lock:
             x, y = event.xdata, event.ydata
 
             curve_name = \
-          self._display_name_to_curve_name[self._edit_curve.get_text()]
+           self._display_name_to_curve_name[self._edit_curve.get_text()]
 
             cursor_depth_index = np.argmin(np.abs(self.log[0] - y))
-            depth = self.log[0][cursor_depth_index]
 
             line, m, b = self._edit_curve_lines[curve_name]
 
@@ -964,6 +931,96 @@ class LogViewer(object):
             if m is not None and b is not None:
                 x_data = (x_data - b) / m
 
-            self.log[curve_name] = x_data
+            self.log[curve_name][:] = x_data
 
             self.fig.canvas.draw()
+
+
+class _CurveEditToggle(ToolToggleBase):
+    """
+    Curve edit toggle for toolbar. Allows redrawing curves graphically
+    in matplotlib.
+    """
+
+    description = 'Curve Draw Edit'
+    radio_group = 'PetroPy'
+
+    file_dir = os.path.dirname(__file__)
+    image = os.path.join(file_dir, 'data', 'images', 'draw.png')
+
+    def enable(self, event):
+        """
+        Color previously selected curve to khaki when editing
+        """
+        for obj in gc.get_objects():
+            if isinstance(obj, LogViewer):
+                if obj._edit_curve is not None:
+                    obj._edit_curve.set_bbox({'facecolor': 'khaki',
+                                              'edgecolor': 'khaki',
+                                              'alpha': 1})
+                    obj.fig.canvas.draw()
+
+    def disable(self, event):
+        """
+        Color previously selected curve to white when not editing
+        """
+        for obj in gc.get_objects():
+            if isinstance(obj, LogViewer):
+                if obj._edit_curve is not None:
+                    obj._edit_curve.set_bbox({'facecolor': 'white',
+                                              'edgecolor': 'white',
+                                              'alpha': 0})
+                    obj.fig.canvas.draw()
+
+
+class _BulkShiftToggle(ToolToggleBase):
+    """
+    Bulk shift toggle for toolbar. Allows bulk shifting curves
+    graphically in matplotlib.
+    """
+
+    description = 'Bulk Shift Edit'
+    radio_group = 'PetroPy'
+
+    file_dir = os.path.dirname(__file__)
+    image = os.path.join(file_dir, 'data', 'images', 'bulk.png')
+
+    def enable(self, event):
+        """
+        Color previously selected curve to khaki when editing
+        """
+        for obj in gc.get_objects():
+            if isinstance(obj, LogViewer):
+                if obj._edit_curve is not None:
+                    obj._edit_curve.set_bbox({'facecolor': 'khaki',
+                                              'edgecolor': 'khaki',
+                                              'alpha': 1})
+                    obj.fig.canvas.draw()
+
+    def disable(self, event):
+        """
+        Color previously selected curve to white when not editing
+        """
+        for obj in gc.get_objects():
+            if isinstance(obj, LogViewer):
+                if obj._edit_curve is not None:
+                    obj._edit_curve.set_bbox({'facecolor': 'white',
+                                              'edgecolor': 'white',
+                                              'alpha': 0})
+                    obj.fig.canvas.draw()
+
+
+class _PetroPyAxes(mpl.axes.Axes):
+    """
+    Petropy axes to disallow scrolling on x-axis. Only allows
+    scrolling along depth (y-axis).
+    """
+
+    name = "PetroPyAxes"
+
+    def drag_pan(self, button, key, x, y):
+        # pretend key=='y'
+        mpl.axes.Axes.drag_pan(self, button, 'y', x, y)
+
+
+mpl.projections.register_projection(_PetroPyAxes)
