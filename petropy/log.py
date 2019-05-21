@@ -170,7 +170,7 @@ class Log(LASFile):
                                                 'depth': float})
 
         well_tops_df =top_df[top_df.uwi == str(self.well['UWI'].value)]
-        for r, row in well_tops_df.iterrows():
+        for _, row in well_tops_df.iterrows():
             self.tops[row.form] = row.depth
 
 
@@ -582,7 +582,7 @@ class Log(LASFile):
                 tpc = (tpc - 227.2 * yn2 - 1165.0 * yh20) / \
                       (1.0 - yn2 - yh20) + tpc_cor
 
-                ppc = (ppc - 493.1 * yn2 - 3200.0 * yH20) / \
+                ppc = (ppc - 493.1 * yn2 - 3200.0 * yh20) / \
                       (1.0 - yn2 - yh20) + ppc_cor
 
             # Reduced pseudocritical properties
@@ -1545,8 +1545,17 @@ class Log(LASFile):
 
         """
 
-        ### check for requirements ###
+        ### initialize required curves ###
         required_raw_curves = ['GR_N', 'NPHI_N', 'RHOB_N', 'RESDEEP_N']
+
+        ### check if PE is availble ###
+        if 'PE_N' in self.keys():
+            use_pe = True
+            required_raw_curves += ['PE_N']
+        else:
+            use_pe = False
+
+        ### check for requirements ###
         for curve in required_raw_curves:
             if curve not in self.keys():
                 raise ValueError('Raw curve %s not found and is \
@@ -1574,22 +1583,6 @@ class Log(LASFile):
             hc_class = 'OIL'
         else:
             hc_class = 'GAS'
-
-        if 'PE_N' in self.keys():
-            use_pe = True
-        else:
-            use_pe = False
-
-        ### get depths ###
-        if top is None:
-            top_index = 0
-        else:
-            top_index = np.where(self[0] == top)[0][0]
-
-        if bottom is None:
-            bottom_index = len(self[0]) - 1
-        else:
-            bottom_index = np.where(self[0] == bottom)[0][0]
 
         ### initialize minerals ###
         if include_qtz.upper()[0] == 'Y':
@@ -2669,13 +2662,13 @@ class Log(LASFile):
                                  facies = facies)
 
         try:
-            prev_df = pd.read_csv(file_path, dtypes = {'API': str,
+            prev_df = pd.read_csv(file_path, dtype = {'API': str,
                                                        'UWI': str})
         except:
             prev_df = pd.DataFrame([])
 
         if replace and len(prev_df) > 0:
-            for i, row in new_df.iterrows():
+            for _, row in new_df.iterrows():
                 drop_indexes = prev_df[(prev_df.UWI == row.UWI) & \
                             (prev_df.FORMATION == row.FORMATION)].index
 

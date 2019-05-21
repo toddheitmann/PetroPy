@@ -17,6 +17,7 @@ and this project generally adheres to [Semantic Versioning](http://semver.org/sp
 
 - [Issue 1](https://github.com/toddheitmann/PetroPy/issues/1) calling newer methods from old versions of required packages. Versions added to requirements.txt.
 - Issue returning empty depth array when trying to find next_formation_depth
+- Issue not removing rows from calculations when only PE is null causing a crash
 
 ## [0.1.6] - 2018-02-15
 
